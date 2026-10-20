@@ -144,6 +144,7 @@
     const S = ariaState(), acc = ariaAcc(), rank = ariaRank(acc), full = ARIA.cnt[3] === 0;
     const isBest = acc > S.best[ARIA.diff];
     if (isBest) S.best[ARIA.diff] = acc;
+    if (rank !== 'C') recAdd('aria');
     const lines = [];
     if (rank !== 'C' && S.day !== dayKey()) {
       S.day = dayKey(); S.buff = true;

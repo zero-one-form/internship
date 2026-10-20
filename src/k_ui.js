@@ -269,12 +269,14 @@
   function renderQuestLog() {
     const box = $('questLog'), q = qState(), M = MAINQ[q.main];
     box.textContent = '';
+    dailyCards(box);
     if (M) box.append(qCard('メイン依頼：' + M.title, q.ma ? goalText(M.goal) + '（' + (mainDone() ? '達成！' : mainProgText()) + '）' : 'ミーナに話しかけると受けられる', '報酬：' + rewardText(M.rew)));
     else box.append(qCard('メイン依頼', 'すべて完了', 'ミーナの掲示板で依頼を受けられる'));
     for (const b of q.act) box.append(qCard('掲示板の依頼', bountyText(b) + '（' + (bountyDone(b) ? '達成！' : bountyProg(b)) + '）', '報酬：' + rewardText(b.rew)));
     if (!q.act.length) box.append(elP('ith', '掲示板の依頼は受けていない。始まりの森のミーナから受けられる'));
     box.append(elP('ith', '報告は始まりの森のミーナへ。設定の「帰還」ですぐ町へ戻れる'));
     box.append(recordsCard());
+    achCards(box);
   }
   function renderOpt() {
     const box = $('optList');

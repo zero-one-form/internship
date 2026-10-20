@@ -120,6 +120,7 @@
   let stgBoost = 1;
   function bossBreak(e) {
     e.stg = 0; e.brkT = 4; e.stunT = Math.max(e.stunT || 0, 4);
+    recAdd('breaks');
     e.charge = null;
     addText(e.x, e.y, 'BREAK!', 'multi', bodyH(e) + 40);
     addVfx({ k: 'ring', x: e.x, y: e.y, R: 3.2, c: '255,220,120', w: 10, life: 0.6 });

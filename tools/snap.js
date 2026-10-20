@@ -43,6 +43,8 @@ async function browserPath() {
     ['aria_play', (G) => { G.ARIA.fake = 29.6; G.ARIA.diff = 1; G.ariaStart(); G.ARIA.fake = 29.6; for (const n of G.ARIA.notes) if (n.t < 29.5) n.hit = 0; G.ARIA.combo = 42; G.ariaHit(0); }],
     ['aria_result', (G) => { G.ARIA.fake = 99; G.ariaTick(); }],
     ['sheet_gear', (G) => { G.ariaClose(); G.ARIA.fake = null; G.enterMap(0, 0); for (let i = 0; i < 10; i++) G.prog.inv.push(G.genItem(3 + (i % 4), i % 4)); G.openSheet(); G.setTab('gear'); }],
+    ['sheet_quest', (G) => { G.closeSheet(); G.recs().kills = 1200; G.recs().legends = 2; G.achCheck(); G.prog.title = 'k1000'; G.openSheet(); G.setTab('quest'); }],
+    ['sheet_quest_ach', (G) => { G.openSheet(); G.setTab('quest'); const pn = document.querySelector('#sheet .panel'); pn.scrollTop = pn.scrollHeight; }],
   ];
   for (const [name, fn] of steps) {
     const ok = await p.evaluate((src) => { const G = window.__G; if (!G) return false; try { G.closeSheet && G.closeSheet(); } catch (e) {} (0, eval)('(' + src + ')')(G); return true; }, fn.toString());

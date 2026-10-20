@@ -67,6 +67,8 @@ docs/             設計書・ロードマップ・QA計画
 | v_pet.js | 249 | ペット（タマゴ1/2000、5種＋色違い、成長、戦闘、騎乗、手続き描画） |
 | w_world.js | 190 | オンライン：週替わり共闘ボス（共有HP）と週間深淵ランキング |
 | x_aria.js | 292 | ミニゲーム「アリアの演奏」（2レーンのリズムゲーム、歌の加護） |
+| y_legend.js | 191 | 他作品から取り入れた仕組み：レジェンド固有効果、回避と見切り、ボスのブレイク、スロー、元素反応 |
+| z_daily.js | 119 | 今日の依頼（3つ・毎日入れ替え）、実績と称号 |
 
 ## 4. 主なゲームシステム（どこを見るか）
 
@@ -80,6 +82,7 @@ docs/             設計書・ロードマップ・QA計画
 ## 5. 保存データ
 - `localStorage` のキー `twinsoul-save-v1` に `prog` オブジェクトをJSONで保存。
 - **新しい項目を足したら、必ず b_core.js の `load()` に検証（サニタイズ）処理を追加**すること。保存データは信頼しない前提で、型・範囲を確認してから取り込んでいる。数値は `num(v, 既定値, 最小, 最大)`（b_core）、装備は `cleanItem`（g_items、こちらは `num(v, 最小, 最大, 既定値)` と引数順が違うので注意）。
+- 追加項目（2026-10-20）: aria（演奏）, daily（今日の依頼）, dailyAll, ach（実績）, title（称号）, rec に dodges/reacts/breaks/aria/floors。装備の pow（レジェンド固有効果）
 - 主な項目: level, exp, stats, sp, kp, skill, form, gold, potions, eq, inv, map, deep, floor, q(依頼), opt(設定), cleared, rank, rankMax, rankDeep, bless, phx, rec(記録), cls(上位職), pets, wb(共闘), wk(週間)。
 
 ## 6. 公開設定（アーティファクトのランタイム機能）

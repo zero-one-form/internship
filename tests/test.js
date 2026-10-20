@@ -541,6 +541,22 @@ const assert = (c, msg) => { if (!c) { errors.push('ASSERT FAIL: ' + msg); conso
     assert((G.recs().reacts || 0) === r0 + 2, 'fire then lightning overloads');
     G.enterMap(0, null); frames(3);
   }
+  // daily missions and achievements
+  {
+    G.prog.daily = null;
+    const S = G.dailyState();
+    assert(S.ids.length === 3 && new Set(S.ids).size === 3, 'three distinct daily missions: ' + S.ids.join(','));
+    const g0 = G.prog.gold, m0 = G.DAILY_POOL.find((m) => m.id === S.ids[0]);
+    G.recAdd(m0.k, m0.n); G.dailyCheck();
+    assert(S.done[0] && !S.done[1] && G.prog.gold > g0, 'finishing a daily mission pays out once');
+    for (const id of S.ids) { const m = G.DAILY_POOL.find((x) => x.id === id); G.recAdd(m.k, m.n); }
+    const inv0 = G.prog.inv.length; G.dailyCheck();
+    assert(S.all && G.prog.dailyAll >= 1 && G.prog.inv.length === inv0 + 1, 'all three missions give the bonus item');
+    G.recs().kills = Math.max(G.recs().kills || 0, 150); G.achCheck();
+    assert(G.prog.ach.includes('k100'), 'achievement unlocks from play records');
+    G.prog.title = 'k100'; G.save(); G.prog.ach = []; G.prog.title = ''; G.prog.daily = null; G.load();
+    assert(G.prog.ach.includes('k100') && G.titleName() === '狩人' && G.prog.daily && G.prog.daily.all, 'achievements, title and daily state survive a reload');
+  }
   // regression: audit fixes
   {
     G.prog.wb = { wk: G.weekKey(), dmg: 1234, claimed: false, day: 1, tries: 2 };

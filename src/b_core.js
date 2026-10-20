@@ -458,7 +458,7 @@
           list: Array.isArray(pp.list) ? pp.list.filter((p) => p && okSp.includes(p.sp)).slice(0, 12).map((p) => ({ id: num(p.id, 1, 1, 1e15), sp: p.sp, lvl: num(p.lvl, 1, 1, 30), exp: num(p.exp, 0, 0, 1e6), shiny: !!p.shiny, name: String(p.name || 'ルル').slice(0, 12) })) : [],
           active: typeof pp.active === 'number' ? pp.active : null, ride: !!pp.ride }; }
       { const cc = s.cls && typeof s.cls === 'object' ? s.cls : {}; prog.cls = { blade: ['saint', 'guard'].includes(cc.blade) ? cc.blade : null, arcane: ['star', 'soul'].includes(cc.arcane) ? cc.arcane : null }; }
-      { const rr = s.rec && typeof s.rec === 'object' ? s.rec : {}; prog.rec = {}; for (const k of ['kills', 'elites', 'bosses', 'legends', 'combo', 'chests', 'goblins', 'deaths', 'dodges', 'reacts']) prog.rec[k] = num(rr[k], 0, 0, 1e9); prog.rec.play = typeof rr.play === 'number' && isFinite(rr.play) ? Math.max(0, rr.play) : 0; }
+      { const rr = s.rec && typeof s.rec === 'object' ? s.rec : {}; prog.rec = {}; for (const k of ['kills', 'elites', 'bosses', 'legends', 'combo', 'chests', 'goblins', 'deaths', 'dodges', 'reacts', 'breaks', 'aria', 'floors']) prog.rec[k] = num(rr[k], 0, 0, 1e9); prog.rec.play = typeof rr.play === 'number' && isFinite(rr.play) ? Math.max(0, rr.play) : 0; }
       prog.cleared = typeof s.cleared === 'number' && isFinite(s.cleared) ? clamp(Math.floor(s.cleared), 0, 9999) : 0;
       if (typeof prog.deep === 'number') prog.deep = Math.min(50, prog.deep);
       const oo = s.opt && typeof s.opt === 'object' ? s.opt : {};
@@ -473,6 +473,15 @@
         if (k) prog.wk = { wk: num(k.wk, 0, 0, 1e7), deep: num(k.deep, 0, 0, 50), rank: num(k.rank, 0, 0, 10), score: num(k.score, 0, 0, 1050) }; }
       { const a = s.aria && typeof s.aria === 'object' ? s.aria : null;
         if (a) prog.aria = { day: num(a.day, 0, 0, 1e8), buff: !!a.buff, best: [0, 1, 2].map((k) => (Array.isArray(a.best) && typeof a.best[k] === 'number' && isFinite(a.best[k]) ? clamp(a.best[k], 0, 100) : 0)) }; }
+      { const d = s.daily && typeof s.daily === 'object' ? s.daily : null;
+        if (d && Array.isArray(d.ids) && d.base && typeof d.base === 'object') {
+          const ids = d.ids.filter((id) => DAILY_POOL.some((m) => m.id === id)).slice(0, 3), base = {};
+          for (const k of DAILY_KEYS) base[k] = num(d.base[k], 0, 0, 1e9);
+          prog.daily = { day: num(d.day, 0, 0, 1e8), base, ids, done: ids.map((_, i) => !!(Array.isArray(d.done) && d.done[i])), all: !!d.all };
+        }
+        prog.dailyAll = num(s.dailyAll, 0, 0, 1e6);
+        prog.ach = Array.isArray(s.ach) ? s.ach.filter((id) => ACH_IDS.includes(id)) : [];
+        prog.title = ACH_IDS.includes(s.title) ? s.title : ''; }
       prog.inv = Array.isArray(s.inv) ? s.inv.map(cleanItem).filter(Boolean).slice(0, INV_MAX) : [];
       prog.eq = { sword: null, staff: null, head: null, body: null, acc: null };
       if (s.eq && typeof s.eq === 'object') for (const t of SLOT_TYPES) { const it = cleanItem(s.eq[t]); if (it && it.type === t) prog.eq[t] = it; }
