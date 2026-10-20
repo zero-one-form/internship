@@ -3,7 +3,7 @@
   const dom = {};
   const lastV = {};
   function cacheDom() {
-    const ids = ['ariaBtn', 'goldHud', 'xpLine', 'lvText', 'formName', 'hpFill', 'hpText', 'mpFill', 'mpText', 'xpFill', 'morphBtn', 'morphLabel', 'potionBtn', 'potionCount', 'shopBtn', 'shopGold', 'ptBadge', 'bagDot', 'bossBar', 'bossName', 'bossFill', 'bossStg'];
+    const ids = ['altarBtn', 'ariaBtn', 'goldHud', 'xpLine', 'lvText', 'formName', 'hpFill', 'hpText', 'mpFill', 'mpText', 'xpFill', 'morphBtn', 'morphLabel', 'potionBtn', 'potionCount', 'shopBtn', 'shopGold', 'ptBadge', 'bagDot', 'bossBar', 'bossName', 'bossFill', 'bossStg'];
     for (const id of ids) dom[id] = $(id);
   }
   function setT(id, v) { if (lastV[id] !== v) { lastV[id] = v; dom[id].textContent = v; } }
@@ -35,6 +35,7 @@
     setT('morphLabel', player.form === 'blade' ? '術へ変身' : '剣へ変身');
     setT('potionCount', String(prog.potions));
     setH('shopBtn', !(inCamp(player.x, player.y) && !player.dead));
+    setH('altarBtn', !(curMap !== 3 && inCamp(player.x, player.y) && !player.dead));
     setH('ariaBtn', !(curMap !== 3 && inCamp(player.x, player.y) && !player.dead));
     setT('shopGold', '所持 ' + prog.gold + 'G');
     const pts = prog.sp + prog.kp;
@@ -346,6 +347,9 @@
     if (curMap === 3) { startFloor(); restoreDive(); }
     netInit();
     ariaBind();
+    applySlots();
+    $('altarBtn').addEventListener('click', altarOpen);
+    $('altarClose').addEventListener('click', altarClose);
     loadFlare(() => {
       makeNpcLooks();
       drawPortrait();
@@ -375,6 +379,7 @@
         findPath, spawnPack, blockedAt, inCamp, gainExp, hurtPlayer, expNeed, chunkCache, castSkill, learn, SKD, fields, meteors,
         get dash() { return dash; },
         ARIA, ariaOpen, ariaStart, ariaHit, ariaTick, ariaClose, ariaChart, ariaState, ariaDiveStart,
+        soul, perkLv, PERKS, gainSoul, rebirth, altarOpen, altarClose, altarRender, streakOnKill, streakEnd, get streakN() { return streakN; }, potMax, GEMS, gainGem, gemFree, sockets, sockOf, makeCtx, castWithGems, applySlots, setSlot, SLOTS, keyOn, growthUpdate, skillCdMul, cdOf, skillMpMul,
         dailyState, dailyCheck, achCheck, DAILY_POOL, ACH, titleName, recAdd,
         withEl, recs, LPOW, hasPow, startDodge, perfectDodge, staggerAdd, get slowMo() { return slowMo; }, makeEnemy,
         save, load, cleanItem, genBounty, ABYSS_MAX_F: ABYSS_MAX, refreshD, makeTestElite() { const e = makeEnemy('goblin', player.x + 3, player.y, 5, ++packSeq, true); enemies.push(e); return e; }

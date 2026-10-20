@@ -162,6 +162,16 @@ button{font-family:inherit;cursor:pointer;-webkit-tap-highlight-color:transparen
 .combo{position:absolute;right:76px;top:45%;z-index:5;text-align:right;pointer-events:none;color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.7);}
 .combo[hidden]{display:none;}
 .opov{position:absolute;inset:0;z-index:45;background:#000;opacity:0;transition:opacity .6s ease;}
+.altar{background:radial-gradient(circle at 32% 25%,rgba(255,255,255,.3),rgba(255,255,255,0) 60%),linear-gradient(135deg,#5a3cc0,#1e1446) !important;color:#efe6ff !important;}
+.streak{position:absolute;top:22%;left:50%;z-index:7;transform:translate(-50%,-50%);pointer-events:none;opacity:0;font-size:clamp(34px,10vw,52px);font-weight:800;font-style:italic;letter-spacing:.06em;color:#fff;text-shadow:0 3px 0 #7a1010,0 0 18px rgba(255,80,40,.8);white-space:nowrap;}
+.streak.t2,.streak.t3{color:#ffd36e;}
+.streak.t4,.streak.t5{color:#ff9af0;text-shadow:0 3px 0 #4a0a6a,0 0 22px rgba(255,90,255,.9);}
+.streak.on{animation:streak 1.4s ease-out forwards;}
+@keyframes streak{0%{opacity:0;transform:translate(-50%,-50%) scale(1.8)}12%{opacity:1;transform:translate(-50%,-50%) scale(1)}70%{opacity:1}100%{opacity:0;transform:translate(-50%,-62%) scale(1)}}
+@media (prefers-reduced-motion:reduce){.streak.on{animation:none;opacity:1}}
+.skx2{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+.skx2 .gsort{margin-left:0;max-width:100%;}
+.skx2 .gem{flex:1 1 140px;}
 .ariaov{position:absolute;inset:0;z-index:30;display:grid;place-items:center;padding:12px;background:#0b0820;}
 .ariaov[hidden]{display:none;}
 #ariaCv{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;}
@@ -444,6 +454,7 @@ button{font-family:inherit;cursor:pointer;-webkit-tap-highlight-color:transparen
     <button id="ultBtn" class="act ult" type="button" aria-label="奥義" hidden><span class="lbl">奥義</span><b id="ultPct">0%</b></button>
     <button id="morphBtn" class="act cd" type="button"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M10 21a14 14 0 0 1 25-8" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/><path d="M36 5v9h-9" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><path d="M38 27a14 14 0 0 1-25 8" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/><path d="M12 43v-9h9" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg><span id="morphLabel" class="lbl">術へ変身</span></button>
     <button id="potionBtn" class="act cd" type="button" aria-label="回復薬を使う"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M14.6 30h18.8l3.7 6.3A4 4 0 0 1 33.6 42H14.4a4 4 0 0 1-3.5-5.8z" style="fill:var(--hp)"/><path d="M19 5h10M21 5v10L10 34a7 7 0 0 0 6 10h16a7 7 0 0 0 6-10L27 15V5" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linejoin="round" stroke-linecap="round"/></svg><b id="potionCount">5</b></button>
+    <button id="altarBtn" class="act shop altar" type="button" hidden aria-label="魂の祭壇（永続の特典と転生）"><span class="lbl">魂の</span><b>祭壇</b></button>
     <button id="ariaBtn" class="act shop aria" type="button" hidden aria-label="アリアの演奏（リズムゲーム）"><span class="lbl">♪演奏</span><b>アリア</b></button>
     <button id="shopBtn" class="act shop" type="button" hidden aria-label="回復薬を買う 20G"><span class="lbl">回復薬</span><b>20G</b><span id="shopGold" hidden></span></button>
   </div>
@@ -540,6 +551,13 @@ button{font-family:inherit;cursor:pointer;-webkit-tap-highlight-color:transparen
       <div id="npcBody"></div>
     </div>
   </div>
+  <div id="altarDlg" class="overlay" hidden>
+    <div class="panel" role="dialog" aria-modal="true" aria-labelledby="altarTitle">
+      <div class="head"><h2 id="altarTitle">魂の祭壇</h2><button id="altarClose" class="close" type="button">閉じる</button></div>
+      <div id="altarBox"></div>
+    </div>
+  </div>
+  <div id="streak" class="streak" aria-live="polite"></div>
   <div id="ariaOv" class="ariaov" hidden>
     <canvas id="ariaCv" aria-label="アリアの演奏"></canvas>
     <button id="ariaStop" class="opskip" type="button" hidden>やめる</button>

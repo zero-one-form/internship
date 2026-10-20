@@ -76,7 +76,7 @@
   function startDodge(l) {
     const [ux, uy] = dodgeDir();
     player.roll = { ux, uy, t: 0.2, sp: 2.8 / 0.2 };
-    player.dodgeT = 0.32; player.witchUsed = false;
+    player.dodgeT = 0.32 + (keyOn('k_mikiri') ? 0.15 : 0); player.witchUsed = false;
     player.sprintT = 1.2 + 0.1 * l; player.sprintLv = l;
     if (hasPow('shadow')) player.shadowT = 2.5;
     player.path.length = 0; player.target = null;
@@ -88,7 +88,7 @@
     if (player.witchUsed) return;
     player.witchUsed = true;
     const long = hasPow('time');
-    addSlowMo(long ? 1.6 : 0.8);
+    addSlowMo((long ? 1.6 : 0.8) * (keyOn('k_mikiri') ? 1.5 : 1));
     player.critT = long ? 4 : 2;
     if (long) player.cd = {};
     addText(player.x, player.y, '見切り！', 'multi', 80);
@@ -155,7 +155,7 @@
     if (!el) return 1;
     const has = e.elT > 0 ? e.el : null;
     const r = has && has !== el ? reactionOf(has, el) : null;
-    if (!r) { if (el !== 'phys') { e.el = el; e.elT = 6; } return 1; }
+    if (!r) { if (el !== 'phys') { e.el = el; e.elT = keyOn('k_elem') ? 12 : 6; } return 1; }
     e.el = null; e.elT = 0;
     const R = REACT[r];
     addText(e.x, e.y, R.name, 'react', bodyH(e) + 34);
@@ -180,7 +180,7 @@
       }
     } finally { reacting = false; }
     sfx(r === 'overload' ? 'boom' : r === 'melt' ? 'fire' : 'ice');
-    return R.mul;
+    return R.mul * (keyOn('k_elem') ? 1.6 : 1);
   }
   function elemDraw(e, x0, y0) {
     if (!(e.elT > 0) || e.dead) return;

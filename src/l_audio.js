@@ -111,7 +111,7 @@
     ice: (t) => { [2093, 2637, 3136].forEach((f, i) => vc(t + i * 0.04, f, 0.4, 'sine', 0.05)); nz(t, 0.4, 0.1, 'highpass', 4000, 9000); },
     vortex: (t) => { vc(t, 600, 0.9, 'sawtooth', 0.05, 80, 900); nz(t, 0.9, 0.12, 'bandpass', 3000, 300, 2); }
   };
-  const SK_SFX = { whirl: 'slam', sprint: 'whoosh', gale: 'whoosh', bash: 'bash', rend: 'slam', cry: 'cry', aura: 'aura', dance: 'whoosh', chain: 'zap', fireball: 'fire', heal: 'heal', frost: 'ice', lance: 'zap', meteor: 'fire', vortex: 'vortex' };
+  const SK_SFX = { skyfall: 'slam', blades: 'whoosh', storm: 'zap', gravity: 'vortex', whirl: 'slam', sprint: 'whoosh', gale: 'whoosh', bash: 'bash', rend: 'slam', cry: 'cry', aura: 'aura', dance: 'whoosh', chain: 'zap', fireball: 'fire', heal: 'heal', frost: 'ice', lance: 'zap', meteor: 'fire', vortex: 'vortex' };
   function sfx(name) {
     const c = AU.ctx;
     if (!c || c.state !== 'running' || opt().se <= 0 || !SFX[name]) return;

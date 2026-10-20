@@ -128,11 +128,11 @@ const assert = (c, msg) => { if (!c) { errors.push('ASSERT FAIL: ' + msg); conso
   assert(G.prog.stats.str === str0 + 1 && G.prog.sp === sp0 - 1, 'plus button raises a stat');
   const kp0 = G.prog.kp;
   w.document.querySelector('.tab[data-tab="blade"]').click();
-  assert(!w.document.getElementById('tabSkill').hidden && w.document.querySelectorAll('#skillTree .skc').length === 14, 'blade skill tree shows 14 skills');
+  assert(!w.document.getElementById('tabSkill').hidden && w.document.querySelectorAll('#skillTree .skc').length === Object.values(G.SKD).filter((s) => s.form !== 'arcane').length, 'blade skill tree shows every blade/common skill: ' + w.document.querySelectorAll('#skillTree .skc').length);
   w.document.querySelector('#skillTree button:not([disabled])').click();
   assert(G.prog.kp === kp0 - 1, 'skill plus spends a skill point');
   w.document.querySelector('.tab[data-tab="arcane"]').click();
-  assert(w.document.querySelectorAll('#skillTree .skc').length === 14, 'arcane skill tree shows 14 skills');
+  assert(w.document.querySelectorAll('#skillTree .skc').length === Object.values(G.SKD).filter((s) => s.form !== 'blade').length, 'arcane skill tree shows every arcane/common skill');
   w.document.querySelector('.tab[data-tab="stat"]').click();
   assert($('derived').children.length === 12, 'derived stats rendered');
   $('closeBtn').click();
@@ -283,7 +283,8 @@ const assert = (c, msg) => { if (!c) { errors.push('ASSERT FAIL: ' + msg); conso
   G.prog.gold = 100000;
   G.openNpc('shop');
   { const p0 = G.prog.potions; [...w.document.querySelectorAll('#npcBody button')][0].click(); assert(G.prog.potions === p0 + 1, 'merchant sells potions'); }
-  { const i0 = G.prog.inv.length; [...w.document.querySelectorAll('#npcBody button')][2].click(); assert(G.prog.inv.length === i0 + 1 || i0 >= 36, 'gamble box gives an item'); }
+  { const i0 = G.prog.inv.length; [...w.document.querySelectorAll('#npcBody button')][3].click(); assert(G.prog.inv.length === i0 + 1 || i0 >= 36, 'gamble box gives an item'); }
+  { const g0 = Object.values(G.prog.gems || {}).reduce((a, b) => a + b, 0); [...w.document.querySelectorAll('#npcBody button')][2].click(); assert(Object.values(G.prog.gems || {}).reduce((a, b) => a + b, 0) === g0 + 1, 'merchant sells support gems'); }
   G.closeNpc();
   G.openNpc('smith'); assert(w.document.querySelectorAll('#npcBody button').length === 1, 'smith offers the gear screen'); G.closeNpc();
   frames(30);
@@ -556,6 +557,50 @@ const assert = (c, msg) => { if (!c) { errors.push('ASSERT FAIL: ' + msg); conso
     assert(G.prog.ach.includes('k100'), 'achievement unlocks from play records');
     G.prog.title = 'k100'; G.save(); G.prog.ach = []; G.prog.title = ''; G.prog.daily = null; G.load();
     assert(G.prog.ach.includes('k100') && G.titleName() === '狩人' && G.prog.daily && G.prog.daily.all, 'achievements, title and daily state survive a reload');
+  }
+  // skills 2.0, meta progression, kill streaks
+  {
+    G.enterMap(0, null); frames(3); G.paused = false;
+    const pl = G.player; pl.dead = false; if (pl.form !== 'blade') G.morph(); pl.form = 'blade'; G.refreshD(); pl.hp = G.D.maxHp; pl.mp = G.D.maxMp;
+    G.prog.skill.whirl = Math.max(G.prog.skill.whirl, 5);
+    G.gainGem('amp', true); G.gainGem('twin', true); G.gainGem('haste', true);
+    assert(G.sockets('whirl') === 2, 'skill Lv5 opens a second gem socket');
+    G.sockOf('whirl')[0] = 'amp'; G.sockOf('whirl')[1] = 'haste';
+    assert(Math.abs(G.makeCtx('whirl').dmg - 1.35) < 1e-9 && G.skillCdMul('whirl') === 0.75, 'socketed gems change damage and cooldown');
+    G.sockOf('whirl')[1] = 'twin';
+    const e = G.makeTestElite(); e.maxHp = e.hp = 1e8; e.x = pl.x + 0.8; e.y = pl.y; e.state = 'idle';
+    G.castWithGems('whirl', G.prog.skill.whirl); const h1 = e.hp;
+    G.growthUpdate(0.35);
+    assert(h1 < 1e8 && e.hp < h1, 'the twin gem casts the skill a second time');
+    G.sockOf('whirl').length = 0;
+    G.setSlot('blade', 'skyfall', 0);
+    assert(G.SLOTS.blade[0] === 'skyfall' && !G.SLOTS.blade.includes('whirl') && G.SLOTS.blade[7] === 'sprint', 'a new skill replaces a hotbar button (dodge stays)');
+    G.setSlot('blade', 'skyfall', 3);
+    assert(G.SLOTS.blade[3] === 'skyfall' && G.SLOTS.blade[0] === 'rend', 'moving a skill on the bar swaps the two buttons');
+    G.setSlot('blade', 'whirl', 0); G.setSlot('blade', 'skyfall', 0);
+    G.save(); G.prog.slots = null; G.load(); G.applySlots();
+    assert(G.SLOTS.blade[0] === 'skyfall', 'hotbar layout survives a reload');
+    G.setSlot('blade', 'whirl', 0);
+    G.prog.skill.skyfall = 1; const h2 = e.hp; pl.target = e;
+    G.castWithGems('skyfall', 1);
+    assert(e.hp < h2, 'skyfall leaps in and slams');
+    G.prog.skill.k_echo = 1;
+    assert(G.skillMpMul('chain') > 1, 'keystones carry a drawback (echo costs more MP)');
+    G.prog.skill.k_echo = 0; G.prog.skill.skyfall = 0; e.dead = true;
+    // altar and rebirth
+    G.gainSoul(500); pl.x = G.SPAWN.x; pl.y = G.SPAWN.y; frames(2);
+    const hpA = G.D.maxHp; G.altarOpen();
+    assert(!w.document.getElementById('altarDlg').hidden, 'the soul altar opens at the camp');
+    w.document.querySelector('#altarBox .primary').click();
+    assert(G.perkLv('hp') === 1 && G.D.maxHp > hpA, 'buying a perk raises stats permanently');
+    G.altarClose();
+    G.prog.level = 45; const pts0 = G.soul().pts;
+    assert(G.rebirth() && G.prog.level === 1 && G.soul().rb === 1 && G.soul().pts > pts0 && G.prog.sp === 3, 'rebirth resets the level and pays soul shards');
+    // kill streak
+    const x0 = G.prog.exp;
+    for (let i = 0; i < 12; i++) G.streakOnKill({ exp: 100 });
+    G.streakEnd();
+    assert(G.prog.exp > x0 && G.streakN === 0, 'a 12-kill streak pays an exp bonus');
   }
   // regression: audit fixes
   {

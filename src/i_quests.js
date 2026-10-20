@@ -183,7 +183,7 @@
   function elH(t) { const h = document.createElement('h3'); h.className = 'sub'; h.textContent = t; return h; }
   function boxPrice() { return 40 + prog.level * 25; }
   function gambleRarity() { const r = Math.random() * 100; return r < 40 ? 0 : r < 80 ? 1 : r < 96 ? 2 : 3; }
-  function buyPots(cost, n) { if (prog.potions + n > POT_MAX) { toast('回復薬はこれ以上持てない（最大' + POT_MAX + '個）'); return; } buy(cost, () => gainPotion(n)); }
+  function buyPots(cost, n) { if (prog.potions + n > potMax()) { toast('回復薬はこれ以上持てない（最大' + potMax() + '個）'); return; } buy(cost, () => gainPotion(n)); }
   function buy(cost, fn) { if (prog.gold < cost) { toast('所持金が足りない'); return; } prog.gold -= cost; fn(); save(); renderNpc(); }
   function openNpc(role) {
     if (player.dead || !$('intro').hidden) return;
@@ -228,6 +228,7 @@
       body.append(
         shopRow('回復薬', '20G', () => buyPots(20, 1)),
         shopRow('回復薬×5', '90G', () => buyPots(90, 5)),
+        shopRow('サポート宝石の袋（スキルにはめる宝石がひとつ）', gemPrice() + 'G', () => buy(gemPrice(), () => gainGem())),
         shopRow('目利き箱（Lv' + prog.level + 'の装備がひとつ。運がよければレジェンド）', bp + 'G', () => {
           if (prog.inv.length >= INV_MAX) { toast('持ち物がいっぱい'); return; }
           buy(bp, () => { const it = genItem(prog.level, gambleRarity()); prog.inv.push(it); toast(RAR[it.rar].name + '：' + it.name + '！'); log(RAR[it.rar].name + '：' + it.name + 'を手に入れた'); });

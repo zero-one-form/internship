@@ -53,7 +53,7 @@
   function openStairs() {
     if (stairsOpen) return;
     stairsOpen = true;
-    if (!WB.on) { addSlowMo(0.5); zoomPunch(0.03); recAdd('floors'); }
+    if (!WB.on) { addSlowMo(0.5); zoomPunch(0.03); recAdd('floors'); soulOnFloor(); }
     const t = farTile();
     const last = curFloor >= ABYSS_MAX;
     const pt = last ? { x: t[0], y: t[1], to: 0, arrive: 1, label: '地上へ帰還' } : { x: t[0], y: t[1], to: 3, arrive: 0, next: true, label: 'B' + (curFloor + 1) + 'F（' + themeOf(curFloor + 1).name + '）へ' };
@@ -67,7 +67,7 @@
     if (curMap !== 3) return;
     floorOnKill(e);
     if (e.world) { bossRef = null; wbKilled(); return; }
-    if (e.boss) { bossRef = null; if (e.final) finalVictory(e); else { toast('ボスを倒した！'); log('ボスを倒した'); } openStairs(); if (!e.final) blessSoon('ボス撃破の祝福'); return; }
+    if (e.boss) { soulOnBoss(e); bossRef = null; if (e.final) finalVictory(e); else { toast('ボスを倒した！'); log('ボスを倒した'); } openStairs(); if (!e.final) blessSoon('ボス撃破の祝福'); return; }
     floorKills++;
     if (curFloor % 5 !== 0 && FLOOR.obj === 'kill' && floorKills >= floorNeed) openStairs();
   }

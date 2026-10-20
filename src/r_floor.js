@@ -17,7 +17,7 @@
   ];
   const bN = (id) => { let n = 0; for (const b of BLESS) if (b === id) n++; return n; };
   function derived(form) {
-    const d = petMods(classMods(derivedBase(form), form));
+    const d = soulMods(petMods(classMods(derivedBase(form), form)));
     if (!BLESS || !BLESS.length) return d;
     d.atk *= 1 + 0.2 * bN('atk');
     d.speed *= 1 + 0.15 * bN('spd'); d.interval /= 1 + 0.1 * bN('spd');

@@ -61,8 +61,8 @@
       S.all = true; prog.dailyAll = (prog.dailyAll || 0) + 1;
       const it = genItem(prog.level + 2, Math.max(2, rollRarity(true)));
       if (prog.inv.length < INV_MAX) prog.inv.push(it); else loot.push({ x: player.x + 0.5, y: player.y, it, t: 0 });
-      gainPotion(3);
-      toast('今日の依頼をすべて達成！ ' + RAR[it.rar].name + '装備と回復薬×3'); sfx('legend');
+      gainPotion(3); gainGem(null, true);
+      toast('今日の依頼をすべて達成！ ' + RAR[it.rar].name + '装備・回復薬×3・サポート宝石'); sfx('legend');
       addVfx({ k: 'pillar', x: player.x, y: player.y, c: '255,214,90', life: 1 });
     }
   }

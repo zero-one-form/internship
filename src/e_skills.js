@@ -1,6 +1,6 @@
 
   /* ================= skills & skill trees ================= */
-  const TIER_LV = [1, 4, 8, 12, 16];
+  const TIER_LV = [1, 4, 8, 12, 16, 24, 32];
   const SK = [
     { id: 'whirl', form: 'blade', tier: 1, act: true, name: '旋風斬', short: '旋風', lv: 1, max: 10, cd: 2.4, mp: (l) => 10 + l,
       desc: (l) => '周りの敵すべてに攻撃力の' + (200 + 30 * (l - 1)) + '%' },
@@ -42,7 +42,23 @@
     { id: 'vortex', form: 'arcane', tier: 4, act: true, name: '引力の渦', short: '引渦', lv: 12, pre: ['lance', 3], max: 10, cd: 12, mp: (l) => 26 + l,
       desc: (l) => '周りの敵を一点に引き寄せ攻撃力の' + (120 + 20 * (l - 1)) + '%、1秒気絶' },
     { id: 'quick', form: 'arcane', tier: 4, act: false, name: '高速詠唱', lv: 12, pre: ['mshield', 3], max: 10, desc: (l) => '術の型のスキルの再使用時間 -' + 3 * l + '%' },
-    { id: 'focus', form: 'arcane', tier: 5, act: false, name: '精神統一', lv: 16, pre: ['amp', 5], max: 10, desc: (l) => '術の型の会心率 +' + (1.5 * l).toFixed(1) + '%、会心ダメージ +' + 6 * l + '%' }
+    { id: 'focus', form: 'arcane', tier: 5, act: false, name: '精神統一', lv: 16, pre: ['amp', 5], max: 10, desc: (l) => '術の型の会心率 +' + (1.5 * l).toFixed(1) + '%、会心ダメージ +' + 6 * l + '%' },
+    // tier 5-6: new actives
+    { id: 'skyfall', form: 'blade', tier: 5, act: true, name: '天翔斬', short: '天翔', lv: 16, pre: ['aura', 2], max: 10, cd: 9, mp: (l) => 28 + 2 * l,
+      desc: (l) => '狙った敵へ跳びかかり、着地点のまわりを攻撃力×' + (3.2 + 0.4 * (l - 1)).toFixed(1) + 'で叩き伏せ、0.8秒気絶させる' },
+    { id: 'storm', form: 'arcane', tier: 5, act: true, name: '雷神招来', short: '雷神', lv: 16, pre: ['meteor', 2], max: 10, cd: 16, mp: (l) => 40 + 2 * l,
+      desc: (l) => '5秒間、0.4秒ごとに近くの敵へ雷が落ちる（雷・攻撃力×' + (1.1 + 0.15 * (l - 1)).toFixed(2) + '）' },
+    { id: 'blades', form: 'blade', tier: 6, act: true, name: '千刃結界', short: '千刃', lv: 24, pre: ['skyfall', 3], max: 10, cd: 18, mp: (l) => 36 + 2 * l,
+      desc: (l) => '4秒間、刃が身のまわりを舞い、0.3秒ごとに近くの敵を攻撃力×' + (0.7 + 0.1 * (l - 1)).toFixed(1) + 'で切り裂く' },
+    { id: 'gravity', form: 'arcane', tier: 6, act: true, name: '重力崩壊', short: '崩壊', lv: 24, pre: ['storm', 3], max: 10, cd: 20, mp: (l) => 55 + 3 * l,
+      desc: (l) => '狙った場所に重力の渦を生み、1.4秒かけて敵を引き寄せてから攻撃力×' + (5 + 0.6 * (l - 1)).toFixed(1) + 'で崩壊させる' },
+    // tier 7: keystones (strong passives with a drawback; one point each)
+    { id: 'k_berserk', form: 'blade', tier: 7, act: false, key: true, name: '極意・狂戦士の血', lv: 32, max: 1, desc: () => 'HPが減るほど剣の型の攻撃力が上がる（最大+60%）。代わりに剣の型で受けるダメージ +15%' },
+    { id: 'k_blood', form: 'blade', tier: 7, act: false, key: true, name: '極意・血の契約', lv: 32, max: 1, desc: () => '剣の型のHP吸収が2倍。代わりに回復薬の回復量が半分' },
+    { id: 'k_elem', form: 'arcane', tier: 7, act: false, key: true, name: '極意・元素の理', lv: 32, max: 1, desc: () => '元素反応のダメージ +60%、敵に残る元素が2倍長く続く。代わりに術の型の通常攻撃 -20%' },
+    { id: 'k_echo', form: 'arcane', tier: 7, act: false, key: true, name: '極意・詠唱連鎖', lv: 32, max: 1, desc: () => 'スキルを使うと20%で待ち時間がすぐ戻る。代わりに消費MP +25%' },
+    { id: 'k_soul', form: 'both', tier: 7, act: false, key: true, name: '極意・双魂一体', lv: 32, max: 1, desc: () => '変身の待ち時間が半分になり、変身後4秒間 与えるダメージ +25%。代わりに最大HP -10%' },
+    { id: 'k_mikiri', form: 'both', tier: 7, act: false, key: true, name: '極意・見切りの境地', lv: 32, max: 1, desc: () => '回避の無敵が0.15秒長く、見切りのスローが1.5倍長い。代わりに回避の待ち時間 +0.8秒' }
   ];
   const SKD = {};
   for (const s of SK) SKD[s.id] = s;
@@ -69,7 +85,7 @@
     questEvent('learn');
     save();
   }
-  function cdOf(id) { return SKD[id].cd * (1 - (D.cdr || 0)); }
+  function cdOf(id) { return SKD[id].cd * (1 - (D.cdr || 0)) * skillCdMul(id) * (id === 'sprint' ? dodgeCdMul() : 1) + skillCdAdd(id); }
   function pickTarget(range) {
     const t = player.target;
     if (t && !t.dead && hyp(t.x - player.x, t.y - player.y) <= range) return t;
@@ -105,6 +121,7 @@
     }
   }
   const CAST = {
+    skyfall: (l) => castSkyfall(l), blades: (l) => castBlades(l), storm: (l) => castStorm(l), gravity: (l) => castGravity(l),
     whirl(l) {
       const R = 2.1, mul = 2.0 + 0.3 * (l - 1);
       for (const e of enemies) {
@@ -279,16 +296,18 @@
     const l = slv(id);
     if (!l) { toast(s.name + 'はまだ覚えていない（' + reqText(s) + '）'); return; }
     if ((player.cd[id] || 0) > 0) return;
-    const mp = Math.round(s.mp(l) * classMpMul());
+    const mp = Math.round(s.mp(l) * classMpMul() * skillMpMul(id));
     if (player.mp < mp) { toast('MPが足りない'); return; }
-    if (CAST[id](l) === false) return;
+    if (castWithGems(id, l) === false) return;
     if (!(bN('echo') && Math.random() < 0.2 * bN('echo'))) player.mp -= mp;
     player.cd[id] = cdOf(id);
+    afterCast(id);
     if (SK_SFX[id]) sfx(SK_SFX[id]);
   }
   function useSkill() { castSkill(0); }
   function skillsUpdate(dt) {
     dodgeUpdate(dt);
+    growthUpdate(dt);
     let changed = false;
     for (const k of ['auraT', 'shiftT', 'sprintT', 'cryT', 'healT', 'frenzyT']) {
       const before = player[k] || 0;
@@ -308,7 +327,7 @@
       player.moving = true;
       player.walkPhase = (player.walkPhase + dt * 5) % 1;
       for (let n = 0; n < 2; n++) addPart({ k: 'magic', x: player.x + rand(-0.15, 0.15), y: player.y + rand(-0.15, 0.15), z: rand(8, 46), vx: 0, vy: 0, vz: 4, t: 0, life: 0.35, s: 0.7, c: 'amber' });
-      if (k >= 1) { const d0 = dash; dash = null; player.moving = false; galeStrike(d0.tgt, d0.mul, d0.stun); }
+      if (k >= 1) { const d0 = dash; dash = null; player.moving = false; withCtx(d0.ctx, () => galeStrike(d0.tgt, d0.mul, d0.stun)); }
     }
     if (dance) {
       dance.t -= dt;
@@ -319,7 +338,7 @@
           dance.flip = !dance.flip;
           player.swingT = player.swingDur = 0.12;
           addFx({ k: 'slash', x: t.x, y: t.y, t: 0, life: 0.2, left: dance.flip, h: bodyH(t) + (dance.flip ? 6 : -2) });
-          hitEnemy(t, D.atk * dance.mul);
+          withCtx(dance.ctx, () => hitEnemy(t, D.atk * dance.mul));
           dance.left--;
           dance.t = 0.11;
           if (dance.left <= 0) dance = null;
@@ -333,14 +352,14 @@
       f.tick -= dt;
       if (f.tick <= 0) {
         f.tick = 0.5;
-        for (const e of enemies) if (!e.dead && hyp(e.x - f.x, e.y - f.y) <= f.r + e.r) { withEl('ice', () => hitEnemy(e, f.dmg)); e.slowT = 0.7; e.slowAmt = 0.5; }
+        for (const e of enemies) if (!e.dead && hyp(e.x - f.x, e.y - f.y) <= f.r + e.r) { withCtx(f.ctx, () => withEl('ice', () => hitEnemy(e, f.dmg))); e.slowT = 0.7; e.slowAmt = 0.5; }
       }
       if (Math.random() < dt * 16) { const a = Math.random() * TAU, r = Math.sqrt(Math.random()) * f.r; addPart({ k: 'magic', x: f.x + Math.cos(a) * r, y: f.y + Math.sin(a) * r, z: 2, vx: 0, vy: 0, vz: rand(10, 22), t: 0, life: 0.8, s: 0.5, c: 'cyan' }); }
     }
     for (let i = meteors.length - 1; i >= 0; i--) {
       const m = meteors[i];
       m.t += dt;
-      if (m.t >= m.at) { meteors.splice(i, 1); explode(m.x, m.y, 1.15, m.dmg); }
+      if (m.t >= m.at) { meteors.splice(i, 1); withCtx(m.ctx, () => explode(m.x, m.y, 1.15, m.dmg)); }
     }
   }
 
@@ -515,6 +534,7 @@
     if (s.act) { const m = document.createElement('p'); m.className = 'skm'; m.textContent = '消費MP ' + s.mp(Math.max(1, l)) + '／再使用 ' + s.cd + '秒'; card.append(m); }
     const rq = reqText(s);
     if (rq) { const r = document.createElement('p'); r.className = 'skr' + (met ? ' ok' : ''); r.textContent = '必要：' + rq; card.append(r); }
+    skillCardExtras(s, card);
     const btn = document.createElement('button');
     btn.type = 'button'; btn.className = 'plus'; btn.textContent = '＋';
     btn.setAttribute('aria-label', s.name + 'のレベルを上げる');
@@ -527,11 +547,12 @@
     $('kpText').textContent = String(prog.kp);
     const box = $('skillTree');
     box.textContent = '';
+    box.append(elP('ith', gemSummary()));
     for (let tier = 1; tier <= TIER_LV.length; tier++) {
       const list = SK.filter((s) => s.tier === tier && (s.form === form || s.form === 'both'));
       if (!list.length) continue;
       const sec = document.createElement('section'); sec.className = 'tier';
-      const h = document.createElement('h4'); h.textContent = '第' + tier + '段（キャラLv' + TIER_LV[tier - 1] + '〜）';
+      const h = document.createElement('h4'); h.textContent = tier === 7 ? '極意（キャラLv' + TIER_LV[6] + '〜・強力だが代償がある）' : '第' + tier + '段（キャラLv' + TIER_LV[tier - 1] + '〜）';
       sec.appendChild(h);
       for (const s of list) sec.appendChild(skillCard(s));
       box.appendChild(sec);

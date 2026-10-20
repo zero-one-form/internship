@@ -43,6 +43,7 @@
     petOnKill(e);
     const dx = e.x - player.x, dy = e.y - player.y, d = hyp(dx, dy) || 1;
     if (!e.boss) { e.kbx = dx / d * 2.6; e.kby = dy / d * 2.6; }
+    streakOnKill(e);
     combo++; comboT = 3.5; comboBest = Math.max(comboBest, combo);
     AU.pm = 1 + Math.min(combo, 40) * 0.015;
     mkN++; mkT = 0.35;
@@ -57,6 +58,7 @@
     }
   }
   function feelUpdate(dt) {
+    streakUpdate(dt);
     if (comboT > 0) { comboT -= dt; if (comboT <= 0) { if (combo >= 10) log(combo + 'コンボで途切れた'); combo = 0; AU.pm = 1; } }
     if (mkT > 0) {
       mkT -= dt;

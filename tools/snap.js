@@ -45,6 +45,10 @@ async function browserPath() {
     ['sheet_gear', (G) => { G.ariaClose(); G.ARIA.fake = null; G.enterMap(0, 0); for (let i = 0; i < 10; i++) G.prog.inv.push(G.genItem(3 + (i % 4), i % 4)); G.openSheet(); G.setTab('gear'); }],
     ['sheet_quest', (G) => { G.closeSheet(); G.recs().kills = 1200; G.recs().legends = 2; G.achCheck(); G.prog.title = 'k1000'; G.openSheet(); G.setTab('quest'); }],
     ['sheet_quest_ach', (G) => { G.openSheet(); G.setTab('quest'); const pn = document.querySelector('#sheet .panel'); pn.scrollTop = pn.scrollHeight; }],
+    ['sheet_skill', (G) => { G.prog.level = 40; G.prog.skill.whirl = 10; G.prog.skill.skyfall = 2; G.gainGem('amp', true); G.gainGem('ice', true); G.sockOf('whirl')[0] = 'amp'; G.openSheet(); G.setTab('blade'); }],
+    ['sheet_skill_end', (G) => { G.openSheet(); G.setTab('blade'); const pn = document.querySelector('#sheet .panel'); pn.scrollTop = pn.scrollHeight; }],
+    ['altar', (G) => { G.enterMap(0, null); G.player.x = G.SPAWN.x; G.player.y = G.SPAWN.y; G.gainSoul(120); G.paused = false; G.altarOpen(); }],
+    ['streak', (G) => { G.altarClose(); for (let i = 0; i < 22; i++) G.streakOnKill({ exp: 10 }); }],
   ];
   for (const [name, fn] of steps) {
     const ok = await p.evaluate((src) => { const G = window.__G; if (!G) return false; try { G.closeSheet && G.closeSheet(); } catch (e) {} (0, eval)('(' + src + ')')(G); return true; }, fn.toString());

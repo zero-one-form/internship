@@ -369,7 +369,7 @@
     undead: { hp: 78, dmg: 9, sp: 1.15, exp: 19, aggro: 3.6, atk: 1.45, r: 0.38, armor: 2, vars: 2 }
   };
   function defaultProg() {
-    return { level: 1, exp: 0, stats: { str: 5, agi: 5, vit: 5, int: 5, luk: 5 }, sp: 0, kp: 0, skill: { whirl: 1, chain: 1, sprint: 1 }, potions: 5, gold: 0, form: 'blade', intro: false, map: 0, deep: 0, floor: 1, q: { main: 0, mp: 0, ma: false, mn: false, act: [], board: [] }, opt: { autoPot: true, autoTarget: true, autoSell: false, stick: true, shake: true, op: true, bgm: 0.6, se: 0.8 }, cleared: 0, inv: [], eq: { sword: null, staff: null, head: null, body: null, acc: null }, starter: false, rank: 0, rankMax: 0, rankDeep: [], bless: [], phx: false, cls: { blade: null, arcane: null }, pets: null, rec: null, aria: null };
+    return { level: 1, exp: 0, stats: { str: 5, agi: 5, vit: 5, int: 5, luk: 5 }, sp: 0, kp: 0, skill: { whirl: 1, chain: 1, sprint: 1 }, potions: 5, gold: 0, form: 'blade', intro: false, map: 0, deep: 0, floor: 1, q: { main: 0, mp: 0, ma: false, mn: false, act: [], board: [] }, opt: { autoPot: true, autoTarget: true, autoSell: false, stick: true, shake: true, op: true, bgm: 0.6, se: 0.8 }, cleared: 0, inv: [], eq: { sword: null, staff: null, head: null, body: null, acc: null }, starter: false, rank: 0, rankMax: 0, rankDeep: [], bless: [], phx: false, cls: { blade: null, arcane: null }, pets: null, rec: null, aria: null, soul: null, gems: null, sock: null, slots: null };
   }
   const prog = defaultProg();
   const player = {
@@ -458,7 +458,7 @@
           list: Array.isArray(pp.list) ? pp.list.filter((p) => p && okSp.includes(p.sp)).slice(0, 12).map((p) => ({ id: num(p.id, 1, 1, 1e15), sp: p.sp, lvl: num(p.lvl, 1, 1, 30), exp: num(p.exp, 0, 0, 1e6), shiny: !!p.shiny, name: String(p.name || 'ルル').slice(0, 12) })) : [],
           active: typeof pp.active === 'number' ? pp.active : null, ride: !!pp.ride }; }
       { const cc = s.cls && typeof s.cls === 'object' ? s.cls : {}; prog.cls = { blade: ['saint', 'guard'].includes(cc.blade) ? cc.blade : null, arcane: ['star', 'soul'].includes(cc.arcane) ? cc.arcane : null }; }
-      { const rr = s.rec && typeof s.rec === 'object' ? s.rec : {}; prog.rec = {}; for (const k of ['kills', 'elites', 'bosses', 'legends', 'combo', 'chests', 'goblins', 'deaths', 'dodges', 'reacts', 'breaks', 'aria', 'floors']) prog.rec[k] = num(rr[k], 0, 0, 1e9); prog.rec.play = typeof rr.play === 'number' && isFinite(rr.play) ? Math.max(0, rr.play) : 0; }
+      { const rr = s.rec && typeof s.rec === 'object' ? s.rec : {}; prog.rec = {}; for (const k of ['kills', 'elites', 'bosses', 'legends', 'combo', 'chests', 'goblins', 'deaths', 'dodges', 'reacts', 'breaks', 'aria', 'floors', 'streak']) prog.rec[k] = num(rr[k], 0, 0, 1e9); prog.rec.play = typeof rr.play === 'number' && isFinite(rr.play) ? Math.max(0, rr.play) : 0; }
       prog.cleared = typeof s.cleared === 'number' && isFinite(s.cleared) ? clamp(Math.floor(s.cleared), 0, 9999) : 0;
       if (typeof prog.deep === 'number') prog.deep = Math.min(50, prog.deep);
       const oo = s.opt && typeof s.opt === 'object' ? s.opt : {};
@@ -482,6 +482,16 @@
         prog.dailyAll = num(s.dailyAll, 0, 0, 1e6);
         prog.ach = Array.isArray(s.ach) ? s.ach.filter((id) => ACH_IDS.includes(id)) : [];
         prog.title = ACH_IDS.includes(s.title) ? s.title : ''; }
+      { const so = s.soul && typeof s.soul === 'object' ? s.soul : {}, pk = so.perks && typeof so.perks === 'object' ? so.perks : {}, perks = {};
+        for (const P of PERKS) { const v = num(pk[P.id], 0, 0, P.max); if (v) perks[P.id] = v; }
+        prog.soul = { pts: num(so.pts, 0, 0, 1e9), total: num(so.total, 0, 0, 1e9), perks, rb: num(so.rb, 0, 0, 999) };
+        const gm = s.gems && typeof s.gems === 'object' ? s.gems : {}; prog.gems = {};
+        for (const g of GEM_IDS) { const v = num(gm[g], 0, 0, 99); if (v) prog.gems[g] = v; }
+        const sk2 = s.sock && typeof s.sock === 'object' ? s.sock : {}; prog.sock = {};
+        for (const id of Object.keys(SKD)) if (Array.isArray(sk2[id])) prog.sock[id] = sk2[id].slice(0, 3).map((g) => (GEM_IDS.includes(g) ? g : null));
+        for (const g of GEM_IDS) { let over = gemsUsed(g) - (prog.gems[g] || 0); for (const id in prog.sock) for (let k = 0; k < 3 && over > 0; k++) if (prog.sock[id][k] === g) { prog.sock[id][k] = null; over--; } }
+        const sl = s.slots && typeof s.slots === 'object' ? s.slots : {};
+        prog.slots = { blade: Array.isArray(sl.blade) ? sl.blade.slice(0, 7).map(String) : null, arcane: Array.isArray(sl.arcane) ? sl.arcane.slice(0, 7).map(String) : null }; }
       prog.inv = Array.isArray(s.inv) ? s.inv.map(cleanItem).filter(Boolean).slice(0, INV_MAX) : [];
       prog.eq = { sword: null, staff: null, head: null, body: null, acc: null };
       if (s.eq && typeof s.eq === 'object') for (const t of SLOT_TYPES) { const it = cleanItem(s.eq[t]); if (it && it.type === t) prog.eq[t] = it; }
@@ -660,10 +670,11 @@
   function hitEnemy(e, base) {
     if (e.dead) return;
     if (e.shieldT > 0) { addText(e.x, e.y, '無効', 'hit', bodyH(e) + 18); return; }
-    const crit = player.critT > 0 || Math.random() < D.crit;
-    const dmg = Math.max(1, Math.round(base * legendDmgMul(e) * elemOnHit(e) * rand(0.9, 1.1) * (crit ? D.critMul : 1) - e.armor));
+    const crit = player.critT > 0 || Math.random() < D.crit + ctxCritAdd();
+    const dmg = Math.max(1, Math.round(base * legendDmgMul(e) * ctxDmgMul(e) * elemOnHit(e) * rand(0.9, 1.1) * (crit ? D.critMul : 1) - e.armor));
     e.hp -= dmg;
     legendOnHit(e, dmg, crit);
+    ctxOnDamage(dmg);
     wbHit(e, dmg);
     e.hitT = 0.12;
     sfx(crit ? 'crit' : 'hit');
@@ -682,7 +693,7 @@
     burst(e.x, e.y, bodyH(e), 'soul', e.elite ? 10 : 4, e.elite ? 'gold' : 'cyan', 0.8);
     const exp = Math.max(1, Math.round(e.exp));
     if (e.elite || Math.random() < 0.65) {
-      const g = Math.round((randi(1, 3) * e.lvl + (e.elite ? 12 : 0)) * (1 + GEAR.gold / 100) * comboMul() * floorGoldMul());
+      const g = Math.round((randi(1, 3) * e.lvl + (e.elite ? 12 : 0)) * (1 + GEAR.gold / 100) * comboMul() * floorGoldMul() * soulGoldMul());
       prog.gold += g;
       goldPending += g;
       if (goldT <= 0) goldT = 0.35;
@@ -693,7 +704,8 @@
     questKill(e);
     legendOnKill(e);
     dropLoot(e);
-    gainExp(Math.round(exp * (1 + GEAR.exp / 100) * comboMul() * floorExpMul()));
+    gainExp(Math.round(exp * (1 + GEAR.exp / 100) * comboMul() * floorExpMul() * soulExpMul()));
+    gemDropOn(e);
   }
   function gainExp(n) {
     prog.exp += n;
@@ -723,15 +735,17 @@
     if (cap) dmg = Math.min(dmg, Math.round(D.maxHp * cap));
     dmg = legendOnHurt(dmg);
     if (dmg < 0) return;
+    if (player.form === 'blade' && keyOn('k_berserk')) dmg = Math.round(dmg * 1.15);
     if (D.shield > 0 && player.mp > 0) { const ab = Math.min(player.mp, dmg * D.shield); player.mp -= ab; dmg = Math.max(0, Math.round(dmg - ab)); }
     player.hp -= dmg;
     onHurtFeel(dmg);
     player.hurtT = 0.22;
     sfx('hurt');
     addText(player.x, player.y, String(dmg), 'hurt', 58);
-    if (player.hp <= 0) { if (phoenixSave()) return; player.hp = 0; die(); }
+    if (player.hp <= 0) { if (soulRevive() || phoenixSave()) return; player.hp = 0; die(); }
   }
   function die() {
+    soulOnDeath();
     player.dead = true; player.deadT = 0; player.target = null; player.path.length = 0; player.moving = false; drag.active = false;
     log('倒れてしまった');
     sfx('death');
@@ -797,7 +811,7 @@
     player.form = player.form === 'blade' ? 'arcane' : 'blade';
     prog.form = player.form;
     legendOnMorph();
-    player.morphT = D.morphCd;
+    player.morphT = D.morphCd * (keyOn('k_soul') ? 0.5 : 1);
     if (prog.skill.shift) player.shiftT = 4;
     setFormAttr();
     refreshD();
@@ -813,7 +827,7 @@
     if (prog.potions <= 0) { toast('回復薬がない'); return; }
     if (player.hp >= D.maxHp - 0.5) { toast('HPは満タン'); return; }
     prog.potions--;
-    const amt = Math.round(D.maxHp * 0.4);
+    const amt = Math.round(D.maxHp * 0.4 * potHealMul());
     player.hp = Math.min(D.maxHp, player.hp + amt);
     player.potT = POT_CD;
     sfx('potion');
@@ -823,13 +837,13 @@
   }
   // carry limit: extra potions picked up at the limit are not kept
   function gainPotion(n) {
-    const k = Math.max(0, Math.min(n, POT_MAX - prog.potions));
+    const k = Math.max(0, Math.min(n, potMax() - prog.potions));
     prog.potions += k;
     return k;
   }
   function buyPotion() {
     if (paused || player.dead || !inCamp(player.x, player.y)) return;
-    if (prog.potions >= POT_MAX) { toast('回復薬はこれ以上持てない（最大' + POT_MAX + '個）'); return; }
+    if (prog.potions >= potMax()) { toast('回復薬はこれ以上持てない（最大' + potMax() + '個）'); return; }
     if (prog.gold < POTION_PRICE) { toast('所持金が足りない'); return; }
     prog.gold -= POTION_PRICE;
     prog.potions++;
@@ -1003,7 +1017,7 @@
     player.path.length = 0; player.target = null; marker = null;
     portalLock = true;
     for (let k = 0; k < (id === 3 ? 18 : 15); k++) spawnPack();
-    if (id === 3) { startFloor(); if (fromMap !== 3) ariaDiveStart(); } else { clearDive(); wbLeave(); }
+    if (id === 3) { startFloor(); if (fromMap !== 3) { ariaDiveStart(); soulDiveStart(); } } else { clearDive(); wbLeave(); }
     questEvent('map', id);
     sfx('portal');
     showBanner(MAPS[id].name, MAPS[id].rec);
