@@ -55,6 +55,7 @@ async function browserPath() {
     ['party_fight', (G) => { }],
     ['pet_tab', (G) => { G.prog.opt.auto = false; G.prog.gold = 50000; G.openSheet(); G.setTab('pet'); }],
     ['offline', (G) => { G.prog.seen = Date.now() - 200 * 60000; G.showOffline(G.offlineRewards()); }],
+    ['tip', (G) => { G.closeSheet(); document.getElementById('petOk').click(); G.paused = false; G.showTip(G.TIPS[3][2]); }],
   ];
   for (const [name, fn] of steps) {
     const ok = await p.evaluate((src) => { const G = window.__G; if (!G) return false; try { G.closeSheet && G.closeSheet(); } catch (e) {} (0, eval)('(' + src + ')')(G); return true; }, fn.toString());

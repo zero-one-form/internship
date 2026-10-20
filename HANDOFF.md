@@ -29,6 +29,9 @@ assets/flare_data.js   キャラ・敵のスプライト（WebPアトラスをba
 assets/song.js         主題歌（MP3をbase64、window.__OPSONG）
 assets/op_theme.mp3 / op_beats.json   主題歌の元ファイルと拍の時刻（オープニング同期用）
 tests/test.js     jsdom回帰テスト
+tools/sim.js      バランス測定ボット（node tools/sim.js 時間）
+tools/lint_dupes.js 関数名の重複チェック
+tools/combat.js   乱戦の撮影
 tools/snap.js     画面写真の自動撮影（node tools/snap.js 出力先 幅 高さ）。JSエラーがあれば失敗終了
 tools/*.js        旧来の撮影スクリプト（パスは書き換えて使う）
 docs/             設計書・ロードマップ・QA計画
@@ -72,6 +75,7 @@ docs/             設計書・ロードマップ・QA計画
 | za_soul.js | 137 | 魂の祭壇（永続特典）、転生、撃破の連鎖ボーナス |
 | zb_skills.js | 211 | サポート宝石、スキルの文脈（遅れて当たる攻撃にも効果）、ホットバー入れ替え、新スキル4つ、極意 |
 | zc_party.js | 194 | 仲間の画面・訓練所・枠の拡張、オフラインの狩り（最大8時間）、AUTO戦闘 |
+| zd_tips.js | 43 | 初めての場面で一度だけ出すヒント |
 
 ## 4. 主なゲームシステム（どこを見るか）
 

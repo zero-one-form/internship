@@ -350,6 +350,7 @@
     applySlots();
     if (!TEST) pendingOffline = offlineRewards(); else prog.seen = Date.now();
     $('autoBtn').addEventListener('click', autoToggle);
+    $('tip').addEventListener('click', tipClose);
     document.addEventListener('keydown', (ev) => { if ((ev.key || '').toLowerCase() === 'a' && !ev.repeat && $('sheet').hidden && !ARIA.on) autoToggle(); });
     $('altarBtn').addEventListener('click', altarOpen);
     $('altarClose').addEventListener('click', altarClose);
@@ -385,6 +386,7 @@
         findPath, spawnPack, blockedAt, inCamp, gainExp, hurtPlayer, expNeed, chunkCache, castSkill, learn, SKD, fields, meteors,
         get dash() { return dash; },
         ARIA, ariaOpen, ariaStart, ariaHit, ariaTick, ariaClose, ariaChart, ariaState, ariaDiveStart,
+        TIPS, tipTick, tipsSeen, showTip,
         partyList, partyAdd, partyRemove, partySlots, entOf, PET_SP, trainS, TRAIN, offlineRewards, showOffline, autoOn, autoToggle, autoBattle, expGapMul, autoRetreat, get autoWall() { return autoWall; }, set autoWall(v) { autoWall = v; }, petPower, partyGoldMul,
         soul, perkLv, PERKS, gainSoul, rebirth, altarOpen, altarClose, altarRender, streakOnKill, streakEnd, get streakN() { return streakN; }, potMax, GEMS, gainGem, gemFree, sockets, sockOf, makeCtx, castWithGems, applySlots, setSlot, SLOTS, keyOn, growthUpdate, skillCdMul, cdOf, skillMpMul,
         dailyState, dailyCheck, achCheck, DAILY_POOL, ACH, titleName, recAdd,

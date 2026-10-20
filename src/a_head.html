@@ -173,6 +173,10 @@ button{font-family:inherit;cursor:pointer;-webkit-tap-highlight-color:transparen
 .streak.on{animation:streak 1.4s ease-out forwards;}
 @keyframes streak{0%{opacity:0;transform:translate(-50%,-50%) scale(1.8)}12%{opacity:1;transform:translate(-50%,-50%) scale(1)}70%{opacity:1}100%{opacity:0;transform:translate(-50%,-62%) scale(1)}}
 @media (prefers-reduced-motion:reduce){.streak.on{animation:none;opacity:1}}
+.tipc{position:absolute;left:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 272px);z-index:9;width:min(calc(100% - 90px),420px);padding:9px 12px 10px;border-radius:14px;transform:translateY(8px);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;font-size:12.5px;font-weight:800;line-height:1.55;}
+.tipc.on{opacity:1;transform:none;pointer-events:auto;cursor:pointer;}
+.tipc b{display:block;font-size:11px;color:var(--accent-ink);letter-spacing:.1em;}
+@media (max-height:520px){.tipc{left:50%;bottom:auto;top:66px;width:min(40%,420px);transform:translate(-50%,8px);}.tipc.on{transform:translate(-50%,0);}}
 .skx2{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
 .skx2 .gsort{margin-left:0;max-width:100%;}
 .skx2 .gem{flex:1 1 140px;}
@@ -563,6 +567,7 @@ button{font-family:inherit;cursor:pointer;-webkit-tap-highlight-color:transparen
     </div>
   </div>
   <div id="streak" class="streak" aria-live="polite"></div>
+  <div id="tip" class="tipc glass" role="status" aria-live="polite"><b>ヒント</b><span id="tipText"></span></div>
   <div id="ariaOv" class="ariaov" hidden>
     <canvas id="ariaCv" aria-label="アリアの演奏"></canvas>
     <button id="ariaStop" class="opskip" type="button" hidden>やめる</button>

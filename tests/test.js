@@ -646,6 +646,15 @@ const assert = (c, msg) => { if (!c) { errors.push('ASSERT FAIL: ' + msg); conso
     assert(!pl.dead, 'AUTO revives a fallen hero after a few seconds of game time');
     G.prog.opt.auto = false;
   }
+  // first-time tips
+  {
+    G.enterMap(0, null); frames(3); G.paused = false; G.player.dead = false;
+    G.prog.tips = []; const lv0 = G.prog.level; G.prog.level = Math.max(3, lv0);
+    G.tipTick(5);
+    assert(G.tipsSeen().includes('auto') && w.document.getElementById('tip').classList.contains('on'), 'a first-time tip appears once its moment comes');
+    for (let i = 0; i < 30; i++) G.tipTick(1);
+    assert(G.tipsSeen().filter((x) => x === 'auto').length === 1, 'each tip is shown only once');
+  }
   // balance pass 2 (from the balance bot)
   {
     const lv0 = G.prog.level; G.prog.level = 50;

@@ -486,7 +486,8 @@
         }
         prog.dailyAll = num(s.dailyAll, 0, 0, 1e6);
         prog.ach = Array.isArray(s.ach) ? s.ach.filter((id) => ACH_IDS.includes(id)) : [];
-        prog.title = ACH_IDS.includes(s.title) ? s.title : ''; }
+        prog.title = ACH_IDS.includes(s.title) ? s.title : '';
+        prog.tips = Array.isArray(s.tips) ? s.tips.filter((id) => TIPS.some((t) => t[0] === id)) : []; }
       { const so = s.soul && typeof s.soul === 'object' ? s.soul : {}, pk = so.perks && typeof so.perks === 'object' ? so.perks : {}, perks = {};
         for (const P of PERKS) { const v = num(pk[P.id], 0, 0, P.max); if (v) perks[P.id] = v; }
         prog.soul = { pts: num(so.pts, 0, 0, 1e9), total: num(so.total, 0, 0, 1e9), perks, rb: num(so.rb, 0, 0, 999) };
