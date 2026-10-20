@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: npm ci
+      - name: Build single-file HTML
+        run: python3 build.py
+      - name: Syntax check
+        run: node --check dist/game_only.js
+      - name: Size budget (16MB)
+        run: |
+          size=$(stat -c%s dist/twinsoul.html)
+          echo "dist/twinsoul.html = $size bytes"
+          test "$size" -le 16000000
+      - name: Regression tests
+        run: node tests/test.js
+      - uses: actions/upload-artifact@v4
+        with:
+          name: twinsoul-html
+          path: dist/twinsoul.html
