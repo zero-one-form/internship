@@ -452,6 +452,7 @@ const assert = (c, msg) => { if (!c) { errors.push('ASSERT FAIL: ' + msg); conso
   { G.enterMap(0, null); frames(3); G.prog.level = Math.max(G.prog.level, 30); G.wbLocal().tries = 0;
     await G.openWorld(); assert(!w.document.getElementById('worldDlg').hidden && w.document.querySelectorAll('#worldBox .qc').length >= 2, 'world panel shows boss and ranking');
     await G.wbEnter(); await sleep(400); frames(5);
+    { const n0 = G.enemies.filter((e) => !e.dead).length; for (let i = 0; i < 6; i++) G.step(0.5); assert(G.enemies.filter((e) => !e.dead && !e.world).length <= n0 + 4, 'no ambient packs spawn in the world-boss arena'); }
     assert(G.WB.on && G.curMap === 3 && G.bossRef && G.bossRef.world && G.bossRef.maxHp >= 8e6, 'rift arena with the shared boss');
     assert(G.enemies.filter((e) => !e.dead).length <= 4, 'arena holds only the boss and its adds');
     const b = G.bossRef; G.hitEnemy(b, 50000); G.hitEnemy(b, 50000); frames(2);
@@ -489,6 +490,19 @@ const assert = (c, msg) => { if (!c) { errors.push('ASSERT FAIL: ' + msg); conso
     G.prog.deep = deep0;
     assert(bad === 0, 'no unreachable floor bounties at the bottom of the abyss');
     G.prog.rank = 2; G.prog.rankMax = 2; G.prog.cls = { blade: 'saint', arcane: null };
+  }
+  // balance: potion carry limit, boss hit cap, item level cap
+  {
+    const p0 = G.prog.potions; G.prog.potions = 29; G.killEnemy(G.makeTestElite()); G.killEnemy(G.makeTestElite());
+    assert(G.prog.potions === 30, 'potions stop at the carry limit (30)'); G.prog.potions = p0;
+    const pl = G.player; pl.dead = false; G.refreshD(); pl.hp = G.D.maxHp; const hp0 = pl.hp;
+    G.hurtPlayer(1e9, 0.38);
+    assert(!pl.dead && hp0 - pl.hp <= Math.round(G.D.maxHp * 0.38) + 1, 'telegraphed boss hits are capped at 38% of max HP');
+    pl.hp = G.D.maxHp;
+    const big = G.genItem(350, 3, 'sword');
+    assert(big.il === 350 && big.opts.every((o) => o.k === 'skill' || isFinite(o.v)), 'items scale past il 99 for abyss ranks');
+    const aspd = G.genItem(400, 3, 'acc').opts.filter((o) => o.k === 'aspd');
+    assert(aspd.every((o) => o.v <= 25), 'percentage affixes stop scaling at il 99');
   }
 
   // reset

@@ -1,12 +1,13 @@
 
   /* ================= equipment & loot ================= */
-  const INV_MAX = 36;
+  const INV_MAX = 36, IL_MAX = 400;
+  const FLAT_OPTS = ['str', 'agi', 'vit', 'int', 'luk', 'hp', 'mp'];
   const SLOT_TYPES = ['sword', 'staff', 'head', 'body', 'acc'];
   const TYPE_INFO = {
     sword: { name: '剣', names: ['鉄の剣', '鋼の長剣', '銀翼の剣', '竜骨の大剣'], icon: 'ic-sword', base: (il) => 4 + il * 2.2, baseTxt: (v) => '剣の型の攻撃力 +' + v },
     staff: { name: '杖', names: ['樫の杖', '水晶の杖', '星詠みの杖', '天穹の杖'], icon: 'ic-staff', base: (il) => 4 + il * 2.2, baseTxt: (v) => '術の型の攻撃力 +' + v },
     head: { name: '頭', names: ['革の帽子', '鉄の兜', '騎士の兜', '天秤の冠'], icon: 'ic-head', base: (il) => 10 + il * 6, baseTxt: (v) => '最大HP +' + v },
-    body: { name: '胴', names: ['旅人の服', '鎖かたびら', '騎士の鎧', '聖銀の鎧'], icon: 'ic-body', base: (il) => 3 + il * 0.3, baseTxt: (v) => '受けるダメージ -' + v + '%', dec: true },
+    body: { name: '胴', names: ['旅人の服', '鎖かたびら', '騎士の鎧', '聖銀の鎧'], icon: 'ic-body', base: (il) => 3 + 27 * (1 - Math.exp(-il / 60)), baseTxt: (v) => '受けるダメージ -' + v + '%', dec: true },
     acc: { name: '装飾', names: ['銅の指輪', '翠玉の首飾り', '月長石の指輪', '星辰の護符'], icon: 'ic-acc', base: (il) => 8 + il * 3, baseTxt: (v) => '最大MP +' + v }
   };
   const RAR = [
@@ -56,7 +57,7 @@
   }
   function genItem(il, rar, type) {
     type = type || SLOT_TYPES[(Math.random() * SLOT_TYPES.length) | 0];
-    il = clamp(Math.round(il), 1, 99);
+    il = clamp(Math.round(il), 1, IL_MAX);
     const T = TYPE_INFO[type], R = RAR[rar];
     const n = R.n[0] + Math.floor(Math.random() * (R.n[1] - R.n[0] + 1));
     const keys = Object.keys(OPTS), used = new Set(), opts = [];
@@ -71,10 +72,11 @@
       let key;
       do { key = keys[(Math.random() * keys.length) | 0]; } while (used.has(key));
       used.add(key);
-      const O = OPTS[key], rg = O.r(il), raw = (rg[0] + Math.random() * (rg[1] - rg[0])) * boost;
+      const O = OPTS[key], rg = O.r(FLAT_OPTS.includes(key) ? il : Math.min(il, 99)), raw = (rg[0] + Math.random() * (rg[1] - rg[0])) * boost;
       opts.push({ k: key, v: O.d ? Math.round(raw * 10) / 10 : Math.max(1, Math.round(raw)) });
     }
-    let name = T.names[Math.min(3, Math.floor((il - 1) / 6))];
+    let name = T.names[il < 7 ? 0 : il < 13 ? 1 : il < 19 ? 2 : 3];
+    if (il >= 100) name = ['真・', '極・', '神・'][Math.min(2, Math.floor((il - 100) / 100))] + name;
     if (rar === 3) name = '「' + EPI[(Math.random() * EPI.length) | 0] + '」' + name;
     else if (rar >= 1 && opts.length && opts[0].k !== 'skill') name = OPTS[opts[0].k].p + name;
     return { id: ++itemSeq, type, il, rar, name, opts, plus: 0, isNew: true };

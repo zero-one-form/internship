@@ -370,7 +370,7 @@
         enterMap, setUserZoom, get portals() { return portals; }, get curMap() { return curMap; }, get zoom() { return zoom; },
         findPath, spawnPack, blockedAt, inCamp, gainExp, hurtPlayer, expNeed, chunkCache, castSkill, learn, SKD, fields, meteors,
         get dash() { return dash; },
-        save, load, cleanItem, genBounty, ABYSS_MAX_F: ABYSS_MAX
+        save, load, cleanItem, genBounty, ABYSS_MAX_F: ABYSS_MAX, refreshD, makeTestElite() { const e = makeEnemy('goblin', player.x + 3, player.y, 5, ++packSeq, true); enemies.push(e); return e; }
       };
     }
     requestAnimationFrame(frame);

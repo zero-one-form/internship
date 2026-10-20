@@ -94,7 +94,7 @@
     if (obj === 'kill') FLOOR.goal = floorNeed = Math.round(floorNeed * (FLOOR.mods.includes('horde') ? 1.3 : 1));
     else if (obj === 'survive') { FLOOR.goal = Math.round(35 + Math.min(25, f * 0.5)); FLOOR.timer = FLOOR.goal; FLOOR.waveT = 2; }
     else { FLOOR.goal = 3; for (let i = 0; i < 3; i++) spawnSpecial(obj === 'treasure' ? 'chest' : obj === 'seal' ? 'seal' : 'bounty'); }
-    if (!FLOOR.mods.includes(weekMod())) { FLOOR.mods.push(weekMod()); FLOOR.bonus += MODS[weekMod()][2]; }
+    if (f >= 6 && !FLOOR.mods.includes(weekMod())) { FLOOR.mods.push(weekMod()); FLOOR.bonus += MODS[weekMod()][2]; }
     if (FLOOR.mods.includes('horde')) for (let k = 0; k < 8; k++) spawnPack();
     if (f >= 4 && Math.random() < 0.22) spawnSpecial('goblin');
     const M = MAPS[3];

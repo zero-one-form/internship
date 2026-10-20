@@ -2,6 +2,7 @@
   /* ================= abyss dungeon (endless floors) ================= */
   let curFloor = 1, floorKills = 0, floorNeed = 0, stairsOpen = false, bossRef = null;
   const slams = [];
+  const BOSS_HIT_CAP = 0.38, BOSS_SHOT_CAP = 0.14; // telegraphed boss attacks: max share of max HP per hit
   const BOSS_NAMES = { skeleton: '骨の王', zombie: '朽ちた巨人', goblin_elite: 'ゴブリンの大将', fire_ant: '炎蟻の女王' };
   function checkpointFloor() { return Math.floor(Math.max(0, prog.deep - 1) / 5) * 5 + 1; }
   function prepFloor() {
@@ -139,7 +140,7 @@
     const moved = moveEnemy(e, e.x + c.dx * st, e.y + c.dy * st);
     e.moving = true;
     if (Math.random() < dt * 30) burst(e.x, e.y, 2, 'dust', 2, '', 1.2);
-    if (!c.hit && !player.dead && hyp(player.x - e.x, player.y - e.y) < 0.95) { c.hit = true; hurtPlayer(e.dmg * 2.2); sfx('bash'); }
+    if (!c.hit && !player.dead && hyp(player.x - e.x, player.y - e.y) < 0.95) { c.hit = true; hurtPlayer(e.dmg * 2.2, BOSS_HIT_CAP); sfx('bash'); }
     if (c.left <= 0 || !moved) { e.charge = null; sfx('slam'); burst(e.x, e.y, 4, 'dust', 14, '', 2.4); }
     return true;
   }
@@ -185,7 +186,7 @@
       s.t += dt;
       if (s.t < s.at) continue;
       slams.splice(i, 1);
-      if (!player.dead && hyp(player.x - s.x, player.y - s.y) < s.r) hurtPlayer(s.dmg);
+      if (!player.dead && hyp(player.x - s.x, player.y - s.y) < s.r) hurtPlayer(s.dmg, BOSS_HIT_CAP);
       addFx({ k: 'boom', x: s.x, y: s.y, r: s.r, t: 0, life: 0.55 });
       burst(s.x, s.y, 4, 'dust', s.r > 1.2 ? 14 : 6, '', 2.5);
     }
@@ -193,7 +194,7 @@
       const s = bshots[i];
       s.t += dt; s.x += s.vx * dt; s.y += s.vy * dt;
       if (s.t > s.life || blockedAt(s.x, s.y, 0.05)) { bshots.splice(i, 1); continue; }
-      if (!player.dead && hyp(player.x - s.x, player.y - s.y) < 0.45) { bshots.splice(i, 1); hurtPlayer(s.dmg); burst(s.x, s.y, 20, 'spark', 8, 'amber', 1.6); }
+      if (!player.dead && hyp(player.x - s.x, player.y - s.y) < 0.45) { bshots.splice(i, 1); hurtPlayer(s.dmg, BOSS_SHOT_CAP); burst(s.x, s.y, 20, 'spark', 8, 'amber', 1.6); }
     }
     for (let i = blines.length - 1; i >= 0; i--) {
       const L = blines[i];
@@ -201,7 +202,7 @@
       if (L.t < L.at) continue;
       blines.splice(i, 1);
       if (L.dmg > 0) {
-        if (!player.dead && segDist(player.x, player.y, L) < L.w / 2 + 0.2) hurtPlayer(L.dmg);
+        if (!player.dead && segDist(player.x, player.y, L) < L.w / 2 + 0.2) hurtPlayer(L.dmg, BOSS_HIT_CAP);
         for (let k = 0; k <= 6; k++) { const u = k / 6; burst(L.x1 + (L.x2 - L.x1) * u, L.y1 + (L.y2 - L.y1) * u, 3, 'dust', 4, '', 2); }
         sfx('slam');
       }

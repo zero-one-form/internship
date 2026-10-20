@@ -10,7 +10,7 @@
   const TAU = Math.PI * 2;
   const FONT = '"M PLUS Rounded 1c","Hiragino Maru Gothic ProN","Hiragino Sans","Noto Sans JP",sans-serif';
   const SAVE_KEY = 'twinsoul-save-v1';
-  const MORPH_CD = 1.0, POT_CD = 0.8, POP_CAP = 85, POTION_PRICE = 20, DAY_LEN = 300;
+  const MORPH_CD = 1.0, POT_CD = 1.5, POT_MAX = 30, POP_CAP = 85, POTION_PRICE = 20, DAY_LEN = 300;
 
   function seeded(seed) {
     let a = seed >>> 0;
@@ -393,7 +393,9 @@
     const lv = (id) => slv(id);
     let atk = blade ? (8 + s.str * 2.2 + L * 1.6 + G.swordAtk) * (1 + 0.04 * lv('sword')) : (6 + s.int * 2.4 + L * 1.5 + G.staffAtk) * (1 + 0.04 * lv('amp'));
     atk *= 1 + G.atkPct / 100;
-    let interval = (blade ? Math.max(0.32, 0.86 - s.agi * 0.011) : Math.max(0.42, 1.06 - s.agi * 0.011)) / (1 + G.aspd / 100);
+    const iv0 = blade ? 0.86 : 1.06, ivLo = blade ? 0.32 : 0.42, knee = (iv0 - ivLo) / 0.011;
+    let interval = Math.max(ivLo, iv0 - s.agi * 0.011) / (1 + Math.max(0, s.agi - knee) * 0.004) / (1 + G.aspd / 100);
+    interval = Math.max(interval, ivLo * 0.55);
     if (blade && player.auraT > 0) { atk *= 1.2 + 0.03 * player.auraLv; interval *= 0.8; }
     if (player.shiftT > 0) atk *= 1 + 0.03 * lv('shift');
     if (player.frenzyT > 0) { atk *= 1.25; interval *= 0.77; }
@@ -511,7 +513,7 @@
       maxHp: hp, hp,
       dmg: T.dmg * (1 + 0.26 * (lvl - 1)) * (elite ? 1.4 : 1),
       speed: T.sp * (elite ? 1.05 : 1),
-      exp: T.exp * (1 + 0.45 * (lvl - 1)) * (elite ? 3 : 1),
+      exp: T.exp * (1 + 0.45 * (lvl - 1)) * (1 + lvl / 150) * (elite ? 3 : 1),
       aggro: T.aggro, atkInt: T.atk, r: T.r * (elite ? 1.2 : 1),
       armor: T.armor + (type === 'undead' ? lvl * 0.6 : 0),
       cv: Math.floor(Math.random() * T.vars),
@@ -669,7 +671,7 @@
       goldPending += g;
       if (goldT <= 0) goldT = 0.35;
     }
-    if (e.elite || Math.random() < 0.09) { prog.potions++; log('回復薬を拾った'); }
+    if (e.elite || Math.random() < 0.09) { if (gainPotion(1)) log('回復薬を拾った'); }
     if (e.elite) log('強い個体を倒した');
     dungeonKill(e);
     questKill(e);
@@ -697,10 +699,11 @@
       save();
     }
   }
-  function hurtPlayer(raw) {
+  function hurtPlayer(raw, cap) {
     if (player.dead || ULT.inv > 0) return;
     classOnHurt();
     let dmg = Math.max(1, Math.round(raw * rand(0.9, 1.1) * (1 - D.guard)));
+    if (cap) dmg = Math.min(dmg, Math.round(D.maxHp * cap));
     if (D.shield > 0 && player.mp > 0) { const ab = Math.min(player.mp, dmg * D.shield); player.mp -= ab; dmg = Math.max(0, Math.round(dmg - ab)); }
     player.hp -= dmg;
     player.hurtT = 0.22;
@@ -797,8 +800,15 @@
     addFx({ k: 'heal', x: player.x, y: player.y, t: 0, life: 0.7 });
     burst(player.x, player.y, 6, 'heal', 14, 'mint', 1.2);
   }
+  // carry limit: extra potions picked up at the limit are not kept
+  function gainPotion(n) {
+    const k = Math.max(0, Math.min(n, POT_MAX - prog.potions));
+    prog.potions += k;
+    return k;
+  }
   function buyPotion() {
     if (paused || player.dead || !inCamp(player.x, player.y)) return;
+    if (prog.potions >= POT_MAX) { toast('回復薬はこれ以上持てない（最大' + POT_MAX + '個）'); return; }
     if (prog.gold < POTION_PRICE) { toast('所持金が足りない'); return; }
     prog.gold -= POTION_PRICE;
     prog.potions++;
@@ -945,7 +955,7 @@
     ambientParticles(dt);
     updateParts(dt);
     spawnT -= dt;
-    if (spawnT <= 0) { spawnT = 0.85; if (aliveCount() < POP_CAP) spawnPack(); }
+    if (spawnT <= 0) { spawnT = 0.85; if (!WB.on && aliveCount() < POP_CAP) spawnPack(); } // the world-boss arena holds only the boss and its adds
     const k = Math.min(1, dt * 7);
     cam.x += (p.x - cam.x) * k;
     cam.y += (p.y - cam.y) * k;
