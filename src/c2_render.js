@@ -212,14 +212,15 @@
   const cv = $('cv');
   const ctx = cv.getContext('2d');
   let W = 1, H = 1, DPR = 1, zoom = 1, HW = 32, HH = 16, ox = 0, oy = 0;
-  let lightCv = null, lctx = null, LW = 0, LH = 0, starCv = null, vigCv = null;
+  let lightCv = null, lctx = null, LW = 0, LH = 0, starCv = null, vigCv = null, dprCap = 2;
   let env = { amb: [255, 255, 255], dark: 0, sky: ['#8fb5d8', '#d8e8f0'] };
   const lights = [], emis = [], drawList = [];
   function resize() {
     const r = $('game').getBoundingClientRect();
     W = Math.max(1, r.width);
     H = Math.max(1, r.height);
-    DPR = opt().lite ? 1 : Math.min(2, window.devicePixelRatio || 1);
+    DPR = opt().lite ? 1 : Math.min(dprCap, window.devicePixelRatio || 1);
+    if (cv.width === Math.round(W * DPR) && cv.height === Math.round(H * DPR) && starCv && starCv.width === Math.ceil(W) && starCv.height === Math.ceil(H)) return;
     cv.width = Math.round(W * DPR);
     cv.height = Math.round(H * DPR);
     applyZoom();
@@ -301,7 +302,8 @@
       ch.used = chunkClock;
       ctx.drawImage(ch.c, v[2], v[3], v[4], v[5]);
     }
-    if (!built) {
+    const cap = Math.max(24, vis.length + 10);
+    if (!built && chunkCache.size < cap) {
       for (let cj = 0; cj < NC && !built; cj++) {
         for (let ci = 0; ci < NC && !built; ci++) {
           const key = ci * 64 + cj;
@@ -313,7 +315,6 @@
         }
       }
     }
-    const cap = Math.max(24, vis.length + 10);
     if (chunkCache.size > cap) {
       const arr = [...chunkCache.entries()].sort((a, b) => a[1].used - b[1].used);
       for (let k = 0; k < arr.length - cap; k++) if (arr[k][1].used < chunkClock) chunkCache.delete(arr[k][0]);

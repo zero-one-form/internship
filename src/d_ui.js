@@ -3,7 +3,7 @@
   const dom = {};
   const lastV = {};
   function cacheDom() {
-    const ids = ['lvText', 'formName', 'hpFill', 'hpText', 'mpFill', 'mpText', 'xpFill', 'morphBtn', 'morphLabel', 'potionBtn', 'potionCount', 'shopBtn', 'shopGold', 'ptBadge', 'bagDot', 'bossBar', 'bossName', 'bossFill'];
+    const ids = ['goldHud', 'xpLine', 'lvText', 'formName', 'hpFill', 'hpText', 'mpFill', 'mpText', 'xpFill', 'morphBtn', 'morphLabel', 'potionBtn', 'potionCount', 'shopBtn', 'shopGold', 'ptBadge', 'bagDot', 'bossBar', 'bossName', 'bossFill'];
     for (const id of ids) dom[id] = $(id);
   }
   function setT(id, v) { if (lastV[id] !== v) { lastV[id] = v; dom[id].textContent = v; } }
@@ -195,7 +195,7 @@
 
   /* ================= input ================= */
   function localXY(ev) {
-    const r = cv.getBoundingClientRect();
+    const r = $('game').getBoundingClientRect();
     return [ev.clientX - r.left, ev.clientY - r.top];
   }
   function pickEnemy(px, py) {
@@ -295,16 +295,29 @@
   });
 
   /* ================= loop ================= */
-  let lastTs = 0;
+  let lastTs = 0, frameErr = 0, slowT = 0, frameAvg = 1 / 60;
   function frame(ts) {
+    requestAnimationFrame(frame);
+    if (lastTs && ts - lastTs < 14) return; // 90/120Hz screens: simulate and draw at ~60fps
     const dt = lastTs ? Math.min(0.05, Math.max(0, (ts - lastTs) / 1000)) : 1 / 60;
     lastTs = ts;
-    time += dt;
-    if (!paused) { const sd = hitStop > 0 ? dt * 0.1 : dt; hitStop = Math.max(0, hitStop - dt); update(sd); }
-    if (!END && !OP.on && !OP.capturing) render();
-    updateHud();
-    feelFrame(dt);
-    requestAnimationFrame(frame);
+    try {
+      time += dt;
+      if (!paused) { const sd = hitStop > 0 ? dt * 0.1 : dt; hitStop = Math.max(0, hitStop - dt); update(sd); }
+      if (!END && !OP.on && !OP.capturing) render();
+      updateHud();
+      feelFrame(dt);
+    } catch (e) {
+      if (frameErr++ < 3) console.error(e);
+    }
+    adaptResolution(dt);
+  }
+  // drop render resolution one step at a time while frames stay slow (keeps phones above ~45fps)
+  function adaptResolution(dt) {
+    if (paused || document.hidden || OP.on) { slowT = 0; return; }
+    frameAvg += (dt - frameAvg) * 0.05;
+    slowT = frameAvg > 0.022 ? slowT + dt : 0;
+    if (slowT > 3 && dprCap > 1.25 && (window.devicePixelRatio || 1) > 1.25) { dprCap -= 0.25; slowT = 0; frameAvg = 1 / 60; resize(); }
   }
   function boot() {
     load();
@@ -322,8 +335,10 @@
     $('mapName').textContent = MAPS[curMap].name;
     resize();
     drawPortrait();
-    if ('ResizeObserver' in window) new ResizeObserver(() => resize()).observe($('game'));
-    window.addEventListener('resize', () => resize());
+    let rq = 0;
+    const onResize = () => { if (!rq) rq = requestAnimationFrame(() => { rq = 0; resize(); }); };
+    if ('ResizeObserver' in window) new ResizeObserver(onResize).observe($('game'));
+    window.addEventListener('resize', onResize);
     for (let k = 0; k < 9; k++) spawnPack();
     if (curMap === 3) { startFloor(); restoreDive(); }
     netInit();
@@ -335,7 +350,7 @@
       sb.textContent = 'はじめる';
       if (!TEST && opt().op !== false) opBoot(); else afterOP();
     });
-    document.addEventListener('visibilitychange', () => { if (document.hidden) save(); });
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) return; save(); if (!TEST && !paused && !player.dead && !OP.on && !END && enemies.some((e) => !e.dead && e.state === 'chase')) openSheet(); });
     window.addEventListener('pagehide', () => save());
     if (TEST) {
       window.__G = {

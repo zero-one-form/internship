@@ -470,7 +470,7 @@
   }
   function opLoop() {
     if (!OP.on) return;
-    const cvs = $('opCv'), d = Math.min(2, window.devicePixelRatio || 1);
+    const cvs = $('opCv'), d = Math.min(1.25, window.devicePixelRatio || 1);
     if (cvs.width !== Math.round(cvs.clientWidth * d) || cvs.height !== Math.round(cvs.clientHeight * d)) { cvs.width = Math.round(cvs.clientWidth * d) || 1; cvs.height = Math.round(cvs.clientHeight * d) || 1; }
     OP.dpr = d;
     if (OP.audio && AU.ctx && AU.ctx.state !== 'running' && performance.now() - OP.started > 800) { OP.audio = false; OP.t0 = performance.now() - Math.max(0, (performance.now() - OP.started) - 250); }

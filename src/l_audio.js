@@ -3,7 +3,8 @@
   const AU = { ctx: null, last: {}, mood: '', step: 0, nextT: 0, mel: 0, switchAt: 0, timer: 0 };
   const mtof = (m) => 440 * Math.pow(2, (m - 69) / 12);
   function audioInit() {
-    if (AU.ctx) { if (AU.ctx.state === 'suspended' && !document.hidden) AU.ctx.resume().catch(() => {}); return; }
+    if (AU.ctx) { if (AU.ctx.state !== 'running' && !document.hidden) AU.ctx.resume().catch(() => {}); return; }
+    try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) { /* unsupported */ }
     const AC = window.AudioContext || window.webkitAudioContext;
     if (!AC) return;
     let c;

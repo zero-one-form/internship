@@ -326,10 +326,9 @@
       st.style.left = ''; st.style.top = ''; st.style.bottom = '';
       $('stickKnob').style.transform = '';
     }
-    const xr = clamp(prog.exp / expNeed(prog.level), 0, 1);
-    $('xpLine').style.transform = 'scaleX(' + xr + ')';
-    $('goldHud').textContent = prog.gold + 'G';
-    $('lvText').textContent = String(prog.level);
+    setS('xpLine', prog.exp / expNeed(prog.level));
+    setT('goldHud', prog.gold + 'G');
+    setT('lvText', String(prog.level));
     if (noteT > 0) { noteT -= dt; if (noteT <= 0 || !prog.inv.includes(noteItem)) { noteT = 0; $('pickNote').hidden = true; } }
   }
   function bindUi2() {

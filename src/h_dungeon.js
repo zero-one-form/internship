@@ -57,6 +57,7 @@
     const pt = last ? { x: t[0], y: t[1], to: 0, arrive: 1, label: '地上へ帰還' } : { x: t[0], y: t[1], to: 3, arrive: 0, next: true, label: 'B' + (curFloor + 1) + 'F（' + themeOf(curFloor + 1).name + '）へ' };
     portals.push(pt);
     props.push({ kind: 'portal', v: 0, x: pt.x, y: pt.y, s: 1, ph: 0, depth: pt.x + pt.y });
+    chunkCache.delete(Math.floor(pt.x / CH) * 64 + Math.floor(pt.y / CH));
     toast(last ? '地上への門が開いた！' : '次の階への門が開いた！（ミニマップの水色の点）');
     log('B' + (curFloor + 1) + 'Fへの門が開いた');
   }
