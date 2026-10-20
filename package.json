@@ -1,0 +1,15 @@
+{
+  "name": "you-thy-aria",
+  "private": true,
+  "description": "YOU, THY ARIA - browser isometric action RPG (single-file HTML)",
+  "scripts": {
+    "build": "python3 build.py",
+    "test": "python3 build.py && node tests/test.js"
+  },
+  "devDependencies": {
+    "jsdom": "^24.0.0",
+    "@napi-rs/canvas": "^0.1.53",
+    "@sparticuz/chromium": "131.0.0",
+    "puppeteer-core": "^23.0.0"
+  }
+}
