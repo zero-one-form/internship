@@ -29,6 +29,7 @@ assets/flare_data.js   キャラ・敵のスプライト（WebPアトラスをba
 assets/song.js         主題歌（MP3をbase64、window.__OPSONG）
 assets/op_theme.mp3 / op_beats.json   主題歌の元ファイルと拍の時刻（オープニング同期用）
 tests/test.js     jsdom回帰テスト
+tools/cutout.py   AIで作ったヒロインの絵の白背景を切り抜き、assets/heroines/ にWebPで保存
 tools/sim.js      バランス測定ボット（node tools/sim.js 時間）
 tools/lint_dupes.js 関数名の重複チェック
 tools/combat.js   乱戦の撮影
@@ -76,6 +77,7 @@ docs/             設計書・ロードマップ・QA計画
 | zb_skills.js | 211 | サポート宝石、スキルの文脈（遅れて当たる攻撃にも効果）、ホットバー入れ替え、新スキル4つ、極意 |
 | zc_party.js | 194 | 仲間の画面・訓練所・枠の拡張、オフラインの狩り（最大8時間）、AUTO戦闘 |
 | zd_tips.js | 43 | 初めての場面で一度だけ出すヒント |
+| ze_heroine.js | 336 | ヒロイン（ミーナ・アリア）：同行と固有能力、好感度と会話、物語の場面（B11〜B50）、奥義のカットイン、仮の絵 |
 
 ## 4. 主なゲームシステム（どこを見るか）
 
@@ -89,7 +91,7 @@ docs/             設計書・ロードマップ・QA計画
 ## 5. 保存データ
 - `localStorage` のキー `twinsoul-save-v1` に `prog` オブジェクトをJSONで保存。
 - **新しい項目を足したら、必ず b_core.js の `load()` に検証（サニタイズ）処理を追加**すること。保存データは信頼しない前提で、型・範囲を確認してから取り込んでいる。数値は `num(v, 既定値, 最小, 最大)`（b_core）、装備は `cleanItem`（g_items、こちらは `num(v, 最小, 最大, 既定値)` と引数順が違うので注意）。
-- 追加項目（2026-10-20）: seen（最後に保存した時刻・オフライン報酬用）, pets.party/slots/train（同行・枠・訓練）, opt.auto, soul（魂の欠片・特典・転生回数）, gems（宝石の数）, sock（スキルごとの宝石）, slots（ホットバー）, aria（演奏）, daily（今日の依頼）, dailyAll, ach（実績）, title（称号）, rec に dodges/reacts/breaks/aria/floors。装備の pow（レジェンド固有効果）
+- 追加項目（2026-10-20）: heroines（ヒロインごとの加入・好感度・既読会話・同行・奥義ゲージ）, story（見た場面）, seen（最後に保存した時刻・オフライン報酬用）, pets.party/slots/train（同行・枠・訓練）, opt.auto, soul（魂の欠片・特典・転生回数）, gems（宝石の数）, sock（スキルごとの宝石）, slots（ホットバー）, aria（演奏）, daily（今日の依頼）, dailyAll, ach（実績）, title（称号）, rec に dodges/reacts/breaks/aria/floors。装備の pow（レジェンド固有効果）
 - 主な項目: level, exp, stats, sp, kp, skill, form, gold, potions, eq, inv, map, deep, floor, q(依頼), opt(設定), cleared, rank, rankMax, rankDeep, bless, phx, rec(記録), cls(上位職), pets, wb(共闘), wk(週間)。
 
 ## 6. 公開設定（アーティファクトのランタイム機能）

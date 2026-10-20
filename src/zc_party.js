@@ -45,6 +45,7 @@
     top.append(elP('qh', '仲間（同行 ' + party.length + '/' + partySlots() + '枠　所持 ' + P.list.length + '/' + PET_KEEP + '）'));
     top.append(elP('qr', 'AUTOをオンにすると、仲間はフィールド中の敵に自分から向かっていく。ゲームを閉じている間も狩りを続け、次に開いたときに成果を持ち帰る（最大8時間）。'));
     box.append(top);
+    heroCards(box);
     const eg = document.createElement('div'); eg.className = 'qc';
     eg.append(elP('qh', 'タマゴ（' + P.eggs.length + '/5）'));
     if (P.eggs.length) {

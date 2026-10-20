@@ -151,6 +151,10 @@ button{font-family:inherit;cursor:pointer;-webkit-tap-highlight-color:transparen
 .ride.on{background:linear-gradient(180deg,#c8ffe4,#6ed0a0) !important;color:#0e3a24;}
 .pcard{display:flex;gap:10px;align-items:flex-start;}
 .pcard.on{outline:2px solid var(--gold);}
+.hcv{height:125px;}
+.hcard{display:flex;gap:10px;align-items:flex-start;}
+.hcard.on{outline:2px solid var(--gold);}
+.hcard > div{flex:1;min-width:0;}
 .pcv{flex:none;width:112px;height:77px;border-radius:10px;background:radial-gradient(circle at 50% 70%,rgba(255,230,160,.35),rgba(255,230,160,0) 70%);}
 .pcard > div{flex:1;min-width:0;}
 #petCv{display:block;margin:6px auto 4px;width:240px;height:180px;}
@@ -173,6 +177,33 @@ button{font-family:inherit;cursor:pointer;-webkit-tap-highlight-color:transparen
 .streak.on{animation:streak 1.4s ease-out forwards;}
 @keyframes streak{0%{opacity:0;transform:translate(-50%,-50%) scale(1.8)}12%{opacity:1;transform:translate(-50%,-50%) scale(1)}70%{opacity:1}100%{opacity:0;transform:translate(-50%,-62%) scale(1)}}
 @media (prefers-reduced-motion:reduce){.streak.on{animation:none;opacity:1}}
+.talk{position:absolute;inset:0;z-index:28;cursor:pointer;background:linear-gradient(180deg,rgba(6,6,18,0) 30%,rgba(6,6,18,.55) 100%);}
+.talk[hidden]{display:none;}
+.talkcv{position:absolute;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 150px);width:min(70vw,330px);height:auto;transform:translateX(-50%);filter:drop-shadow(0 10px 18px rgba(0,0,0,.45));}
+.talkbox{position:absolute;left:12px;right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);min-height:128px;padding:20px 16px 16px;border-radius:16px;background:linear-gradient(180deg,rgba(255,252,244,.97),rgba(250,244,230,.97));border:1px solid var(--edge);box-shadow:0 12px 30px rgba(0,0,0,.4);color:#241d10;}
+.talkbox p{margin:0;font-size:15.5px;font-weight:800;line-height:1.75;}
+.talkname{position:absolute;left:14px;top:-14px;padding:3px 14px;border-radius:12px;color:#fff;font-size:14px;letter-spacing:.08em;box-shadow:0 3px 8px rgba(0,0,0,.3);}
+.talkname:empty{display:none;}
+.talknext{position:absolute;right:14px;bottom:8px;font-size:12px;color:#b08a3a;animation:tnext 1s ease-in-out infinite;}
+@keyframes tnext{50%{transform:translateY(3px)}}
+@media (max-height:520px){.talkcv{left:auto;right:4%;transform:none;width:min(30vw,240px);bottom:0;}.talkbox{right:34%;}}
+.cutin{position:absolute;inset:0;z-index:27;pointer-events:none;overflow:hidden;}
+.cutin[hidden]{display:none;}
+.cband{position:absolute;left:-10%;right:-10%;top:34%;height:150px;background:linear-gradient(90deg,transparent,var(--cc,#b9a6ff) 20%,#fff 50%,var(--cc,#b9a6ff) 80%,transparent);transform:skewY(-8deg) scaleX(0);opacity:.9;}
+.cutin canvas{position:absolute;top:calc(34% - 110px);left:0;width:240px;height:320px;transform:translateX(-120%);}
+.ctext{position:absolute;top:calc(34% + 40px);right:6%;text-align:right;color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.5),0 0 14px rgba(0,0,0,.4);opacity:0;}
+.ctext b{display:block;font-size:clamp(26px,8vw,40px);font-style:italic;letter-spacing:.06em;}
+.ctext span{font-size:13px;font-weight:800;letter-spacing:.2em;}
+.cutin.on .cband{animation:cband 1.2s ease-out forwards;}
+.cutin.on canvas{animation:cchar 1.2s cubic-bezier(.2,.8,.2,1) forwards;}
+.cutin.on .ctext{animation:ctext 1.2s ease-out forwards;}
+@keyframes cband{0%{transform:skewY(-8deg) scaleX(0)}15%,80%{transform:skewY(-8deg) scaleX(1);opacity:.9}100%{transform:skewY(-8deg) scaleX(1);opacity:0}}
+@keyframes cchar{0%{transform:translateX(-120%)}20%,75%{transform:translateX(8%)}100%{transform:translateX(30%);opacity:0}}
+@keyframes ctext{0%,15%{opacity:0;transform:translateX(30px)}30%,80%{opacity:1;transform:none}100%{opacity:0}}
+@media (prefers-reduced-motion:reduce){.cutin{display:none}}
+.herob{overflow:hidden;padding:0;background:conic-gradient(rgba(255,214,110,.75) calc(var(--ult,0) * 1turn),rgba(0,0,0,.15) 0) !important;border:3px solid #f2c94c !important;}
+.herob canvas{width:100%;height:100%;border-radius:50%;}
+.herob.ready{animation:ultpulse 1s ease-in-out infinite;}
 .tipc{position:absolute;left:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 272px);z-index:9;width:min(calc(100% - 90px),420px);padding:9px 12px 10px;border-radius:14px;transform:translateY(8px);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;font-size:12.5px;font-weight:800;line-height:1.55;}
 .tipc.on{opacity:1;transform:none;pointer-events:auto;cursor:pointer;}
 .tipc b{display:block;font-size:11px;color:var(--accent-ink);letter-spacing:.1em;}
@@ -269,6 +300,9 @@ button{font-family:inherit;cursor:pointer;-webkit-tap-highlight-color:transparen
 #sk0{right:128px;bottom:28px;}#sk1{right:115px;bottom:78px;}#sk2{right:78px;bottom:115px;}#sk3{right:28px;bottom:128px;}
 #sk4,#sk5,#sk6,#sk7{width:50px;height:50px;}
 #sk4{right:190px;bottom:50px;}#sk5{right:162px;bottom:122px;}#sk6{right:103px;bottom:173px;}#sk7{right:27px;bottom:192px;}
+.campbtns{position:absolute;left:12px;top:calc(env(safe-area-inset-top,0px) + 250px);z-index:5;display:flex;flex-direction:column;gap:8px;}
+.campbtns .act{position:relative;width:54px;height:54px;}
+@media (max-height:520px){.campbtns{top:auto;bottom:150px;left:150px;flex-direction:row;}}
 .quick{position:absolute;right:10px;bottom:270px;z-index:5;display:flex;flex-direction:column;gap:8px;align-items:flex-end;}
 .quick .act{position:relative;width:50px;height:50px;}
 #morphBtn{border:3px solid var(--next);}
@@ -458,11 +492,14 @@ button{font-family:inherit;cursor:pointer;-webkit-tap-highlight-color:transparen
   <div id="stick" class="stick" aria-hidden="true"><div id="stickKnob" class="knob"></div></div>
   <div class="xpline" aria-label="経験値"><i id="xpLine"></i></div>
   <div class="quick">
+    <button id="heroBtn" class="act herob" type="button" hidden><canvas id="heroBtnCv" width="96" height="96" aria-hidden="true"></canvas></button>
     <button id="autoBtn" class="act autob" type="button" aria-label="AUTO（自動で戦う）" aria-pressed="false"><b>AUTO</b></button>
     <button id="rideBtn" class="act ride" type="button" aria-label="騎乗" hidden><span id="rideLbl" class="lbl">騎乗</span></button>
     <button id="ultBtn" class="act ult" type="button" aria-label="奥義" hidden><span class="lbl">奥義</span><b id="ultPct">0%</b></button>
     <button id="morphBtn" class="act cd" type="button"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M10 21a14 14 0 0 1 25-8" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/><path d="M36 5v9h-9" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><path d="M38 27a14 14 0 0 1-25 8" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/><path d="M12 43v-9h9" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg><span id="morphLabel" class="lbl">術へ変身</span></button>
     <button id="potionBtn" class="act cd" type="button" aria-label="回復薬を使う"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M14.6 30h18.8l3.7 6.3A4 4 0 0 1 33.6 42H14.4a4 4 0 0 1-3.5-5.8z" style="fill:var(--hp)"/><path d="M19 5h10M21 5v10L10 34a7 7 0 0 0 6 10h16a7 7 0 0 0 6-10L27 15V5" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linejoin="round" stroke-linecap="round"/></svg><b id="potionCount">5</b></button>
+  </div>
+  <div class="campbtns">
     <button id="altarBtn" class="act shop altar" type="button" hidden aria-label="魂の祭壇（永続の特典と転生）"><span class="lbl">魂の</span><b>祭壇</b></button>
     <button id="ariaBtn" class="act shop aria" type="button" hidden aria-label="アリアの演奏（リズムゲーム）"><span class="lbl">♪演奏</span><b>アリア</b></button>
     <button id="shopBtn" class="act shop" type="button" hidden aria-label="回復薬を買う 20G"><span class="lbl">回復薬</span><b>20G</b><span id="shopGold" hidden></span></button>
@@ -567,6 +604,11 @@ button{font-family:inherit;cursor:pointer;-webkit-tap-highlight-color:transparen
     </div>
   </div>
   <div id="streak" class="streak" aria-live="polite"></div>
+  <div id="talkDlg" class="talk" hidden role="dialog" aria-modal="true" aria-label="会話">
+    <canvas id="talkCv" class="talkcv" width="420" height="560" aria-hidden="true"></canvas>
+    <div class="talkbox"><b id="talkName" class="talkname"></b><p id="talkText"></p><span class="talknext" aria-hidden="true">▼</span></div>
+  </div>
+  <div id="cutin" class="cutin" hidden aria-hidden="true"><div class="cband"></div><canvas id="cutinCv" width="300" height="400"></canvas><div class="ctext"><b id="cutinName"></b><span id="cutinWho"></span></div></div>
   <div id="tip" class="tipc glass" role="status" aria-live="polite"><b>ヒント</b><span id="tipText"></span></div>
   <div id="ariaOv" class="ariaov" hidden>
     <canvas id="ariaCv" aria-label="アリアの演奏"></canvas>

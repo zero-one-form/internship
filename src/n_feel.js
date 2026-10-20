@@ -71,6 +71,7 @@
   }
   function feelFrame(dt) {
     autoBless(dt);
+    heroAuto(dt);
     punchZ *= Math.pow(0.0008, dt); if (punchZ < 0.0005) punchZ = 0;
     const kd = Math.pow(0.0004, dt); kickX *= kd; kickY *= kd;
     // red screen edges: flash when hit, slow pulse while HP is low

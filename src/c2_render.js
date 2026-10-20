@@ -530,10 +530,12 @@
     for (const e of enemies) drawList.push(e);
     drawList.push(player);
     for (const q of partyList()) { const E = entOf(q); if (E !== PET || !riding()) drawList.push(E); }
+    for (const id of heroOut()) drawList.push(heroEnt(id));
     drawList.sort(byDepth);
     for (const o of drawList) {
       if (o === player) drawHero();
       else if (o.isPet) drawPet(o);
+      else if (o.isHeroine) drawHeroine(o);
       else if (o.kind) drawProp(o);
       else drawEnemy(o);
     }

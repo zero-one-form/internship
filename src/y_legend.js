@@ -22,7 +22,7 @@
     let m = 1;
     if (e.brkT > 0) m *= 1.5;
     if (player.shadowT > 0) m *= 1.4;
-    return m;
+    return m * heroAtkMul();
   }
   function legendOnHit(e, dmg, crit) {
     if (e.boss) staggerAdd(e, dmg, crit);

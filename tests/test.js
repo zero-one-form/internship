@@ -646,11 +646,35 @@ const assert = (c, msg) => { if (!c) { errors.push('ASSERT FAIL: ' + msg); conso
     assert(!pl.dead, 'AUTO revives a fallen hero after a few seconds of game time');
     G.prog.opt.auto = false;
   }
+  // heroines: story joins, abilities, ultimates, saves
+  {
+    const skip = () => { let n = 0; while (G.talkCur && n++ < 40) G.talkAdvance(); };
+    G.enterMap(0, null); frames(3); G.paused = false;
+    const pl = G.player; pl.dead = false; pl.x = G.SPAWN.x; pl.y = G.SPAWN.y; G.refreshD(); pl.hp = G.D.maxHp;
+    G.prog.heroines = null; G.prog.story = [];
+    const q0 = G.qState().main; G.qState().main = G.MAINQ.length;
+    G.heroTick(1);
+    assert(G.talkCur === 'mina_join' && G.paused && !$('talkDlg').hidden, 'finishing the main quests starts Mina\'s joining scene');
+    skip();
+    assert(G.heroJoined('mina') && !G.paused && $('talkDlg').hidden, 'Mina joins the party after the scene');
+    for (const f of [11, 16, 21]) { G.enterDungeon(f); frames(3); G.paused = false; G.heroTick(1); skip(); }
+    assert(G.heroJoined('aria') && ['aria_voice', 'aria_meet', 'aria_join'].every((k) => G.storySeen().includes(k)), 'Aria\'s arc plays out from B11 to B20 and she joins');
+    assert(G.heroOut().length === 2 && G.heroAtkMul() > 1, 'both heroines travel along; Aria\'s song raises attack');
+    pl.hp = G.D.maxHp * 0.5; const hp0 = pl.hp; G.heroEnt('mina').atkT = 0; G.heroUpdate(0.05);
+    assert(pl.hp > hp0, 'Mina heals the hero');
+    const e = G.makeTestElite(); e.maxHp = e.hp = 1e7; e.x = pl.x + 2; e.y = pl.y; G.heroS('aria').ult = 60;
+    G.heroUlt('aria');
+    assert(e.hp < 1e7 && pl.ariaSongT > 0 && !$('cutin').hidden, 'Aria\'s ultimate hits, buffs and shows a cut-in');
+    e.dead = true;
+    G.heroS('mina').aff = 90; G.save(); G.prog.heroines = null; G.load();
+    assert(G.heroJoined('mina') && G.affLv('mina') === 3 && G.storySeen().includes('aria_join'), 'heroine progress survives a reload');
+    G.qState().main = q0; G.enterMap(0, null); frames(3); G.paused = false;
+  }
   // first-time tips
   {
     G.enterMap(0, null); frames(3); G.paused = false; G.player.dead = false;
     G.prog.tips = []; const lv0 = G.prog.level; G.prog.level = Math.max(3, lv0);
-    G.tipTick(5);
+    for (let i = 0; i < 3 && !G.tipsSeen().includes('auto'); i++) G.tipTick(10); // a tip still on screen is hidden first
     assert(G.tipsSeen().includes('auto') && w.document.getElementById('tip').classList.contains('on'), 'a first-time tip appears once its moment comes');
     for (let i = 0; i < 30; i++) G.tipTick(1);
     assert(G.tipsSeen().filter((x) => x === 'auto').length === 1, 'each tip is shown only once');

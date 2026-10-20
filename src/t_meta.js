@@ -38,7 +38,7 @@
     if (combo > (r.combo || 0)) r.combo = combo;
   }
   function recAdd(k, n) { const r = recs(); r[k] = (r[k] || 0) + (n || 1); }
-  function metaUpdate(dt) { const r = recs(); r.play = (r.play || 0) + dt; classUpdate(dt); petUpdate(dt); petHud(); wbUpdate(dt); dailyTick(dt); tipTick(dt); }
+  function metaUpdate(dt) { const r = recs(); r.play = (r.play || 0) + dt; classUpdate(dt); petUpdate(dt); petHud(); wbUpdate(dt); dailyTick(dt); tipTick(dt); heroUpdate(dt); heroTick(dt); heroHud(); }
   function recordsCard() {
     const r = recs(), h = Math.floor((r.play || 0) / 3600), m = Math.floor(((r.play || 0) % 3600) / 60);
     const c = document.createElement('div'); c.className = 'qc';

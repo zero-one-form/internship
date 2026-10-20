@@ -351,6 +351,9 @@
     if (!TEST) pendingOffline = offlineRewards(); else prog.seen = Date.now();
     $('autoBtn').addEventListener('click', autoToggle);
     $('tip').addEventListener('click', tipClose);
+    $('talkDlg').addEventListener('click', talkAdvance);
+    $('heroBtn').addEventListener('click', () => heroUlt($('heroBtn').dataset.id));
+    document.addEventListener('keydown', (ev) => { if (!talkCur) return; const k = ev.key || ''; if (k === 'Enter' || k === ' ' || k === 'Escape') { ev.preventDefault(); ev.stopImmediatePropagation(); talkAdvance(); } }, true);
     document.addEventListener('keydown', (ev) => { if ((ev.key || '').toLowerCase() === 'a' && !ev.repeat && $('sheet').hidden && !ARIA.on) autoToggle(); });
     $('altarBtn').addEventListener('click', altarOpen);
     $('altarClose').addEventListener('click', altarClose);
@@ -386,6 +389,7 @@
         findPath, spawnPack, blockedAt, inCamp, gainExp, hurtPlayer, expNeed, chunkCache, castSkill, learn, SKD, fields, meteors,
         get dash() { return dash; },
         ARIA, ariaOpen, ariaStart, ariaHit, ariaTick, ariaClose, ariaChart, ariaState, ariaDiveStart,
+        HEROINES, SCENES, heroS, heroOut, heroJoined, affLv, playScene, talkAdvance, get talkCur() { return talkCur; }, heroTick, heroUpdate, heroUlt, heroAtkMul, storySeen, heroEnt, drawBust,
         TIPS, tipTick, tipsSeen, showTip,
         partyList, partyAdd, partyRemove, partySlots, entOf, PET_SP, trainS, TRAIN, offlineRewards, showOffline, autoOn, autoToggle, autoBattle, expGapMul, autoRetreat, get autoWall() { return autoWall; }, set autoWall(v) { autoWall = v; }, petPower, partyGoldMul,
         soul, perkLv, PERKS, gainSoul, rebirth, altarOpen, altarClose, altarRender, streakOnKill, streakEnd, get streakN() { return streakN; }, potMax, GEMS, gainGem, gemFree, sockets, sockOf, makeCtx, castWithGems, applySlots, setSlot, SLOTS, keyOn, growthUpdate, skillCdMul, cdOf, skillMpMul,

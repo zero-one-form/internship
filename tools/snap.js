@@ -56,11 +56,16 @@ async function browserPath() {
     ['pet_tab', (G) => { G.prog.opt.auto = false; G.prog.gold = 50000; G.openSheet(); G.setTab('pet'); }],
     ['offline', (G) => { G.prog.seen = Date.now() - 200 * 60000; G.showOffline(G.offlineRewards()); }],
     ['tip', (G) => { G.closeSheet(); document.getElementById('petOk').click(); G.paused = false; G.showTip(G.TIPS[3][2]); }],
+    ['talk', (G) => { document.getElementById('tip').classList.remove('on'); G.enterMap(0, null); G.player.x = G.SPAWN.x; G.player.y = G.SPAWN.y; G.prog.story = []; G.heroS('mina').j = false; G.qState().main = G.MAINQ.length; G.paused = false; G.heroTick(1); G.talkAdvance(); }],
+    ['talk_aria', (G) => { while (G.talkCur) G.talkAdvance(); G.playScene('aria_join'); G.talkAdvance(); G.talkAdvance(); }],
+    ['heroines_field', (G) => { while (G.talkCur) G.talkAdvance(); G.heroS('aria').j = true; G.heroS('mina').j = true; G.enterDungeon(21); G.prog.opt.auto = true; }],
+    ['cutin', (G) => { G.heroS('aria').ult = 60; G.heroUlt('aria'); }],
+    ['hero_tab', (G) => { G.prog.opt.auto = false; G.heroS('mina').aff = 70; G.openSheet(); G.setTab('pet'); }],
   ];
   for (const [name, fn] of steps) {
     const ok = await p.evaluate((src) => { const G = window.__G; if (!G) return false; try { G.closeSheet && G.closeSheet(); } catch (e) {} (0, eval)('(' + src + ')')(G); return true; }, fn.toString());
     if (!ok) { console.log('no test hook; skipping', name); continue; }
-    await wait(1500);
+    await wait(name === 'cutin' ? 350 : 1500);
     await shot(name);
   }
   console.log('errors', errs.length);
