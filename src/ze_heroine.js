@@ -111,8 +111,14 @@
     const src = window.__HEROINE_ART && window.__HEROINE_ART[key];
     if (!src) return null;
     let im = heroImgs[key];
-    if (!im) { im = heroImgs[key] = new Image(); im.src = src; }
+    if (!im) { im = heroImgs[key] = new Image(); im.onload = heroArtLoaded; im.src = src; }
     return im.complete && im.naturalWidth ? im : null;
+  }
+  // images decode asynchronously: start them at boot, and redraw open portraits once one arrives
+  function heroArtPreload() { for (const k in (window.__HEROINE_ART || {})) heroArt(k); }
+  function heroArtLoaded() {
+    if (talkCur) talkShow();
+    const b = $('heroBtn'); if (b) b.dataset.id = '';
   }
   // placeholder: a simple chibi drawn in code with each heroine's palette
   function drawHeroinePH(g, id, x, y, s, t, faceLeft, expr) {

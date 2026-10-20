@@ -352,6 +352,7 @@
     $('autoBtn').addEventListener('click', autoToggle);
     $('tip').addEventListener('click', tipClose);
     $('talkDlg').addEventListener('click', talkAdvance);
+    heroArtPreload();
     $('heroBtn').addEventListener('click', () => heroUlt($('heroBtn').dataset.id));
     document.addEventListener('keydown', (ev) => { if (!talkCur) return; const k = ev.key || ''; if (k === 'Enter' || k === ' ' || k === 'Escape') { ev.preventDefault(); ev.stopImmediatePropagation(); talkAdvance(); } }, true);
     document.addEventListener('keydown', (ev) => { if ((ev.key || '').toLowerCase() === 'a' && !ev.repeat && $('sheet').hidden && !ARIA.on) autoToggle(); });
