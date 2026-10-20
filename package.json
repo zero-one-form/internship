@@ -4,7 +4,8 @@
   "description": "YOU, THY ARIA - browser isometric action RPG (single-file HTML)",
   "scripts": {
     "build": "python3 build.py",
-    "test": "python3 build.py && node tests/test.js"
+    "test": "python3 build.py && node tools/lint_dupes.js && node tests/test.js",
+    "sim": "python3 build.py && node tools/sim.js 2"
   },
   "devDependencies": {
     "jsdom": "^24.0.0",

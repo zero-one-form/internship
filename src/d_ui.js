@@ -372,6 +372,9 @@
         get envDark() { return envDark; },
         setDay(ph) { dayT = ph * DAY_LEN; },
         step(dt) { time += dt; update(dt); render(); updateHud(); feelFrame(dt); },
+        // fast simulation without drawing (balance bot)
+        get transit() { return transit; },
+        simStep(dt) { time += dt; if (!paused) { const sd = hitStop > 0 ? dt * 0.1 : slowMo > 0 ? dt * 0.3 : dt; hitStop = Math.max(0, hitStop - dt); slowMo = Math.max(0, slowMo - dt); update(sd); } autoBless(dt); },
         useSkill, morph, drinkPotion, buyPotion, openSheet, closeSheet, respawn,
         genItem, equip, sell, sellNormals, enhance, dropLoot, loot, refreshGear, get GEAR() { return GEAR; },
         enterDungeon(f) { curFloor = f; enterMap(3, 0); }, get floor() { return curFloor; }, get stairsOpen() { return stairsOpen; }, get bossRef() { return bossRef; }, get floorNeed() { return floorNeed; }, killEnemy, slams, bshots, blines, bpools,
@@ -382,7 +385,7 @@
         findPath, spawnPack, blockedAt, inCamp, gainExp, hurtPlayer, expNeed, chunkCache, castSkill, learn, SKD, fields, meteors,
         get dash() { return dash; },
         ARIA, ariaOpen, ariaStart, ariaHit, ariaTick, ariaClose, ariaChart, ariaState, ariaDiveStart,
-        partyList, partyAdd, partyRemove, partySlots, entOf, PET_SP, trainS, TRAIN, offlineRewards, showOffline, autoOn, autoToggle, autoUpdate, petPower, partyGoldMul,
+        partyList, partyAdd, partyRemove, partySlots, entOf, PET_SP, trainS, TRAIN, offlineRewards, showOffline, autoOn, autoToggle, autoBattle, petPower, partyGoldMul,
         soul, perkLv, PERKS, gainSoul, rebirth, altarOpen, altarClose, altarRender, streakOnKill, streakEnd, get streakN() { return streakN; }, potMax, GEMS, gainGem, gemFree, sockets, sockOf, makeCtx, castWithGems, applySlots, setSlot, SLOTS, keyOn, growthUpdate, skillCdMul, cdOf, skillMpMul,
         dailyState, dailyCheck, achCheck, DAILY_POOL, ACH, titleName, recAdd,
         withEl, recs, LPOW, hasPow, startDodge, perfectDodge, staggerAdd, get slowMo() { return slowMo; }, makeEnemy,

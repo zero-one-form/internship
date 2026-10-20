@@ -635,6 +635,17 @@ const assert = (c, msg) => { if (!c) { errors.push('ASSERT FAIL: ' + msg); conso
     es.forEach((e) => { e.dead = true; });
     P.party = []; P.active = null;
   }
+  // regression: AUTO must not replace the auto-potion routine
+  {
+    G.enterMap(0, null); frames(3); G.paused = false;
+    const pl = G.player; pl.dead = false; G.refreshD(); G.prog.opt.autoPot = true; G.prog.potions = 5; pl.potT = 0;
+    pl.x = G.CAMP.x + 9; pl.y = G.CAMP.y + 6; while (G.blockedAt(pl.x, pl.y, 0.3)) pl.x += 0.5;
+    pl.hp = G.D.maxHp * 0.2; G.step(0.05);
+    assert(G.prog.potions === 4, 'auto-potion drinks below 30% HP');
+    G.prog.opt.auto = true; pl.hp = 0; pl.dead = true; for (let i = 0; i < 80; i++) G.step(0.05);
+    assert(!pl.dead, 'AUTO revives a fallen hero after a few seconds of game time');
+    G.prog.opt.auto = false;
+  }
   // regression: audit fixes
   {
     G.prog.wb = { wk: G.weekKey(), dmg: 1234, claimed: false, day: 1, tries: 2 };

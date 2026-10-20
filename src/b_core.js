@@ -994,7 +994,7 @@
     updateFx(dt);
     ambientParticles(dt);
     updateParts(dt);
-    autoUpdate(dt);
+    autoBattle(dt);
     spawnT -= dt;
     if (spawnT <= 0) { spawnT = 0.85; if (!WB.on && aliveCount() < POP_CAP) spawnPack(); } // the world-boss arena holds only the boss and its adds
     const k = Math.min(1, dt * 7);

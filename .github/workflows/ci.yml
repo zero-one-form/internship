@@ -22,6 +22,8 @@ jobs:
         run: python3 build.py
       - name: Syntax check
         run: node --check dist/game_only.js
+      - name: No duplicate function names across modules
+        run: node tools/lint_dupes.js
       - name: Size budget (16MB)
         run: |
           size=$(stat -c%s dist/twinsoul.html)

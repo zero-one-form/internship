@@ -145,10 +145,10 @@
     const b = $('autoBtn'), on = autoOn();
     if (force || b.dataset.on !== String(on)) { b.dataset.on = String(on); b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); }
   }
-  function autoUpdate(dt) {
+  function autoBattle(dt) {
     autoHud(false);
     if (!autoOn()) return;
-    if (player.dead) { autoDeadT += dt; if (autoDeadT > 3 && !$('dead').hidden) { autoDeadT = 0; respawn(); } return; }
+    if (player.dead) { autoDeadT += dt; if (autoDeadT > 3) { autoDeadT = 0; respawn(); } return; }
     autoDeadT = 0;
     if (autoHold > 0) { autoHold -= dt; return; }
     if (stick.active || drag.active) { autoHold = 2.5; return; }
