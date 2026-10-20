@@ -540,7 +540,7 @@
       maxHp: hp, hp,
       dmg: T.dmg * (1 + 0.26 * (lvl - 1)) * (elite ? 1.4 : 1),
       speed: T.sp * (elite ? 1.05 : 1),
-      exp: T.exp * (1 + 0.45 * (lvl - 1)) * (1 + lvl / 150) * (elite ? 3 : 1),
+      exp: T.exp * (1 + 0.45 * (lvl - 1)) * (elite ? 3 : 1),
       aggro: T.aggro, atkInt: T.atk, r: T.r * (elite ? 1.2 : 1),
       armor: T.armor + (type === 'undead' ? lvl * 0.6 : 0),
       cv: Math.floor(Math.random() * T.vars),
@@ -690,13 +690,15 @@
     provoke(e);
     if (e.hp <= 0) killEnemy(e);
   }
+  // experience falls off against enemies far below the hero's level
+  function expGapMul(e) { const gap = prog.level - e.lvl - 5; return gap > 0 ? Math.max(0.05, 1 - gap * 0.08) : 1; }
   function killEnemy(e) {
     e.dead = true; e.hp = 0; e.deathT = DIE_T;
     sfx('kill');
     onKillFeel(e);
     if (player.target === e) { player.target = null; autoRetarget(e); }
     burst(e.x, e.y, bodyH(e), 'soul', e.elite ? 10 : 4, e.elite ? 'gold' : 'cyan', 0.8);
-    const exp = Math.max(1, Math.round(e.exp));
+    const exp = Math.max(1, Math.round(e.exp * expGapMul(e)));
     if (e.elite || Math.random() < 0.65) {
       const g = Math.round((randi(1, 3) * e.lvl + (e.elite ? 12 : 0)) * (1 + GEAR.gold / 100) * comboMul() * floorGoldMul() * soulGoldMul() * partyGoldMul());
       prog.gold += g;

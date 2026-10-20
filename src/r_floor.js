@@ -112,6 +112,8 @@
     e._f = 1;
     if (!inDive() || e.obj) return;
     const f = curFloor, m = FLOOR.mods;
+    // deeper floors are tougher on their own, not just higher level (B50: HP x5, damage x3)
+    e.maxHp = Math.round(e.maxHp * (1 + f * 0.08)); e.hp = e.maxHp; e.dmg *= 1 + f * 0.04;
     if (m.includes('elite') && !e.elite && !e.boss && Math.random() < 0.2) { e.elite = true; e.maxHp *= 3; e.hp = e.maxHp; e.dmg *= 1.4; e.exp *= 3; e.r *= 1.2; }
     if (m.includes('frenzy')) { e.speed *= 1.25; e.dmg *= 1.15; e.atkInt *= 0.85; }
     if (m.includes('armored')) { e.maxHp = Math.round(e.maxHp * 1.4); e.hp = e.maxHp; }

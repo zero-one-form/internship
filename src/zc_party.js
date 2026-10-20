@@ -135,6 +135,26 @@
   /* ---------- AUTO battle ---------- */
   let autoHold = 0, autoSkT = 0, autoMorphT = 4, autoDeadT = 0, autoBlessT = 0;
   function autoOn() { return !!opt().auto; }
+  // idle-friendly wall handling: after 3 falls on the same floor, drop back 5 floors and train there
+  let autoWall = { f: 0, n: 0 };
+  function autoRetreat() {
+    if (curMap !== 3 || WB.on || autoWall.n < 3) return;
+    const back = Math.max(1, Math.floor((autoWall.f - 1) / 5) * 5 + 1 - 5);
+    autoWall = { f: 0, n: 0 };
+    toast('AUTO：B' + curFloor + 'Fで3回倒れたので、B' + back + 'Fまで戻って鍛え直す');
+    curFloor = back; enterMap(3, 0);
+  }
+  // the nearest floor objective, unless a regular enemy is right next to the hero
+  function autoGoal() {
+    if (nearest(player.x, player.y, 1.6, null)) return null;
+    let best = null, bd = 1e9;
+    for (const e of enemies) {
+      if (e.dead || !(e.obj || e.bounty || e.boss)) continue;
+      const d = hyp(e.x - player.x, e.y - player.y);
+      if (d < bd) { bd = d; best = e; }
+    }
+    return best;
+  }
   function autoToggle() {
     opt().auto = !opt().auto; save();
     autoHud(true);
@@ -148,23 +168,37 @@
   function autoBattle(dt) {
     autoHud(false);
     if (!autoOn()) return;
-    if (player.dead) { autoDeadT += dt; if (autoDeadT > 3) { autoDeadT = 0; respawn(); } return; }
+    if (player.dead) {
+      if (autoDeadT === 0 && curMap === 3 && !WB.on) { autoWall = autoWall.f === curFloor ? { f: curFloor, n: autoWall.n + 1 } : { f: curFloor, n: 1 }; }
+      autoDeadT += dt;
+      if (autoDeadT > 3) { autoDeadT = 0; respawn(); autoRetreat(); }
+      return;
+    }
     autoDeadT = 0;
     if (autoHold > 0) { autoHold -= dt; return; }
     if (stick.active || drag.active) { autoHold = 2.5; return; }
     if (transit) return;
     if (prog.sp > 0) { const pat = player.form === 'blade' ? ['str', 'str', 'vit', 'agi'] : ['int', 'int', 'vit', 'luk']; let i = 0; while (prog.sp > 0) { prog.stats[pat[i++ % 4]]++; prog.sp--; } refreshD(); }
-    // target: current one, else the nearest enemy (objectives included) anywhere on the map
+    // in the abyss: once the gate is open, head for it (only fight what is in the way);
+    // before that, floor objectives (chests, seals, bounties, the boss) come first
+    const dive = curMap === 3 && !WB.on;
     let t = player.target && !player.target.dead ? player.target : null;
-    if (!t) {
+    // self-defense: never walk past enemies that are hitting the hero to reach a far-away goal
+    if (t && hyp(t.x - player.x, t.y - player.y) > 3) { const close = nearest(player.x, player.y, 1.8, null); if (close && close !== t) { t = close; player.target = t; player.repathT = 0; } }
+    if (dive && stairsOpen) {
+      if (t && hyp(t.x - player.x, t.y - player.y) > 2.2) { t = null; player.target = null; }
+      if (!t) { const near = nearest(player.x, player.y, 2.2, null); if (near) { t = near; player.target = t; player.repathT = 0; } }
+      if (!t && !player.path.length) {
+        const pt = portals[portals.length - 1], path = pt && findPath(player.x, player.y, pt.x, pt.y);
+        if (path) player.path = path;
+      }
+    } else if (!t || (dive && !(t.obj || t.bounty || t.boss) && autoGoal())) {
+      const goal = dive ? autoGoal() : null;
       let bd = 1e9;
-      for (const e of enemies) { if (e.dead) continue; const d = hyp(e.x - player.x, e.y - player.y) - (e.obj ? 3 : 0); if (d < bd) { bd = d; t = e; } }
-      if (t && hyp(t.x - player.x, t.y - player.y) > 30) t = null;
-      if (t) { player.target = t; player.repathT = 0; }
-    }
-    if (!t && curMap === 3 && stairsOpen && !player.path.length) {
-      const pt = portals[portals.length - 1], path = pt && findPath(player.x, player.y, pt.x, pt.y);
-      if (path) player.path = path;
+      if (goal) t = goal;
+      else for (const e of enemies) { if (e.dead) continue; const d = hyp(e.x - player.x, e.y - player.y); if (d < bd) { bd = d; t = e; } }
+      if (t && !goal && hyp(t.x - player.x, t.y - player.y) > 30) t = null;
+      if (t && t !== player.target) { player.target = t; player.repathT = 0; }
     }
     // skills on cooldown order, heal only when hurt
     autoSkT -= dt;

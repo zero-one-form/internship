@@ -440,7 +440,7 @@ const assert = (c, msg) => { if (!c) { errors.push('ASSERT FAIL: ' + msg); conso
     const es = G.enemies.filter((e) => !e.dead).slice(0, 3); es.forEach((e, i) => { e.x = p.x + 1.5 + i * 0.3; e.y = p.y + 1; e.hp = e.maxHp = 1e6; e.state = 'chase'; });
     p.target = es[0]; frames(240); if (!es.some((e) => e.hp < 1e6)) console.log('  PETDBG', JSON.stringify({ sp: pet.sp, paused: G.paused, pet: [G.PET.x, G.PET.y], pl: [p.x, p.y], es: es.map((e) => [e.x, e.y, e.dead, e.state]), tgt: !!p.target, dead: p.dead, sheet: !w.document.getElementById('sheet').hidden, dlg: !w.document.getElementById('petDlg').hidden, cls: !w.document.getElementById('clsDlg').hidden })); assert(es.some((e) => e.hp < 1e6), 'pet attacks enemies');
     const s0 = G.D.speed; pet.lvl = 15; G.toggleRide(); frames(2);
-    assert(G.riding() && G.D.speed > s0 * 1.25, 'adult pet can be ridden for speed (' + s0.toFixed(2) + ' -> ' + G.D.speed.toFixed(2) + ')');
+    assert(G.riding() && Math.abs(G.D.speed - s0 * G.PET_SP[pet.sp].mount) < 0.01 && G.PET_SP[pet.sp].mount >= 1.2, 'adult pet can be ridden for its species speed bonus (' + s0.toFixed(2) + ' -> ' + G.D.speed.toFixed(2) + ')');
     assert(!w.document.getElementById('rideBtn').hidden, 'ride button visible');
     G.toggleRide(); assert(!G.riding(), 'dismount');
     for (let k = 0; k < 3; k++) { G.gainEgg(); G.eggProgress(130); w.document.getElementById('petOk').click(); }
@@ -645,6 +645,21 @@ const assert = (c, msg) => { if (!c) { errors.push('ASSERT FAIL: ' + msg); conso
     G.prog.opt.auto = true; pl.hp = 0; pl.dead = true; for (let i = 0; i < 80; i++) G.step(0.05);
     assert(!pl.dead, 'AUTO revives a fallen hero after a few seconds of game time');
     G.prog.opt.auto = false;
+  }
+  // balance pass 2 (from the balance bot)
+  {
+    const lv0 = G.prog.level; G.prog.level = 50;
+    assert(G.expGapMul({ lvl: 10 }) === 0.05 && G.expGapMul({ lvl: 46 }) === 1, 'experience falls off against much weaker enemies');
+    G.prog.level = lv0;
+    const pl = G.player; pl.dead = false; G.refreshD(); pl.hp = G.D.maxHp;
+    G.FLOOR.force = 'kill'; G.enterDungeon(12); frames(3);
+    for (const e of G.enemies.slice()) { if (G.stairsOpen) break; if (!e.dead && !e.obj && !e.treasure) G.killEnemy(e); }
+    for (const e of G.enemies) e.dead = true;
+    pl.target = null; pl.path.length = 0; G.prog.opt.auto = true; G.autoBattle(0.05);
+    assert(G.stairsOpen && pl.path.length > 0, 'AUTO heads for the open gate');
+    G.autoWall = { f: 12, n: 3 }; G.autoRetreat();
+    assert(G.floor === 6 && G.curMap === 3, 'after 3 falls AUTO drops back five floors to train: B' + G.floor);
+    G.prog.opt.auto = false; G.enterMap(0, null); frames(3);
   }
   // regression: audit fixes
   {

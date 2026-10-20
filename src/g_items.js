@@ -50,7 +50,7 @@
   }
   function optText(o) { return o.k === 'skill' ? '「' + SKD[o.sid].name + '」Lv +' + o.v + '（習得済みのとき）' : OPTS[o.k].t(o.v); }
   function rollRarity(elite) {
-    const w = elite ? [20, 42, 29, 9] : [56, 31, 11, 2];
+    const w = elite ? [24, 45, 28, 3] : [60, 30, 9.3, 0.7];
     let r = Math.random() * 100;
     for (let k = 0; k < 4; k++) { if (r < w[k]) return k; r -= w[k]; }
     return 0;

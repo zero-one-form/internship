@@ -33,7 +33,7 @@
   function startFloor() {
     if (WB.on) { wbStart(); return; }
     floorKills = 0; stairsOpen = false; bossRef = null; clearBossFx();
-    floorNeed = Math.min(40, 12 + curFloor);
+    floorNeed = Math.min(60, 18 + Math.round(curFloor * 1.2));
     if (curFloor > prog.deep) prog.deep = curFloor;
     lbOnFloor(curFloor);
     questEvent('floor');

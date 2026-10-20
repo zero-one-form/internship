@@ -79,7 +79,7 @@
   /* ---------- kill streaks: kills less than 1.2s apart chain into a massacre bonus ---------- */
   function streakOnKill(e) {
     if (streakGap > 1.2) streakEnd();
-    streakN++; streakGap = 0; streakExp += e.exp || 0;
+    streakN++; streakGap = 0; streakExp += (e.exp || 0) * (e.lvl ? expGapMul(e) : 1);
     let tier = -1;
     for (let i = 0; i < STREAK.length; i++) if (streakN >= STREAK[i][0]) tier = i;
     if (tier > streakTier) {
