@@ -8,6 +8,50 @@
 
 ---
 
+## 0. Geminiにそのまま貼る版（可愛さ重視・おすすめ）
+
+1人につき1つの会話で、①→②→③→④の順に貼る（①の顔を基準に②〜④をそろえる）。気に入らない回は「もっと可愛く、目を大きく」と追加で頼む。
+
+### ミーナ
+① 立ち絵・ふつう
+```
+Generate an image. Cute moe anime girl illustration in a modern gacha game style, kawaii, big sparkling eyes with detailed highlights, small face, soft pink blush on cheeks, glossy hair, cel shading, clean thin lineart, soft pastel colors, single character, centered, plain pure white background, no text, no watermark, portrait aspect ratio 3:4.
+Bust portrait from chest up of a sweet gentle girl around 18: long honey-blonde hair in a loose side braid over her right shoulder, a small green leaf hair clip, big soft emerald-green eyes, gentle warm closed-mouth smile, forest-green hooded robe with gold trim and small leaf embroidery, hood down, holding a wooden staff topped with fresh leaves and a tiny glowing lantern.
+```
+② 立ち絵・笑顔
+```
+Same character, same outfit, same art style, same framing and white background. Change only the expression: bright happy open-mouth smile, eyes happily closed in curved arcs, extra blush.
+```
+③ 立ち絵・困り顔
+```
+Same character, same outfit, same art style, same framing and white background. Change only the expression: worried troubled face, eyebrows raised in the middle, slightly teary eyes, looking a little aside, hand near her chest.
+```
+④ ちびキャラ
+```
+Same character as a full-body chibi figure, 2.5 heads tall, big head and tiny body, three-quarter view facing right, cheerful ready pose holding her leaf staff with the little lantern, simple cute shapes readable at small size, plain pure white background, square 1:1, no text.
+```
+
+### アリア
+① 立ち絵・ふつう
+```
+Generate an image. Cute moe anime girl illustration in a modern gacha game style, kawaii, big sparkling eyes with detailed highlights, small face, soft pink blush on cheeks, glossy hair, cel shading, clean thin lineart, soft pastel colors, single character, centered, plain pure white background, no text, no watermark, portrait aspect ratio 3:4.
+Bust portrait from chest up of a small ethereal girl around 15: very long fluffy silver-white hair that fades to pale lavender at the tips, big golden eyes with star-shaped highlights, innocent curious expression with lips slightly parted, white and gold frilly dress decorated with musical staff lines and notes, a glowing golden music-note hair ornament, tiny sparkles of light floating around her.
+```
+② 立ち絵・笑顔
+```
+Same character, same outfit, same art style, same framing and white background. Change only the expression: soft blissful smile, eyes gently curved, head tilted slightly, as if humming a song.
+```
+③ 立ち絵・悲しい顔
+```
+Same character, same outfit, same art style, same framing and white background. Change only the expression: sad lonely face, eyes looking down, small tears at the corners of her eyes.
+```
+④ ちびキャラ
+```
+Same character as a full-body chibi figure, 2.5 heads tall, big head and tiny body, three-quarter view facing right, floating slightly above the ground with arms open as if singing, little music notes and sparkles around her, simple cute shapes readable at small size, plain pure white background, square 1:1, no text.
+```
+
+---
+
 ## 1. 作る画像（1人あたり4枚）
 
 | ファイル名 | 中身 | 大きさの目安 | 使う場所 |
