@@ -499,6 +499,12 @@
     const x0 = isoX(player.x, player.y), yb = isoY(player.x, player.y), rh = rideHeight(), y0 = yb - rh;
     if (rh) drawMount(x0, yb);
     const ha = rh && !player.swingT ? ['hero_' + player.form, 'stance', 0] : heroAnim();
+    if (!player.dead) {
+      const rc = player.form === 'blade' ? '255,196,90' : '176,146,255', pul = 0.5 + Math.sin(time * 3) * 0.12;
+      ctx.save(); ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(' + rc + ',' + pul + ')';
+      ctx.beginPath(); ctx.ellipse(x0, yb, 21 * zoom, 10.5 * zoom, 0, 0, TAU); ctx.stroke(); ctx.restore();
+      emis.push([player.form === 'blade' ? 'amber' : 'violet', x0, yb, 30 * zoom, 0.28]);
+    }
     drawFlare(ha[0], ha[1], player.dir, ha[2], x0, y0, HERO_SCALE, 1);
     if (player.form === 'arcane' && !player.dead) {
       for (let k = 0; k < 2; k++) {
@@ -737,7 +743,7 @@
   function drawBars() {
     ctx.textAlign = 'center';
     for (const e of enemies) {
-      if (e.dead || e.boss || !(e.hp < e.maxHp || player.target === e || e.elite || e.title)) continue;
+      if (e.dead || e.boss || !(e.hp < e.maxHp || player.target === e || e.elite || e.obj || e.bounty || e.treasure)) continue;
       const x0 = isoX(e.x, e.y), y0 = isoY(e.x, e.y);
       if (x0 < -40 || x0 > W + 40 || y0 < 0 || y0 > H + 80) continue;
       const sc = e.elite ? 1.18 : 1;
@@ -750,24 +756,28 @@
         if (e.elite) { g.addColorStop(0, '#ffe9a0'); g.addColorStop(1, '#e0a020'); } else { g.addColorStop(0, '#ff8a96'); g.addColorStop(1, '#d0304b'); }
         ctx.fillStyle = g; roundRect(x0 - bw / 2, top, Math.max(bh, bw * f), bh, 2.5); ctx.fill();
       }
-      if (player.target === e || e.elite || e.title) {
-        ctx.font = '800 ' + Math.round(11 * zoom) + 'px ' + FONT;
+      // full names only for the target and objectives; other elites get a short tag (keeps crowds readable)
+      const full = player.target === e || e.obj || e.bounty || e.treasure;
+      if (full || e.elite) {
+        ctx.font = '800 ' + Math.max(10, Math.round(11 * zoom)) + 'px ' + FONT;
         ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(10,12,30,0.8)'; ctx.lineJoin = 'round';
-        const label = e.title ? e.title + (e.obj === 'chest' ? '' : ' Lv' + e.lvl) : (e.elite ? '★ ' : '') + 'Lv' + e.lvl;
+        const ttl = e.title && (player.target === e ? e.title : e.title.split(' ')[0]);
+        const label = full && ttl ? ttl + (e.obj === 'chest' ? '' : ' Lv' + e.lvl) : (e.elite ? '★ ' : '') + 'Lv' + e.lvl;
         ctx.strokeText(label, x0, top - 5);
         ctx.fillStyle = e.treasure || e.obj === 'chest' ? '#ffe600' : e.bounty ? '#ff9a3a' : e.obj === 'seal' ? '#d9a6ff' : e.aff ? '#ff9ac2' : e.elite ? '#ffe27a' : '#ffffff'; ctx.fillText(label, x0, top - 5);
       }
     }
   }
-  const TEXT_STYLE = { hit: ['#ffffff', 16, 'rgba(20,22,48,0.9)'], crit: ['#ffd36e', 28, 'rgba(80,24,0,0.95)'], hurt: ['#ff6b7a', 16, 'rgba(60,0,12,0.9)'], gold: ['#ffe27a', 14, 'rgba(70,46,0,0.9)'], heal: ['#8dffbf', 15, 'rgba(0,44,22,0.9)'], multi: ['#ffef9a', 24, 'rgba(90,20,0,0.95)'] };
+  const TEXT_STYLE = { hit: ['#ffffff', 14, 'rgba(20,22,48,0.9)'], crit: ['#ffd36e', 23, 'rgba(80,24,0,0.95)'], hurt: ['#ff6b7a', 16, 'rgba(60,0,12,0.9)'], gold: ['#ffe27a', 14, 'rgba(70,46,0,0.9)'], heal: ['#8dffbf', 15, 'rgba(0,44,22,0.9)'], multi: ['#ffef9a', 24, 'rgba(90,20,0,0.95)'] };
   function drawTexts() {
     ctx.textAlign = 'center';
     ctx.lineJoin = 'round';
     for (const t of texts) {
       const k = t.t / t.life, st = TEXT_STYLE[t.kind] || TEXT_STYLE.hit;
       const pop = t.kind === 'crit' || t.kind === 'multi' ? 1 + Math.max(0, 0.3 - k) * 3 : 1 + Math.max(0, 0.18 - k) * 2.2;
-      const x0 = isoX(t.x, t.y), y0 = isoY(t.x, t.y) - (t.h + k * 24) * zoom;
-      const size = Math.round(st[1] * zoom * pop);
+      const rise = t.vy ? t.vy * t.t - 0.5 * 190 * t.t * t.t + k * 8 : k * 24;
+      const x0 = isoX(t.x, t.y) + (t.vx || 0) * t.t * zoom, y0 = isoY(t.x, t.y) - (t.h + rise) * zoom;
+      const size = Math.round(st[1] * zoom * pop / 2) * 2;
       ctx.globalAlpha = k < 0.7 ? 1 : 1 - (k - 0.7) / 0.3;
       ctx.font = '800 ' + size + 'px ' + FONT;
       ctx.lineWidth = Math.max(3, size * 0.24);
@@ -852,7 +862,13 @@
     }
   }
   function render() {
+    const z0 = zoom;
+    if (punchZ) { zoom = z0 * (1 + punchZ); HW = 32 * zoom; HH = 16 * zoom; }
+    try { renderWorld(); } finally { if (zoom !== z0) { zoom = z0; HW = 32 * zoom; HH = 16 * zoom; } }
+  }
+  function renderWorld() {
     computeOrigin();
+    ox += kickX; oy += kickY;
     env = envAt(((dayT / DAY_LEN) % 1 + 1) % 1);
     const BIr = BIOMES[MAPS[curMap].biome];
     env.amb = [env.amb[0] * BIr.tint[0], env.amb[1] * BIr.tint[1], env.amb[2] * BIr.tint[2]];

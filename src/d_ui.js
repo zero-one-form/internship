@@ -313,12 +313,14 @@
     }
     adaptResolution(dt);
   }
+  // resizing clears the canvas: redraw right away so there is no blank frame
+  function resizeAndDraw() { resize(); if (!END && !OP.on && !OP.capturing && !ARIA.on) try { render(); } catch (e) { /* next frame retries */ } }
   // drop render resolution one step at a time while frames stay slow (keeps phones above ~45fps)
   function adaptResolution(dt) {
     if (paused || document.hidden || OP.on) { slowT = 0; return; }
     frameAvg += (dt - frameAvg) * 0.05;
     slowT = frameAvg > 0.022 ? slowT + dt : 0;
-    if (slowT > 3 && dprCap > 1.25 && (window.devicePixelRatio || 1) > 1.25) { dprCap -= 0.25; slowT = 0; frameAvg = 1 / 60; resize(); }
+    if (slowT > 3 && dprCap > 1.25 && (window.devicePixelRatio || 1) > 1.25) { dprCap -= 0.25; slowT = 0; frameAvg = 1 / 60; resizeAndDraw(); }
   }
   function boot() {
     load();
@@ -337,7 +339,7 @@
     resize();
     drawPortrait();
     let rq = 0;
-    const onResize = () => { if (!rq) rq = requestAnimationFrame(() => { rq = 0; resize(); }); };
+    const onResize = () => { if (!rq) rq = requestAnimationFrame(() => { rq = 0; resizeAndDraw(); }); };
     if ('ResizeObserver' in window) new ResizeObserver(onResize).observe($('game'));
     window.addEventListener('resize', onResize);
     for (let k = 0; k < 9; k++) spawnPack();

@@ -640,8 +640,9 @@
   const bodyH = (e) => (e.type === 'ant' ? 20 : e.type === 'undead' ? 40 : 32) * (e.boss ? 1.75 : e.elite ? 1.18 : 1);
   function addFx(o) { fx.push(o); if (fx.length > 80) fx.shift(); }
   function addText(x, y, s, kind, h) {
-    const j = kind === 'gold' || kind === 'heal' ? 0 : 0.28;
-    texts.push({ x: x + rand(-j, j), y: y + rand(-j, j), s, kind, h: (h || 30) + rand(-4, 4), t: 0, life: kind === 'gold' ? 1.1 : 0.85 });
+    const j = kind === 'gold' || kind === 'heal' ? 0 : 0.16, arc = kind === 'hit' || kind === 'crit' || kind === 'hurt';
+    texts.push({ x: x + rand(-j, j), y: y + rand(-j, j), s, kind, h: (h || 30) + rand(-4, 4), t: 0, life: kind === 'gold' ? 1.1 : kind === 'crit' ? 0.95 : 0.85,
+      vx: arc ? rand(-1, 1) * (kind === 'crit' ? 46 : 34) : 0, vy: arc ? (kind === 'crit' ? 96 : 78) : 0 });
     if (texts.length > 60) texts.shift();
   }
   function hitEnemy(e, base) {
@@ -694,7 +695,7 @@
       refreshD();
       player.hp = D.maxHp; player.mp = D.maxMp;
       sfx('level');
-      addFx({ k: 'lvl', x: player.x, y: player.y, t: 0, life: 1.3 });
+      addFx({ k: 'lvl', x: player.x, y: player.y, t: 0, life: 1.3 }); zoomPunch(0.05); buzz(30);
       burst(player.x, player.y, 10, 'gold', 26, 'gold', 1.6);
       toast('レベル' + prog.level + '！ ステータスで振り分けよう');
       log('レベル' + prog.level + 'になった');
@@ -708,6 +709,7 @@
     if (cap) dmg = Math.min(dmg, Math.round(D.maxHp * cap));
     if (D.shield > 0 && player.mp > 0) { const ab = Math.min(player.mp, dmg * D.shield); player.mp -= ab; dmg = Math.max(0, Math.round(dmg - ab)); }
     player.hp -= dmg;
+    onHurtFeel(dmg);
     player.hurtT = 0.22;
     sfx('hurt');
     addText(player.x, player.y, String(dmg), 'hurt', 58);
