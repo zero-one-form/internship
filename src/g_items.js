@@ -82,7 +82,8 @@
   function cleanItem(it) {
     if (!it || typeof it !== 'object' || !TYPE_INFO[it.type]) return null;
     const num = (v, lo, hi, d) => (typeof v === 'number' && isFinite(v) ? clamp(v, lo, hi) : d);
-    const opts = Array.isArray(it.opts) ? it.opts.filter((o) => o && (o.k === 'skill' ? SKD[o.sid] : OPTS[o.k]) && typeof o.v === 'number' && isFinite(o.v)).slice(0, 6) : [];
+    const own = (o, k) => typeof k === 'string' && Object.prototype.hasOwnProperty.call(o, k);
+    const opts = Array.isArray(it.opts) ? it.opts.filter((o) => o && (o.k === 'skill' ? own(SKD, o.sid) : own(OPTS, o.k)) && typeof o.v === 'number' && isFinite(o.v)).slice(0, 6).map((o) => (o.k === 'skill' ? { k: 'skill', sid: o.sid, v: clamp(Math.round(o.v), 1, 3) } : { k: o.k, v: clamp(o.v, 0, 200) })) : [];
     return { id: Math.floor(num(it.id, 1, 1e12, ++itemSeq)), type: it.type, il: Math.round(num(it.il, 1, 999, 1)), rar: Math.round(num(it.rar, 0, 3, 0)), name: String(it.name || TYPE_INFO[it.type].names[0]).slice(0, 40), opts, plus: Math.round(num(it.plus, 0, 10, 0)), isNew: !!it.isNew, lock: !!it.lock };
   }
   function giveStarter() {

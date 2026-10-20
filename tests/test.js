@@ -475,10 +475,28 @@ const assert = (c, msg) => { if (!c) { errors.push('ASSERT FAIL: ' + msg); conso
   assert(G.envDark < 0.05, 'day restored');
   assert(G.chunkCache.size > 0 && G.chunkCache.size <= 49, 'chunk cache bounded: ' + G.chunkCache.size);
 
+  // regression: audit fixes
+  {
+    G.prog.wb = { wk: G.weekKey(), dmg: 1234, claimed: false, day: 1, tries: 2 };
+    G.prog.wk = { wk: G.weekKey(), deep: 12, rank: 1, score: 112 };
+    G.save(); G.prog.wb = null; G.prog.wk = null; G.load();
+    assert(G.prog.wb && G.prog.wb.tries === 2 && G.prog.wb.dmg === 1234, 'world-boss tries/damage survive a reload');
+    assert(G.prog.wk && G.prog.wk.score === 112, 'weekly ranking score survives a reload');
+    const it = G.cleanItem({ id: 5, type: 'sword', il: 10, rar: 1, name: 'x', plus: 0, opts: [{ k: 'constructor', v: 1 }, { k: '__proto__', v: 1 }, { k: 'aspd', v: -100 }] });
+    assert(it.opts.length === 1 && it.opts[0].k === 'aspd' && it.opts[0].v === 0, 'saved item options: inherited keys dropped, values bounded');
+    const deep0 = G.prog.deep; G.prog.deep = 50; let bad = 0;
+    for (let i = 0; i < 200; i++) { const b = G.genBounty(); if (b.k === 'floor' && b.n > G.ABYSS_MAX_F) bad++; }
+    G.prog.deep = deep0;
+    assert(bad === 0, 'no unreachable floor bounties at the bottom of the abyss');
+    G.prog.rank = 2; G.prog.rankMax = 2; G.prog.cls = { blade: 'saint', arcane: null };
+  }
+
   // reset
   $('menuBtn').click();
   $('resetBtn').click(); $('resetBtn').click();
   assert(G.prog.level === 1 && G.prog.exp === 0 && G.prog.potions === 5, 'reset restores a fresh character');
+  assert(G.prog.rank === 0 && G.prog.rankMax === 0 && !G.prog.cls.blade, 'reset clears abyss rank and advanced class');
+  assert(G.prog.wb && G.prog.wb.tries === 2, 'reset keeps today\'s world-boss tries (no reset exploit)');
   $('closeBtn').click();
   frames(10);
 

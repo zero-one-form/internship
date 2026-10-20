@@ -369,7 +369,7 @@
     undead: { hp: 78, dmg: 9, sp: 1.15, exp: 19, aggro: 3.6, atk: 1.45, r: 0.38, armor: 2, vars: 2 }
   };
   function defaultProg() {
-    return { level: 1, exp: 0, stats: { str: 5, agi: 5, vit: 5, int: 5, luk: 5 }, sp: 0, kp: 0, skill: { whirl: 1, chain: 1 }, potions: 5, gold: 0, form: 'blade', intro: false, map: 0, deep: 0, floor: 1, q: { main: 0, mp: 0, ma: false, mn: false, act: [], board: [] }, opt: { autoPot: true, autoTarget: true, autoSell: false, stick: true, shake: true, op: true, bgm: 0.6, se: 0.8 }, cleared: 0, inv: [], eq: { sword: null, staff: null, head: null, body: null, acc: null }, starter: false };
+    return { level: 1, exp: 0, stats: { str: 5, agi: 5, vit: 5, int: 5, luk: 5 }, sp: 0, kp: 0, skill: { whirl: 1, chain: 1 }, potions: 5, gold: 0, form: 'blade', intro: false, map: 0, deep: 0, floor: 1, q: { main: 0, mp: 0, ma: false, mn: false, act: [], board: [] }, opt: { autoPot: true, autoTarget: true, autoSell: false, stick: true, shake: true, op: true, bgm: 0.6, se: 0.8 }, cleared: 0, inv: [], eq: { sword: null, staff: null, head: null, body: null, acc: null }, starter: false, rank: 0, rankMax: 0, rankDeep: [], bless: [], phx: false, cls: { blade: null, arcane: null }, pets: null, rec: null };
   }
   const prog = defaultProg();
   const player = {
@@ -462,8 +462,12 @@
       prog.opt = { autoPot: oo.autoPot !== false, autoTarget: oo.autoTarget !== false, autoSell: !!oo.autoSell, stick: oo.stick !== false, lite: !!oo.lite, shake: oo.shake !== false, op: oo.op !== false, bgm: typeof oo.bgm === 'number' && isFinite(oo.bgm) ? clamp(oo.bgm, 0, 1) : 0.6, se: typeof oo.se === 'number' && isFinite(oo.se) ? clamp(oo.se, 0, 1) : 0.8 };
       const qq = s.q && typeof s.q === 'object' ? s.q : {};
       const okB = (b) => b && typeof b === 'object' && ['kill', 'elite', 'floor'].includes(b.k) && typeof b.n === 'number' && isFinite(b.n) && b.rew && typeof b.rew === 'object' && (b.k !== 'kill' || ['goblin', 'ant', 'undead'].includes(b.what));
-      const fixB = (b) => Object.assign(b, { p: typeof b.p === 'number' && isFinite(b.p) ? b.p : 0 });
+      const fixB = (b) => ({ k: b.k, what: b.k === 'kill' ? b.what : undefined, n: num(b.n, 1, 1, 99), p: num(b.p, 0, 0, 99), nt: !!b.nt, rew: { gold: num(b.rew.gold, 0, 0, 1e7), exp: num(b.rew.exp, 0, 0, 1e9), pot: num(b.rew.pot, 0, 0, 99), item: num(b.rew.item, 0, 0, 3) } });
       prog.q = { main: num(qq.main, 0, 0, 99), mp: num(qq.mp, 0, 0, 1e6), ma: !!qq.ma, mn: !!qq.mn, act: Array.isArray(qq.act) ? qq.act.filter(okB).map(fixB).slice(0, 3) : [], board: Array.isArray(qq.board) ? qq.board.filter(okB).map(fixB).slice(0, 3) : [] };
+      { const w = s.wb && typeof s.wb === 'object' ? s.wb : null;
+        if (w) prog.wb = { wk: num(w.wk, 0, 0, 1e7), dmg: num(w.dmg, 0, 0, 5e9), claimed: !!w.claimed, day: num(w.day, 0, 0, 1e8), tries: num(w.tries, 0, 0, WB_TRIES), killed: !!w.killed };
+        const k = s.wk && typeof s.wk === 'object' ? s.wk : null;
+        if (k) prog.wk = { wk: num(k.wk, 0, 0, 1e7), deep: num(k.deep, 0, 0, 50), rank: num(k.rank, 0, 0, 10), score: num(k.score, 0, 0, 1050) }; }
       prog.inv = Array.isArray(s.inv) ? s.inv.map(cleanItem).filter(Boolean).slice(0, INV_MAX) : [];
       prog.eq = { sword: null, staff: null, head: null, body: null, acc: null };
       if (s.eq && typeof s.eq === 'object') for (const t of SLOT_TYPES) { const it = cleanItem(s.eq[t]); if (it && it.type === t) prog.eq[t] = it; }
@@ -953,10 +957,10 @@
     if (id === 3) prepFloor();
     clearBossFx(); bossRef = null;
     buildMap(id);
-    prog.map = id;
+    prog.map = id === 3 && WB.on ? 0 : id;
     rebuildBiome();
     enemies.length = 0; shots.length = 0; fx.length = 0; texts.length = 0; parts.length = 0; vfx.length = 0;
-    fields.length = 0; meteors.length = 0; dash = null; dance = null; loot.length = 0;
+    fields.length = 0; meteors.length = 0; dash = null; dance = null; loot.length = 0; pendingNpc = null;
     let px = SPAWN.x, py = SPAWN.y;
     if (arrive != null && portals[arrive]) {
       const p = portals[arrive], dx = CAMP.x - p.x, dy = CAMP.y - p.y, d = hyp(dx, dy) || 1;

@@ -52,7 +52,8 @@
     const L = prog.level, r = Math.random();
     if (r < 0.6) { const n = randi(8, 16); return { k: 'kill', what: ['goblin', 'ant', 'undead'][randi(0, 2)], n, p: 0, rew: { gold: Math.round(25 * L + n * 6), exp: Math.round(expNeed(L) * 0.18), item: Math.random() < 0.3 ? 1 : 0 } }; }
     if (r < 0.85) { const n = randi(2, 4); return { k: 'elite', n, p: 0, rew: { gold: Math.round(60 * L), exp: Math.round(expNeed(L) * 0.3), item: 2 } }; }
-    const f = Math.max(2, prog.deep + randi(1, 2));
+    if (prog.deep >= ABYSS_MAX) { const n = randi(3, 5); return { k: 'elite', n, p: 0, rew: { gold: Math.round(70 * L), exp: Math.round(expNeed(L) * 0.35), item: 2 } }; }
+    const f = Math.min(ABYSS_MAX, Math.max(2, prog.deep + randi(1, 2)));
     return { k: 'floor', n: f, p: 0, rew: { gold: Math.round(80 * L + f * 30), exp: Math.round(expNeed(L) * 0.4), item: 2 } };
   }
   function fillBoard() { const q = qState(); while (q.board.length < 3) q.board.push(genBounty()); }
@@ -185,8 +186,9 @@
   function buy(cost, fn) { if (prog.gold < cost) { toast('所持金が足りない'); return; } prog.gold -= cost; fn(); save(); renderNpc(); }
   function openNpc(role) {
     if (player.dead || !$('intro').hidden) return;
-    npcOpen = role; paused = true; drag.active = false;
+    npcOpen = role; drag.active = false;
     renderNpc();
+    paused = true;
     $('npcDlg').hidden = false;
   }
   function closeNpc() { $('npcDlg').hidden = true; npcOpen = null; paused = false; save(); }

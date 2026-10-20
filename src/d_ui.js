@@ -369,7 +369,8 @@
         openNpc, closeNpc, qState, MAINQ, NPCS, mainDone, get npcOpen() { return npcOpen; },
         enterMap, setUserZoom, get portals() { return portals; }, get curMap() { return curMap; }, get zoom() { return zoom; },
         findPath, spawnPack, blockedAt, inCamp, gainExp, hurtPlayer, expNeed, chunkCache, castSkill, learn, SKD, fields, meteors,
-        get dash() { return dash; }
+        get dash() { return dash; },
+        save, load, cleanItem, genBounty, ABYSS_MAX_F: ABYSS_MAX
       };
     }
     requestAnimationFrame(frame);

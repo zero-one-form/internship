@@ -259,6 +259,7 @@
     sfx('quest');
   }
   function chooseBless(id) {
+    if (!inDive()) { $('blessDlg').hidden = true; blessOpen = false; paused = false; return; }
     BLESS.push(id);
     prog.bless = BLESS.slice(); save();
     refreshD();

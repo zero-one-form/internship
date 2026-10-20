@@ -7,7 +7,7 @@
     { name: '血塗れの大将軍', type: 'goblin', cv: 0, biome: 'ab_blood' }
   ];
   const WEEK_MODS = ['frenzy', 'armored', 'horde', 'elite', 'blast', 'regen', 'burning', 'dark'];
-  const WB_TIME = 90, WB_TRIES = 3, WB_HP = 8e6;
+  const WB_TIME = 90, WB_TRIES = 3, WB_HP = 8e6, WB_DMG_CAP = 3e6; // one player's weekly contribution can't exceed this
   var NET = { ready: false, db: null, user: null, me: null, canWrite: false, note: 'オフライン（このページだけで遊べる）' };
   var WB = { on: false, t: 0, dmg: 0, boss: null, global: null };
   function weekKey() { const d = new Date(); return Math.floor((Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 86400000 + 3) / 7); }
@@ -41,7 +41,7 @@
   }
   async function netQuery(col, field, val) {
     if (!NET.ready) return [];
-    try { const s = await NET.db.collection(col).where(field, '==', val).limit(500).get(); return s.docs.map((d) => d.data()).filter((x) => x && typeof x.uid === 'string'); } catch (e) { return []; }
+    try { const s = await NET.db.collection(col).where(field, '==', val).limit(500).get(); return s.docs.map((d) => ({ id: d.id, x: d.data() })).filter((r) => r.x && typeof r.x.uid === 'string' && r.x.uid === r.id).map((r) => r.x); } catch (e) { return []; }
   }
   async function names(ids) {
     const out = {};
@@ -52,18 +52,18 @@
   async function wbRefresh() {
     const L = wbLocal(), wk = weekKey();
     let rows = await netQuery('wb', 'boss', wk);
-    rows = rows.filter((r) => typeof r.dmg === 'number' && isFinite(r.dmg) && r.dmg >= 0).map((r) => ({ uid: r.uid, dmg: Math.min(r.dmg, 5e9), lvl: r.lvl }));
-    if (!rows.some((r) => r.uid === NET.me)) rows.push({ uid: NET.me || 'me', dmg: L.dmg, lvl: prog.level });
-    else for (const r of rows) if (r.uid === NET.me) r.dmg = Math.max(r.dmg, L.dmg);
+    rows = rows.filter((r) => typeof r.dmg === 'number' && isFinite(r.dmg) && r.dmg >= 0).map((r) => ({ uid: r.uid, dmg: Math.min(r.dmg, WB_DMG_CAP), lvl: clamp(Math.floor(+r.lvl || 1), 1, 999), killed: r.killed === true }));
+    if (!rows.some((r) => r.uid === NET.me)) rows.push({ uid: NET.me || 'me', dmg: L.dmg, lvl: prog.level, killed: false });
+    else for (const r of rows) if (r.uid === NET.me) { L.dmg = Math.max(L.dmg, r.dmg); r.dmg = L.dmg; }
     const n = rows.filter((r) => r.dmg > 0).length || 1, hpMax = Math.round(WB_HP * Math.pow(n, 0.8)), sum = rows.reduce((a, r) => a + r.dmg, 0);
     rows.sort((a, b) => b.dmg - a.dmg);
-    WB.global = { hpMax, left: Math.max(0, hpMax - sum), n, rows, wk };
+    WB.global = { hpMax, left: rows.some((r) => r.killed) || L.killed ? 0 : Math.max(0, hpMax - sum), n, rows, wk };
     return WB.global;
   }
   async function lbRefresh() {
     const W = wkLocal();
     let rows = await netQuery('lb', 'week', weekKey());
-    rows = rows.filter((r) => typeof r.score === 'number' && isFinite(r.score)).map((r) => ({ uid: r.uid, score: r.score, deep: r.deep, rank: r.rank, lvl: r.lvl }));
+    rows = rows.filter((r) => [r.score, r.deep, r.rank].every((v) => typeof v === 'number' && isFinite(v)) && r.rank >= 0 && r.rank <= 10 && r.deep >= 1 && r.deep <= 50 && r.score === r.rank * 100 + r.deep).map((r) => ({ uid: r.uid, score: r.score, deep: r.deep, rank: r.rank, lvl: clamp(Math.floor(+r.lvl || 1), 1, 999) }));
     if (!rows.some((r) => r.uid === NET.me) && W.score > 0) rows.push({ uid: NET.me || 'me', score: W.score, deep: W.deep, rank: W.rank, lvl: prog.level });
     rows.sort((a, b) => b.score - a.score);
     return rows;
@@ -101,8 +101,10 @@
     if (WB.on) return;
     if (L.tries >= WB_TRIES) { toast('今日の挑戦回数を使い切った（毎日' + WB_TRIES + '回）'); return; }
     if (curMap === 3) { toast('深淵の中からは挑めない。地上から挑もう'); return; }
-    if (player.dead) return;
-    await wbRefresh();
+    if (player.dead || WB.entering) return;
+    WB.entering = true;
+    try { await wbRefresh(); } finally { WB.entering = false; }
+    if (WB.on || curMap === 3 || player.dead || transit || L.tries >= WB_TRIES) return;
     if (WB.global.left <= 0) { toast('今週の共闘ボスはすでに討伐された！'); return; }
     L.tries++; save();
     $('worldDlg').hidden = true; paused = false;
@@ -115,7 +117,7 @@
     WB.t -= dt;
     if (WB.t <= 0) wbEnd('time');
   }
-  function wbLeave() { if (!WB.on) return; WB.on = false; const L = wbLocal(); L.dmg += Math.round(WB.dmg); WB.dmg = 0; save(); netWrite('wb', { boss: weekKey(), dmg: L.dmg, lvl: prog.level }); }
+  function wbLeave() { if (!WB.on) return; WB.on = false; const L = wbLocal(); L.dmg += Math.round(WB.dmg); WB.dmg = 0; save(); netWrite('wb', { boss: weekKey(), dmg: L.dmg, lvl: prog.level, killed: !!L.killed }); }
   function wbHit(e, dmg) { if (e.world && WB.on) WB.dmg += dmg; }
   async function wbEnd(reason) {
     if (!WB.on) return;
@@ -126,10 +128,10 @@
     prog.gold += gold;
     player.dead = false; player.hp = D.maxHp; $('dead').hidden = true;
     gainExp(exp);
-    await netWrite('wb', { boss: weekKey(), dmg: L.dmg, lvl: prog.level });
-    const G = await wbRefresh();
+    if (reason === 'kill') L.killed = true;
     transit = true; $('fade').classList.add('on');
     setTimeout(() => { enterMap(0, null); $('fade').classList.remove('on'); transit = false; openWorld({ dmg: got, gold, exp, reason }); }, 320);
+    netWrite('wb', { boss: weekKey(), dmg: L.dmg, lvl: prog.level, killed: !!L.killed });
   }
   function wbKilled() {
     WB.global && (WB.global.left = 0);
