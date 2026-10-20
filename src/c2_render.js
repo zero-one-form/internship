@@ -490,6 +490,7 @@
       ctx.restore();
     }
     if (!e.dead) {
+      elemDraw(e, x0, y0);
       if (e.aff || e.treasure || e.shieldT > 0) affixDraw(e, x0, y0);
       if (e.elite) emis.push(['gold', x0, y0 - bodyH(e) * zoom, 44 * zoom, 0.3 + Math.sin(time * 4 + e.anim) * 0.1]);
       if (e.type === 'ant' && envDark > 0.2) emis.push(['warm', x0, y0 - 14 * zoom, 30 * zoom, envDark * 0.3]);
@@ -768,13 +769,13 @@
       }
     }
   }
-  const TEXT_STYLE = { hit: ['#ffffff', 14, 'rgba(20,22,48,0.9)'], crit: ['#ffd36e', 23, 'rgba(80,24,0,0.95)'], hurt: ['#ff6b7a', 16, 'rgba(60,0,12,0.9)'], gold: ['#ffe27a', 14, 'rgba(70,46,0,0.9)'], heal: ['#8dffbf', 15, 'rgba(0,44,22,0.9)'], multi: ['#ffef9a', 24, 'rgba(90,20,0,0.95)'] };
+  const TEXT_STYLE = { hit: ['#ffffff', 14, 'rgba(20,22,48,0.9)'], crit: ['#ffd36e', 23, 'rgba(80,24,0,0.95)'], hurt: ['#ff6b7a', 16, 'rgba(60,0,12,0.9)'], gold: ['#ffe27a', 14, 'rgba(70,46,0,0.9)'], heal: ['#8dffbf', 15, 'rgba(0,44,22,0.9)'], multi: ['#ffef9a', 24, 'rgba(90,20,0,0.95)'], react: ['#e6f6ff', 19, 'rgba(20,30,80,0.95)'] };
   function drawTexts() {
     ctx.textAlign = 'center';
     ctx.lineJoin = 'round';
     for (const t of texts) {
       const k = t.t / t.life, st = TEXT_STYLE[t.kind] || TEXT_STYLE.hit;
-      const pop = t.kind === 'crit' || t.kind === 'multi' ? 1 + Math.max(0, 0.3 - k) * 3 : 1 + Math.max(0, 0.18 - k) * 2.2;
+      const pop = t.kind === 'crit' || t.kind === 'multi' || t.kind === 'react' ? 1 + Math.max(0, 0.3 - k) * 3 : 1 + Math.max(0, 0.18 - k) * 2.2;
       const rise = t.vy ? t.vy * t.t - 0.5 * 190 * t.t * t.t + k * 8 : k * 24;
       const x0 = isoX(t.x, t.y) + (t.vx || 0) * t.t * zoom, y0 = isoY(t.x, t.y) - (t.h + rise) * zoom;
       const size = Math.round(st[1] * zoom * pop / 2) * 2;

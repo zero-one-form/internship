@@ -128,3 +128,63 @@
     addSlowMo(0.4); zoomPunch(0.06); addShake(10); buzz([40, 30, 40]); sfx('boom');
     toast(bossName(e) + 'が崩れた！ 4秒間 与えるダメージ +50%');
   }
+
+  /* ---------- elemental reactions (Genshin Impact style) ---------- */
+  // Spells leave an element on the enemy; a different element (or a sword hit on ice) triggers a reaction.
+  // The two forms work together: freeze with 術, switch, shatter with 剣.
+  const REACT = {
+    melt: { name: '融解', c: '#ffb36b', mul: 2.0 },
+    shatter: { name: '粉砕', c: '#bff4ff', mul: 2.2 },
+    supercon: { name: '超伝導', c: '#b7a6ff', mul: 1.3 },
+    overload: { name: '過負荷', c: '#ff8a5a', mul: 1.2 }
+  };
+  const EL_GLOW = { fire: 'warm', ice: 'cyan', volt: 'violet' };
+  const EL_RING = { fire: '255,150,70', ice: '140,230,255', volt: '190,150,255' };
+  let curEl = null, reacting = false;
+  const reactSeen = {};
+  function withEl(el, fn) { const prev = curEl; curEl = el; try { return fn(); } finally { curEl = prev; } }
+  function reactionOf(a, b) {
+    const s = a < b ? a + '+' + b : b + '+' + a;
+    return s === 'fire+ice' ? 'melt' : s === 'ice+phys' ? 'shatter' : s === 'ice+volt' ? 'supercon' : s === 'fire+volt' ? 'overload' : null;
+  }
+  // returns the damage multiplier for this hit and applies / consumes element auras
+  function elemOnHit(e) {
+    if (reacting) return 1;
+    const el = curEl || (player.form === 'blade' ? 'phys' : null);
+    if (!el) return 1;
+    const has = e.elT > 0 ? e.el : null;
+    const r = has && has !== el ? reactionOf(has, el) : null;
+    if (!r) { if (el !== 'phys') { e.el = el; e.elT = 6; } return 1; }
+    e.el = null; e.elT = 0;
+    const R = REACT[r];
+    addText(e.x, e.y, R.name, 'react', bodyH(e) + 34);
+    recAdd('reacts');
+    if (!reactSeen[r]) { reactSeen[r] = 1; toast('元素反応「' + R.name + '」！' + (r === 'shatter' ? ' 凍った敵を剣で砕いた' : r === 'melt' ? ' 炎と氷が重なった' : r === 'supercon' ? ' 雷と氷が重なった' : ' 炎と雷が重なった')); }
+    reacting = true;
+    try {
+      if (r === 'supercon') {
+        for (const o of enemies) if (o !== e && !o.dead && hyp(o.x - e.x, o.y - e.y) < 2) { hitEnemy(o, D.atk * 1.2); o.slowT = 3; o.slowAmt = 0.5; }
+        addVfx({ k: 'ring', x: e.x, y: e.y, R: 2, c: '190,160,255', w: 6, life: 0.45 });
+      } else if (r === 'overload') {
+        for (const o of enemies) {
+          if (o === e || o.dead || hyp(o.x - e.x, o.y - e.y) > 2) continue;
+          hitEnemy(o, D.atk * 1.6);
+          if (!o.boss) { const dx = o.x - e.x, dy = o.y - e.y, d = hyp(dx, dy) || 1; o.kbx = dx / d * 4; o.kby = dy / d * 4; }
+        }
+        vfxExplode(e.x, e.y, 1.6); addShake(5);
+      } else if (r === 'shatter') {
+        burst(e.x, e.y, bodyH(e), 'magic', 18, 'cyan', 4); addShake(3);
+      } else {
+        burst(e.x, e.y, bodyH(e), 'ember', 14, 'warm', 3.5);
+      }
+    } finally { reacting = false; }
+    sfx(r === 'overload' ? 'boom' : r === 'melt' ? 'fire' : 'ice');
+    return R.mul;
+  }
+  function elemDraw(e, x0, y0) {
+    if (!(e.elT > 0) || e.dead) return;
+    const c = EL_RING[e.el], a = Math.min(1, e.elT) * (0.55 + Math.sin(time * 8 + e.anim) * 0.15);
+    ctx.save(); ctx.lineWidth = 2.2; ctx.strokeStyle = 'rgba(' + c + ',' + a + ')';
+    ctx.beginPath(); ctx.ellipse(x0, y0, 17 * zoom, 8.5 * zoom, 0, 0, TAU); ctx.stroke(); ctx.restore();
+    emis.push([EL_GLOW[e.el], x0, y0 - bodyH(e) * 0.5 * zoom, 30 * zoom, 0.35 * a]);
+  }

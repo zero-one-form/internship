@@ -526,6 +526,21 @@ const assert = (c, msg) => { if (!c) { errors.push('ASSERT FAIL: ' + msg); conso
     G.prog.eq.acc = null; G.refreshGear();
     G.enterMap(0, null); frames(3);
   }
+  // elemental reactions
+  {
+    G.enterDungeon(2); frames(3);
+    const pl = G.player; pl.dead = false; G.refreshD(); pl.hp = G.D.maxHp;
+    const e = G.makeTestElite(); e.maxHp = e.hp = 1e7;
+    const r0 = G.recs().reacts || 0;
+    G.withEl('ice', () => G.hitEnemy(e, 1));
+    assert(e.el === 'ice' && e.elT > 0, 'a frost hit leaves ice on the enemy');
+    if (pl.form !== 'blade') G.morph();
+    pl.form = 'blade'; const h0 = e.hp; G.hitEnemy(e, 1000);
+    assert(!(e.elT > 0) && (G.recs().reacts || 0) === r0 + 1 && h0 - e.hp > 1500, 'a sword hit shatters the ice for extra damage: ' + Math.round(h0 - e.hp));
+    G.withEl('fire', () => G.hitEnemy(e, 1)); const h1 = e.hp; G.withEl('volt', () => G.hitEnemy(e, 1000));
+    assert((G.recs().reacts || 0) === r0 + 2, 'fire then lightning overloads');
+    G.enterMap(0, null); frames(3);
+  }
   // regression: audit fixes
   {
     G.prog.wb = { wk: G.weekKey(), dmg: 1234, claimed: false, day: 1, tries: 2 };

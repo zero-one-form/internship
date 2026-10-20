@@ -458,7 +458,7 @@
           list: Array.isArray(pp.list) ? pp.list.filter((p) => p && okSp.includes(p.sp)).slice(0, 12).map((p) => ({ id: num(p.id, 1, 1, 1e15), sp: p.sp, lvl: num(p.lvl, 1, 1, 30), exp: num(p.exp, 0, 0, 1e6), shiny: !!p.shiny, name: String(p.name || 'ルル').slice(0, 12) })) : [],
           active: typeof pp.active === 'number' ? pp.active : null, ride: !!pp.ride }; }
       { const cc = s.cls && typeof s.cls === 'object' ? s.cls : {}; prog.cls = { blade: ['saint', 'guard'].includes(cc.blade) ? cc.blade : null, arcane: ['star', 'soul'].includes(cc.arcane) ? cc.arcane : null }; }
-      { const rr = s.rec && typeof s.rec === 'object' ? s.rec : {}; prog.rec = {}; for (const k of ['kills', 'elites', 'bosses', 'legends', 'combo', 'chests', 'goblins', 'deaths', 'dodges']) prog.rec[k] = num(rr[k], 0, 0, 1e9); prog.rec.play = typeof rr.play === 'number' && isFinite(rr.play) ? Math.max(0, rr.play) : 0; }
+      { const rr = s.rec && typeof s.rec === 'object' ? s.rec : {}; prog.rec = {}; for (const k of ['kills', 'elites', 'bosses', 'legends', 'combo', 'chests', 'goblins', 'deaths', 'dodges', 'reacts']) prog.rec[k] = num(rr[k], 0, 0, 1e9); prog.rec.play = typeof rr.play === 'number' && isFinite(rr.play) ? Math.max(0, rr.play) : 0; }
       prog.cleared = typeof s.cleared === 'number' && isFinite(s.cleared) ? clamp(Math.floor(s.cleared), 0, 9999) : 0;
       if (typeof prog.deep === 'number') prog.deep = Math.min(50, prog.deep);
       const oo = s.opt && typeof s.opt === 'object' ? s.opt : {};
@@ -588,6 +588,7 @@
       e.lunge = Math.max(0, e.lunge - dt);
       e.stunT = Math.max(0, (e.stunT || 0) - dt);
       if (e.brkT) e.brkT = Math.max(0, e.brkT - dt);
+      if (e.elT > 0) e.elT -= dt;
       e.slowT = Math.max(0, (e.slowT || 0) - dt);
       e.weakT = Math.max(0, (e.weakT || 0) - dt);
       if (e.stunT > 0) { e.moving = false; continue; }
@@ -651,7 +652,7 @@
     if (e.dead) return;
     if (e.shieldT > 0) { addText(e.x, e.y, '無効', 'hit', bodyH(e) + 18); return; }
     const crit = player.critT > 0 || Math.random() < D.crit;
-    const dmg = Math.max(1, Math.round(base * legendDmgMul(e) * rand(0.9, 1.1) * (crit ? D.critMul : 1) - e.armor));
+    const dmg = Math.max(1, Math.round(base * legendDmgMul(e) * elemOnHit(e) * rand(0.9, 1.1) * (crit ? D.critMul : 1) - e.armor));
     e.hp -= dmg;
     legendOnHit(e, dmg, crit);
     wbHit(e, dmg);

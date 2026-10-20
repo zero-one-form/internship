@@ -87,7 +87,7 @@
   function explode(x, y, r, dmg) {
     sfx('boom');
     vfxExplode(x, y, r);
-    if (dmg > 0) for (const e of enemies) if (!e.dead && hyp(e.x - x, e.y - y) <= r + e.r) hitEnemy(e, dmg);
+    if (dmg > 0) withEl('fire', () => { for (const e of enemies) if (!e.dead && hyp(e.x - x, e.y - y) <= r + e.r) hitEnemy(e, dmg); });
     addFx({ k: 'boom', x, y, r, t: 0, life: 0.55 });
     burst(x, y, 10, 'spark', 14, 'warm', 3);
     burst(x, y, 3, 'dust', 6, '', 1.6);
@@ -196,7 +196,7 @@
       while (cur && hit.size <= jumps) {
         hit.add(cur);
         pts.push([cur.x, cur.y, bodyH(cur)]);
-        hitEnemy(cur, D.atk * mul * m);
+        withEl('volt', () => hitEnemy(cur, D.atk * mul * m));
         m *= 0.9;
         cur = nearest(cur.x, cur.y, 3.3, hit);
       }
@@ -235,7 +235,7 @@
     lance(l) {
       const a = aimDir(7), ux = a[0], uy = a[1];
       const mul = 2.2 + 0.3 * (l - 1), len = 6.5;
-      lineHit(ux, uy, len, 0.65, (e) => hitEnemy(e, D.atk * mul));
+      lineHit(ux, uy, len, 0.65, (e) => withEl('volt', () => hitEnemy(e, D.atk * mul)));
       addFx({ k: 'lance', x: player.x, y: player.y, ux, uy, len, t: 0, life: 0.4 });
       player.swingT = player.swingDur = 0.34;
       return true;
@@ -333,7 +333,7 @@
       f.tick -= dt;
       if (f.tick <= 0) {
         f.tick = 0.5;
-        for (const e of enemies) if (!e.dead && hyp(e.x - f.x, e.y - f.y) <= f.r + e.r) { hitEnemy(e, f.dmg); e.slowT = 0.7; e.slowAmt = 0.5; }
+        for (const e of enemies) if (!e.dead && hyp(e.x - f.x, e.y - f.y) <= f.r + e.r) { withEl('ice', () => hitEnemy(e, f.dmg)); e.slowT = 0.7; e.slowAmt = 0.5; }
       }
       if (Math.random() < dt * 16) { const a = Math.random() * TAU, r = Math.sqrt(Math.random()) * f.r; addPart({ k: 'magic', x: f.x + Math.cos(a) * r, y: f.y + Math.sin(a) * r, z: 2, vx: 0, vy: 0, vz: rand(10, 22), t: 0, life: 0.8, s: 0.5, c: 'cyan' }); }
     }

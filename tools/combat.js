@@ -39,7 +39,10 @@ const chrome = () => process.env.CHROME || (fs.existsSync('/opt/pw-browsers/chro
     ['04_morph', (G) => G.morph()],
     ['05_arcane', (G) => G.castSkill(0)],
     ['06_arcane2', (G) => G.castSkill(2)],
-    ['07_after', (G) => G.attackNearest()],
+    ['07_frost', (G) => G.castSkill(3)],
+    ['08_chain', (G) => G.castSkill(0)],
+    ['09_shatter', (G) => { G.morph(); G.castSkill(0); }],
+    ['10_after', (G) => G.attackNearest()],
   ];
   for (const [name, fn] of shots) {
     await p.evaluate((src) => { const G = window.__G; G.player.hp = G.D.maxHp; G.player.mp = G.D.maxMp; G.player.cd = {}; (0, eval)('(' + src + ')')(G); }, fn.toString());

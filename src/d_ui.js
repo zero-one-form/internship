@@ -375,7 +375,7 @@
         findPath, spawnPack, blockedAt, inCamp, gainExp, hurtPlayer, expNeed, chunkCache, castSkill, learn, SKD, fields, meteors,
         get dash() { return dash; },
         ARIA, ariaOpen, ariaStart, ariaHit, ariaTick, ariaClose, ariaChart, ariaState, ariaDiveStart,
-        LPOW, hasPow, startDodge, perfectDodge, staggerAdd, get slowMo() { return slowMo; }, makeEnemy,
+        withEl, recs, LPOW, hasPow, startDodge, perfectDodge, staggerAdd, get slowMo() { return slowMo; }, makeEnemy,
         save, load, cleanItem, genBounty, ABYSS_MAX_F: ABYSS_MAX, refreshD, makeTestElite() { const e = makeEnemy('goblin', player.x + 3, player.y, 5, ++packSeq, true); enemies.push(e); return e; }
       };
     }
