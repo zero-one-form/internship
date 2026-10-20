@@ -12,6 +12,7 @@
     { id: 'bless', name: '祝福の先導', max: 1, cost: 30, d: () => '深淵に潜るたび、最初に祝福を1つ選べる' },
     { id: 'phoenix', name: '不死鳥の羽', max: 1, cost: 45, d: () => '潜行ごとに1度だけ、倒れてもHP40%で立ち上がる' }
   ];
+  const EGG_SHARDS = 25;
   const PERK_IDS = PERKS.map((p) => p.id);
   const REBIRTH_LV = 40;
   const STREAK = [[10, '殺戮'], [20, '蹂躙'], [35, '虐殺'], [50, '壊滅'], [75, '鏖殺'], [100, '天災']];
@@ -125,6 +126,10 @@
       b.disabled = l >= P.max || S.pts < perkCost(P);
       c.append(t, b); box.append(c);
     }
+    { const ec = document.createElement('div'); ec.className = 'qc row2'; const t = document.createElement('div');
+      t.append(elP('qg', 'ふしぎなタマゴ'), elP('qr', '魂の欠片からタマゴをひとつ生み出す（仲間が生まれる）'));
+      const b = elBtn(EGG_SHARDS + ' 欠片', 'primary small', () => { if (S.pts < EGG_SHARDS) { toast('魂の欠片が足りない'); return; } if (pets().eggs.length >= 5) { toast('タマゴはもう持てない（5個まで）'); return; } S.pts -= EGG_SHARDS; gainEgg(); altarRender(); });
+      b.disabled = S.pts < EGG_SHARDS || pets().eggs.length >= 5; ec.append(t, b); box.append(ec); }
     const rc = document.createElement('div'); rc.className = 'qc';
     rc.append(elP('qh', '転生'), elP('qr', 'Lv' + REBIRTH_LV + '以上で、レベル・能力値・スキルをはじめに戻す。装備・お金・深淵の記録・魂の特典はそのまま。魂の欠片 +' + rebirthGain() + '、転生ごとに経験値 +10%、はじめから能力ポイント+3・スキルポイント+2（転生回数ぶん）。'));
     const rb = elBtn(prog.level < REBIRTH_LV ? 'Lv' + REBIRTH_LV + 'で転生できる（いまLv' + prog.level + '）' : rbArmed ? 'もう一度押すと転生する' : '転生する', 'ghost', () => {

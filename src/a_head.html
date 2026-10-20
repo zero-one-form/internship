@@ -162,6 +162,10 @@ button{font-family:inherit;cursor:pointer;-webkit-tap-highlight-color:transparen
 .combo{position:absolute;right:76px;top:45%;z-index:5;text-align:right;pointer-events:none;color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.7);}
 .combo[hidden]{display:none;}
 .opov{position:absolute;inset:0;z-index:45;background:#000;opacity:0;transition:opacity .6s ease;}
+.autob b{font-size:11px;letter-spacing:.04em;}
+.autob.on{background:radial-gradient(circle at 32% 25%,rgba(255,255,255,.45),rgba(255,255,255,0) 60%),linear-gradient(135deg,#3ad0a0,#0e7a5a) !important;color:#fff !important;border-color:#9fffd8 !important;animation:autop 1.6s ease-in-out infinite;}
+@keyframes autop{0%,100%{box-shadow:0 0 0 0 rgba(80,255,190,.6)}50%{box-shadow:0 0 14px 4px rgba(80,255,190,.75)}}
+@media (prefers-reduced-motion:reduce){.autob.on{animation:none}}
 .altar{background:radial-gradient(circle at 32% 25%,rgba(255,255,255,.3),rgba(255,255,255,0) 60%),linear-gradient(135deg,#5a3cc0,#1e1446) !important;color:#efe6ff !important;}
 .streak{position:absolute;top:22%;left:50%;z-index:7;transform:translate(-50%,-50%);pointer-events:none;opacity:0;font-size:clamp(34px,10vw,52px);font-weight:800;font-style:italic;letter-spacing:.06em;color:#fff;text-shadow:0 3px 0 #7a1010,0 0 18px rgba(255,80,40,.8);white-space:nowrap;}
 .streak.t2,.streak.t3{color:#ffd36e;}
@@ -450,6 +454,7 @@ button{font-family:inherit;cursor:pointer;-webkit-tap-highlight-color:transparen
   <div id="stick" class="stick" aria-hidden="true"><div id="stickKnob" class="knob"></div></div>
   <div class="xpline" aria-label="経験値"><i id="xpLine"></i></div>
   <div class="quick">
+    <button id="autoBtn" class="act autob" type="button" aria-label="AUTO（自動で戦う）" aria-pressed="false"><b>AUTO</b></button>
     <button id="rideBtn" class="act ride" type="button" aria-label="騎乗" hidden><span id="rideLbl" class="lbl">騎乗</span></button>
     <button id="ultBtn" class="act ult" type="button" aria-label="奥義" hidden><span class="lbl">奥義</span><b id="ultPct">0%</b></button>
     <button id="morphBtn" class="act cd" type="button"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M10 21a14 14 0 0 1 25-8" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/><path d="M36 5v9h-9" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><path d="M38 27a14 14 0 0 1-25 8" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/><path d="M12 43v-9h9" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg><span id="morphLabel" class="lbl">術へ変身</span></button>
@@ -490,7 +495,7 @@ button{font-family:inherit;cursor:pointer;-webkit-tap-highlight-color:transparen
           <div><dt>深淵の回廊</dt><dd>森の北の門から入る全50層のダンジョン。階ごとに地形と目標（殲滅・賞金首・宝探し・耐久・封印石）が変わり、目標を果たすと次の階への門が開く。5階ごとにボス、B50Fに深淵の主</dd></div>
           <div><dt>呪いと祝福</dt><dd>深い階には報酬が増える「呪い」がつく。ボスや宝探しの後に選べる「祝福」は、深淵を出るか倒れるまで重ねがけで効く</dd></div>
           <div><dt>上位職と奥義</dt><dd>Lv20で剣・術それぞれ2つの上位職から選べる。敵を倒すと奥義ゲージがたまり、右の「奥義」ボタン（Rキー）で発動</dd></div>
-          <div><dt>ペット</dt><dd>どの敵からも2000分の1で「ふしぎなタマゴ」が落ちる。敵を倒して温めると孵り、ランダムなペットが一緒に戦う。Lv15で成体になると背中に乗れる（Fキー）</dd></div>
+          <div><dt>仲間とAUTO</dt><dd>「ふしぎなタマゴ」（敵から2000分の1、道具屋、魂の祭壇）が孵ると12種類の仲間のどれかが生まれる。最大6匹まで同行し、訓練所でゴールドを使って強化できる。右の「AUTO」（Aキー）で主人公と仲間が自動で戦い、ゲームを閉じている間も仲間が狩りを続ける（最大8時間）。成体のリーダーには乗れる（Fキー）</dd></div>
           <div><dt>共闘ボス</dt><dd>右上の王冠から、今週の共闘ボス「世界の裂け目」に1日3回、各90秒挑める。全員のダメージの合計でHPが減り、倒すと参加者全員に報酬。週間ランキングでは今週の呪いがかかった深淵の到達階を競う</dd></div>
           <div><dt>深淵の位階</dt><dd>深淵の主を倒すと、敵も報酬も強くなる次の位階（最大Ⅹ）に挑める。設定から切り替え可能</dd></div>
           <div><dt>落ちた装備</dt><dd>光の柱が目印。近づくと拾える。右下の「装備」で付け替え・売却、キャンプで強化</dd></div>
@@ -510,7 +515,7 @@ button{font-family:inherit;cursor:pointer;-webkit-tap-highlight-color:transparen
         <button type="button" class="tab" data-tab="arcane" role="tab">術技</button>
         <button type="button" class="tab" data-tab="gear" role="tab">装備</button>
         <button type="button" class="tab" data-tab="quest" role="tab">依頼</button>
-        <button type="button" class="tab" data-tab="pet" role="tab">ペット</button>
+        <button type="button" class="tab" data-tab="pet" role="tab">仲間</button>
         <button type="button" class="tab" data-tab="opt" role="tab">設定</button>
       </div>
       <div id="tabStat">

@@ -229,6 +229,7 @@
         shopRow('回復薬', '20G', () => buyPots(20, 1)),
         shopRow('回復薬×5', '90G', () => buyPots(90, 5)),
         shopRow('サポート宝石の袋（スキルにはめる宝石がひとつ）', gemPrice() + 'G', () => buy(gemPrice(), () => gainGem())),
+        shopRow('ふしぎなタマゴ（仲間が生まれる。5個まで持てる）', eggPrice() + 'G', () => { if (pets().eggs.length >= 5) { toast('タマゴはもう持てない（5個まで）'); return; } buy(eggPrice(), () => gainEgg()); }),
         shopRow('目利き箱（Lv' + prog.level + 'の装備がひとつ。運がよければレジェンド）', bp + 'G', () => {
           if (prog.inv.length >= INV_MAX) { toast('持ち物がいっぱい'); return; }
           buy(bp, () => { const it = genItem(prog.level, gambleRarity()); prog.inv.push(it); toast(RAR[it.rar].name + '：' + it.name + '！'); log(RAR[it.rar].name + '：' + it.name + 'を手に入れた'); });

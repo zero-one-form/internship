@@ -259,7 +259,7 @@
     $('tabPet').hidden = sheetTab !== 'pet';
     if (own) {
       $('tabStat').hidden = true; $('tabSkill').hidden = true; $('tabGear').hidden = true;
-      $('sheetTitle').textContent = sheetTab === 'quest' ? '依頼' : sheetTab === 'pet' ? 'ペット' : '設定';
+      $('sheetTitle').textContent = sheetTab === 'quest' ? '依頼' : sheetTab === 'pet' ? '仲間' : '設定';
       if (sheetTab === 'quest') renderQuestLog(); else if (sheetTab === 'pet') renderPets(); else renderOpt();
       return;
     }

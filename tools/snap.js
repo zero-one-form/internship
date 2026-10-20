@@ -49,6 +49,12 @@ async function browserPath() {
     ['sheet_skill_end', (G) => { G.openSheet(); G.setTab('blade'); const pn = document.querySelector('#sheet .panel'); pn.scrollTop = pn.scrollHeight; }],
     ['altar', (G) => { G.enterMap(0, null); G.player.x = G.SPAWN.x; G.player.y = G.SPAWN.y; G.gainSoul(120); G.paused = false; G.altarOpen(); }],
     ['streak', (G) => { G.altarClose(); for (let i = 0; i < 22; i++) G.streakOnKill({ exp: 10 }); }],
+    ['party', (G) => { G.closeSheet(); const P = G.pets(); P.list.length = 0; P.party = []; P.active = null; P.slots = 4; let id = 1;
+      for (const sp of ['golem', 'fairy', 'mimic', 'phoenix', 'kirin', 'frost']) { P.list.push({ id: id, sp, lvl: 20 + id * 3, exp: 0, shiny: id === 4, name: 'テスト' + id }); G.partyAdd(id, true); id++; }
+      G.enterMap(0, 0); G.prog.opt.auto = true; for (let k = 0; k < 3; k++) G.spawnPack(); }],
+    ['party_fight', (G) => { }],
+    ['pet_tab', (G) => { G.prog.opt.auto = false; G.prog.gold = 50000; G.openSheet(); G.setTab('pet'); }],
+    ['offline', (G) => { G.prog.seen = Date.now() - 200 * 60000; G.showOffline(G.offlineRewards()); }],
   ];
   for (const [name, fn] of steps) {
     const ok = await p.evaluate((src) => { const G = window.__G; if (!G) return false; try { G.closeSheet && G.closeSheet(); } catch (e) {} (0, eval)('(' + src + ')')(G); return true; }, fn.toString());

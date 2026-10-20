@@ -529,11 +529,11 @@
     }
     for (const e of enemies) drawList.push(e);
     drawList.push(player);
-    if (activePet() && !riding()) drawList.push(PET);
+    for (const q of partyList()) { const E = entOf(q); if (E !== PET || !riding()) drawList.push(E); }
     drawList.sort(byDepth);
     for (const o of drawList) {
       if (o === player) drawHero();
-      else if (o === PET) drawPet();
+      else if (o.isPet) drawPet(o);
       else if (o.kind) drawProp(o);
       else drawEnemy(o);
     }

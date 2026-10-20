@@ -369,7 +369,7 @@
     undead: { hp: 78, dmg: 9, sp: 1.15, exp: 19, aggro: 3.6, atk: 1.45, r: 0.38, armor: 2, vars: 2 }
   };
   function defaultProg() {
-    return { level: 1, exp: 0, stats: { str: 5, agi: 5, vit: 5, int: 5, luk: 5 }, sp: 0, kp: 0, skill: { whirl: 1, chain: 1, sprint: 1 }, potions: 5, gold: 0, form: 'blade', intro: false, map: 0, deep: 0, floor: 1, q: { main: 0, mp: 0, ma: false, mn: false, act: [], board: [] }, opt: { autoPot: true, autoTarget: true, autoSell: false, stick: true, shake: true, op: true, bgm: 0.6, se: 0.8 }, cleared: 0, inv: [], eq: { sword: null, staff: null, head: null, body: null, acc: null }, starter: false, rank: 0, rankMax: 0, rankDeep: [], bless: [], phx: false, cls: { blade: null, arcane: null }, pets: null, rec: null, aria: null, soul: null, gems: null, sock: null, slots: null };
+    return { level: 1, exp: 0, stats: { str: 5, agi: 5, vit: 5, int: 5, luk: 5 }, sp: 0, kp: 0, skill: { whirl: 1, chain: 1, sprint: 1 }, potions: 5, gold: 0, form: 'blade', intro: false, map: 0, deep: 0, floor: 1, q: { main: 0, mp: 0, ma: false, mn: false, act: [], board: [] }, opt: { autoPot: true, autoTarget: true, autoSell: false, stick: true, shake: true, op: true, bgm: 0.6, se: 0.8 }, cleared: 0, inv: [], eq: { sword: null, staff: null, head: null, body: null, acc: null }, starter: false, rank: 0, rankMax: 0, rankDeep: [], bless: [], phx: false, cls: { blade: null, arcane: null }, pets: null, rec: null, aria: null, soul: null, seen: 0, gems: null, sock: null, slots: null };
   }
   const prog = defaultProg();
   const player = {
@@ -419,6 +419,7 @@
   function refreshD() { D = derived(player.form); }
 
   function save() {
+    prog.seen = Date.now();
     try { localStorage.setItem(SAVE_KEY, JSON.stringify(prog)); } catch (err) { /* storage unavailable */ }
   }
   function load() {
@@ -453,10 +454,14 @@
       prog.rankDeep = Array.isArray(s.rankDeep) ? s.rankDeep.slice(0, 11).map((v) => num(v, 0, 0, 50)) : [];
       prog.bless = Array.isArray(s.bless) ? s.bless.filter((v) => typeof v === 'string' && v.length < 12).slice(0, 60) : [];
       prog.phx = !!s.phx;
-      { const pp = s.pets && typeof s.pets === 'object' ? s.pets : {}; const okSp = ['slime', 'fox', 'bird', 'wolf', 'dragon'];
+      { const pp = s.pets && typeof s.pets === 'object' ? s.pets : {}; const okSp = Object.keys(PET_SP);
         prog.pets = { eggs: Array.isArray(pp.eggs) ? pp.eggs.filter((e) => e && typeof e === 'object').slice(0, 5).map((e) => ({ p: num(e.p, 0, 0, 999), id: num(e.id, 1, 1, 1e15) })) : [],
-          list: Array.isArray(pp.list) ? pp.list.filter((p) => p && okSp.includes(p.sp)).slice(0, 12).map((p) => ({ id: num(p.id, 1, 1, 1e15), sp: p.sp, lvl: num(p.lvl, 1, 1, 30), exp: num(p.exp, 0, 0, 1e6), shiny: !!p.shiny, name: String(p.name || 'ルル').slice(0, 12) })) : [],
-          active: typeof pp.active === 'number' ? pp.active : null, ride: !!pp.ride }; }
+          list: Array.isArray(pp.list) ? pp.list.filter((p) => p && okSp.includes(p.sp)).slice(0, PET_KEEP).map((p) => ({ id: num(p.id, 1, 1, 1e15), sp: p.sp, lvl: num(p.lvl, 1, 1, PET_MAX), exp: num(p.exp, 0, 0, 1e6), shiny: !!p.shiny, name: String(p.name || 'ルル').slice(0, 12) })) : [],
+          active: typeof pp.active === 'number' ? pp.active : null, ride: !!pp.ride,
+          party: Array.isArray(pp.party) ? pp.party.filter((id) => typeof id === 'number').slice(0, PARTY_MAX) : [],
+          slots: num(pp.slots, 0, 0, PARTY_MAX - 2),
+          train: { atk: num(pp.train && pp.train.atk, 0, 0, 999), spd: num(pp.train && pp.train.spd, 0, 0, 50), exp: num(pp.train && pp.train.exp, 0, 0, 50) } }; }
+      prog.seen = num(s.seen, 0, 0, 1e15);
       { const cc = s.cls && typeof s.cls === 'object' ? s.cls : {}; prog.cls = { blade: ['saint', 'guard'].includes(cc.blade) ? cc.blade : null, arcane: ['star', 'soul'].includes(cc.arcane) ? cc.arcane : null }; }
       { const rr = s.rec && typeof s.rec === 'object' ? s.rec : {}; prog.rec = {}; for (const k of ['kills', 'elites', 'bosses', 'legends', 'combo', 'chests', 'goblins', 'deaths', 'dodges', 'reacts', 'breaks', 'aria', 'floors', 'streak']) prog.rec[k] = num(rr[k], 0, 0, 1e9); prog.rec.play = typeof rr.play === 'number' && isFinite(rr.play) ? Math.max(0, rr.play) : 0; }
       prog.cleared = typeof s.cleared === 'number' && isFinite(s.cleared) ? clamp(Math.floor(s.cleared), 0, 9999) : 0;
@@ -693,7 +698,7 @@
     burst(e.x, e.y, bodyH(e), 'soul', e.elite ? 10 : 4, e.elite ? 'gold' : 'cyan', 0.8);
     const exp = Math.max(1, Math.round(e.exp));
     if (e.elite || Math.random() < 0.65) {
-      const g = Math.round((randi(1, 3) * e.lvl + (e.elite ? 12 : 0)) * (1 + GEAR.gold / 100) * comboMul() * floorGoldMul() * soulGoldMul());
+      const g = Math.round((randi(1, 3) * e.lvl + (e.elite ? 12 : 0)) * (1 + GEAR.gold / 100) * comboMul() * floorGoldMul() * soulGoldMul() * partyGoldMul());
       prog.gold += g;
       goldPending += g;
       if (goldT <= 0) goldT = 0.35;
@@ -989,6 +994,7 @@
     updateFx(dt);
     ambientParticles(dt);
     updateParts(dt);
+    autoUpdate(dt);
     spawnT -= dt;
     if (spawnT <= 0) { spawnT = 0.85; if (!WB.on && aliveCount() < POP_CAP) spawnPack(); } // the world-boss arena holds only the boss and its adds
     const k = Math.min(1, dt * 7);

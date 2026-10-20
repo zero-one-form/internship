@@ -70,6 +70,7 @@
     if (player.frenzyT > 0 && !player.dead && Math.random() < dt * 18) addPart({ k: 'gold', x: player.x + rand(-0.35, 0.35), y: player.y + rand(-0.35, 0.35), z: rand(2, 30), vx: 0, vy: 0, vz: rand(24, 40), t: 0, life: 0.6, s: 0.7, c: Math.random() < 0.5 ? 'gold' : 'amber' });
   }
   function feelFrame(dt) {
+    autoBless(dt);
     punchZ *= Math.pow(0.0008, dt); if (punchZ < 0.0005) punchZ = 0;
     const kd = Math.pow(0.0004, dt); kickX *= kd; kickY *= kd;
     // red screen edges: flash when hit, slow pulse while HP is low

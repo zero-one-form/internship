@@ -32,6 +32,7 @@ let now = 0;
 function frames(n, ms = 16) { for (let i = 0; i < n; i++) { const q = rafQ; rafQ = []; now += ms; for (const cb of q) cb(now); } }
 const $ = (id) => w.document.getElementById(id);
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const shopBtn = (label) => { for (const row of w.document.querySelectorAll('#npcBody .qc, #npcBody > div')) if (row.textContent.includes(label)) { const btn = row.querySelector('button'); if (btn) return btn; } throw new Error('shop row not found: ' + label); };
 const assert = (c, msg) => { if (!c) { errors.push('ASSERT FAIL: ' + msg); console.log('  FAIL:', msg); } else console.log('  ok:', msg); };
 
 (async () => { await sleep(30);
@@ -283,8 +284,8 @@ const assert = (c, msg) => { if (!c) { errors.push('ASSERT FAIL: ' + msg); conso
   G.prog.gold = 100000;
   G.openNpc('shop');
   { const p0 = G.prog.potions; [...w.document.querySelectorAll('#npcBody button')][0].click(); assert(G.prog.potions === p0 + 1, 'merchant sells potions'); }
-  { const i0 = G.prog.inv.length; [...w.document.querySelectorAll('#npcBody button')][3].click(); assert(G.prog.inv.length === i0 + 1 || i0 >= 36, 'gamble box gives an item'); }
-  { const g0 = Object.values(G.prog.gems || {}).reduce((a, b) => a + b, 0); [...w.document.querySelectorAll('#npcBody button')][2].click(); assert(Object.values(G.prog.gems || {}).reduce((a, b) => a + b, 0) === g0 + 1, 'merchant sells support gems'); }
+  { const i0 = G.prog.inv.length; shopBtn('目利き箱').click(); assert(G.prog.inv.length === i0 + 1 || i0 >= 36, 'gamble box gives an item'); }
+  { const g0 = Object.values(G.prog.gems || {}).reduce((a, b) => a + b, 0); shopBtn('サポート宝石').click(); assert(Object.values(G.prog.gems || {}).reduce((a, b) => a + b, 0) === g0 + 1, 'merchant sells support gems'); }
   G.closeNpc();
   G.openNpc('smith'); assert(w.document.querySelectorAll('#npcBody button').length === 1, 'smith offers the gear screen'); G.closeNpc();
   frames(30);
@@ -601,6 +602,38 @@ const assert = (c, msg) => { if (!c) { errors.push('ASSERT FAIL: ' + msg); conso
     for (let i = 0; i < 12; i++) G.streakOnKill({ exp: 100 });
     G.streakEnd();
     assert(G.prog.exp > x0 && G.streakN === 0, 'a 12-kill streak pays an exp bonus');
+  }
+  // idle layer: party of companions, training, offline hunting, AUTO
+  {
+    G.enterMap(0, null); frames(3); G.paused = false;
+    const pl = G.player; pl.dead = false;
+    assert(Object.keys(G.PET_SP).length === 12, 'twelve companion species');
+    const P = G.pets(); P.eggs.length = 0; P.list.length = 0; P.active = null; P.party = []; P.slots = 0; P.ride = false;
+    for (let k = 0; k < 4; k++) { G.gainEgg(); G.eggProgress(130); w.document.getElementById('petOk').click(); }
+    assert(P.list.length === 4 && G.partyList().length === 2, 'two companions travel together at first');
+    G.prog.gold = 1e7; G.openSheet(); G.setTab('pet');
+    const slotBtn = [...w.document.querySelectorAll('#petBox .qc.row2')].find((r) => r.textContent.includes('同行の枠')).querySelector('button'); slotBtn.click();
+    assert(G.partySlots() === 3, 'buying a slot lets one more companion join');
+    const join = [...w.document.querySelectorAll('#petBox .pcard')].find((c) => c.textContent.includes('連れて行く')).querySelector('.primary'); join.click();
+    assert(G.partyList().length === 3 && new Set(G.partyList().map((q) => G.entOf(q))).size === 3, 'each companion has its own body on the field');
+    const atkBtn = [...w.document.querySelectorAll('#petBox .qc.row2')].find((r) => r.textContent.includes('攻撃の訓練')).querySelector('button');
+    const tr0 = G.trainS().atk; atkBtn.click();
+    assert(G.trainS().atk === tr0 + 1, 'training upgrades are bought with gold');
+    G.closeSheet();
+    // offline
+    G.prog.seen = Date.now() - 90 * 60000; const g0 = G.prog.gold;
+    const r = G.offlineRewards();
+    assert(r && r.min === 90 && G.prog.gold > g0 && Math.abs(G.prog.seen - Date.now()) < 5000, 'companions bring back gold for time away: ' + (r && r.gold));
+    G.prog.seen = Date.now() - 30 * 3600000; assert(G.offlineRewards().min === 480, 'offline rewards stop at 8 hours');
+    // AUTO
+    pl.x = G.CAMP.x + 8; pl.y = G.CAMP.y + 6; while (G.blockedAt(pl.x, pl.y, 0.3)) pl.x += 0.5; pl.target = null; pl.path.length = 0; G.refreshD(); pl.hp = G.D.maxHp;
+    const es = G.enemies.filter((e) => !e.dead && !e.obj).slice(0, 2); es.forEach((e, i) => { e.x = pl.x + 3 + i; e.y = pl.y + 1; e.hp = e.maxHp = 1e6; e.state = 'idle'; });
+    G.autoToggle(); assert(G.autoOn(), 'AUTO turns on');
+    for (let i = 0; i < 120; i++) G.step(0.05);
+    assert(pl.target && es.some((e) => e.hp < 1e6), 'AUTO finds enemies and fights them');
+    G.autoToggle(); assert(!G.autoOn(), 'AUTO turns off');
+    es.forEach((e) => { e.dead = true; });
+    P.party = []; P.active = null;
   }
   // regression: audit fixes
   {
