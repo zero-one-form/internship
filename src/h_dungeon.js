@@ -109,9 +109,13 @@
   }
   function firePools(e, n) {
     for (let k = 0; k < n; k++) {
-      const a = Math.random() * TAU, r = k ? rand(1.2, 3) : 0, x = player.x + Math.cos(a) * r, y = player.y + Math.sin(a) * r;
-      if (blockedAt(x, y, 0.1)) continue;
-      bpools.push({ x, y, r: 1.15, t: 0, wait: 0.85, life: 6, dps: e.dmg * 0.5, kind: 'fire', tick: 0 });
+      // retry a few spots so the attack doesn't fizzle next to walls
+      for (let tries = 0; tries < 8; tries++) {
+        const a = Math.random() * TAU, r = k ? rand(1.2, 3) * (1 - tries * 0.08) : 0, x = player.x + Math.cos(a) * r, y = player.y + Math.sin(a) * r;
+        if (blockedAt(x, y, 0.1)) continue;
+        bpools.push({ x, y, r: 1.15, t: 0, wait: 0.85, life: 6, dps: e.dmg * 0.5, kind: 'fire', tick: 0 });
+        break;
+      }
     }
   }
   function fissures(e, n) {

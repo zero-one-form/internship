@@ -3,7 +3,7 @@
   const dom = {};
   const lastV = {};
   function cacheDom() {
-    const ids = ['goldHud', 'xpLine', 'lvText', 'formName', 'hpFill', 'hpText', 'mpFill', 'mpText', 'xpFill', 'morphBtn', 'morphLabel', 'potionBtn', 'potionCount', 'shopBtn', 'shopGold', 'ptBadge', 'bagDot', 'bossBar', 'bossName', 'bossFill'];
+    const ids = ['ariaBtn', 'goldHud', 'xpLine', 'lvText', 'formName', 'hpFill', 'hpText', 'mpFill', 'mpText', 'xpFill', 'morphBtn', 'morphLabel', 'potionBtn', 'potionCount', 'shopBtn', 'shopGold', 'ptBadge', 'bagDot', 'bossBar', 'bossName', 'bossFill'];
     for (const id of ids) dom[id] = $(id);
   }
   function setT(id, v) { if (lastV[id] !== v) { lastV[id] = v; dom[id].textContent = v; } }
@@ -35,6 +35,7 @@
     setT('morphLabel', player.form === 'blade' ? '術へ変身' : '剣へ変身');
     setT('potionCount', String(prog.potions));
     setH('shopBtn', !(inCamp(player.x, player.y) && !player.dead));
+    setH('ariaBtn', !(curMap !== 3 && inCamp(player.x, player.y) && !player.dead));
     setT('shopGold', '所持 ' + prog.gold + 'G');
     const pts = prog.sp + prog.kp;
     setH('ptBadge', pts <= 0);
@@ -304,7 +305,7 @@
     try {
       time += dt;
       if (!paused) { const sd = hitStop > 0 ? dt * 0.1 : dt; hitStop = Math.max(0, hitStop - dt); update(sd); }
-      if (!END && !OP.on && !OP.capturing) render();
+      if (!END && !OP.on && !OP.capturing && !ARIA.on) render();
       updateHud();
       feelFrame(dt);
     } catch (e) {
@@ -342,6 +343,7 @@
     for (let k = 0; k < 9; k++) spawnPack();
     if (curMap === 3) { startFloor(); restoreDive(); }
     netInit();
+    ariaBind();
     loadFlare(() => {
       makeNpcLooks();
       drawPortrait();
@@ -370,6 +372,7 @@
         enterMap, setUserZoom, get portals() { return portals; }, get curMap() { return curMap; }, get zoom() { return zoom; },
         findPath, spawnPack, blockedAt, inCamp, gainExp, hurtPlayer, expNeed, chunkCache, castSkill, learn, SKD, fields, meteors,
         get dash() { return dash; },
+        ARIA, ariaOpen, ariaStart, ariaHit, ariaTick, ariaClose, ariaChart, ariaState, ariaDiveStart,
         save, load, cleanItem, genBounty, ABYSS_MAX_F: ABYSS_MAX, refreshD, makeTestElite() { const e = makeEnemy('goblin', player.x + 3, player.y, 5, ++packSeq, true); enemies.push(e); return e; }
       };
     }

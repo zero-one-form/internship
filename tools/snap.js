@@ -36,7 +36,11 @@ async function browserPath() {
     ['abyss_b5_boss', (G) => { G.enterDungeon(5); }],
     ['abyss_b23', (G) => { G.enterDungeon(23); }],
     ['abyss_b50', (G) => { G.enterDungeon(50); }],
-    ['sheet_gear', (G) => { G.enterMap(0, 0); for (let i = 0; i < 10; i++) G.prog.inv.push(G.genItem(3 + (i % 4), i % 4)); G.openSheet(); G.setTab('gear'); }],
+    ['camp', (G) => { G.enterMap(0, null); G.player.x = G.SPAWN.x; G.player.y = G.SPAWN.y; }],
+    ['aria_menu', (G) => { G.ariaOpen(); }],
+    ['aria_play', (G) => { G.ARIA.fake = 29.6; G.ARIA.diff = 1; G.ariaStart(); G.ARIA.fake = 29.6; for (const n of G.ARIA.notes) if (n.t < 29.5) n.hit = 0; G.ARIA.combo = 42; G.ariaHit(0); }],
+    ['aria_result', (G) => { G.ARIA.fake = 99; G.ariaTick(); }],
+    ['sheet_gear', (G) => { G.ariaClose(); G.ARIA.fake = null; G.enterMap(0, 0); for (let i = 0; i < 10; i++) G.prog.inv.push(G.genItem(3 + (i % 4), i % 4)); G.openSheet(); G.setTab('gear'); }],
   ];
   for (const [name, fn] of steps) {
     const ok = await p.evaluate((src) => { const G = window.__G; if (!G) return false; try { G.closeSheet && G.closeSheet(); } catch (e) {} (0, eval)('(' + src + ')')(G); return true; }, fn.toString());

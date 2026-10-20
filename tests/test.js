@@ -476,6 +476,32 @@ const assert = (c, msg) => { if (!c) { errors.push('ASSERT FAIL: ' + msg); conso
   assert(G.envDark < 0.05, 'day restored');
   assert(G.chunkCache.size > 0 && G.chunkCache.size <= 49, 'chunk cache bounded: ' + G.chunkCache.size);
 
+  // minigame: アリアの演奏
+  {
+    G.enterMap(0, null); frames(3); G.paused = false;
+    const pl = G.player; pl.dead = false; pl.x = G.SPAWN.x; pl.y = G.SPAWN.y; frames(2);
+    assert(!$('ariaBtn').hidden, 'rhythm game button shows at the camp');
+    const charts = [0, 1, 2].map((d) => G.ariaChart(d));
+    assert(charts[0].length < charts[1].length && charts[1].length < charts[2].length && charts.every((c) => c.every((n, i) => i === 0 || n.t >= c[i - 1].t)), 'three difficulties, sorted charts: ' + charts.map((c) => c.length).join('/'));
+    G.ariaState().day = 0; G.ariaState().buff = false;
+    const g0 = G.prog.gold;
+    G.ariaOpen();
+    assert(G.ARIA.on && G.paused && !$('ariaOv').hidden, 'rhythm game opens and pauses the field');
+    G.ARIA.fake = -1; G.ARIA.diff = 1; G.ariaStart();
+    for (const n of G.ARIA.notes) { G.ARIA.fake = n.t + 0.01; G.ariaHit(n.lane); }
+    G.ARIA.fake = G.ARIA.end + 0.1; G.ariaTick();
+    const R = G.ARIA.result;
+    assert(R && R.rank === 'S' && R.full && G.ARIA.cnt[0] === G.ARIA.notes.length, 'hitting every note on time gives rank S full combo');
+    assert(G.ariaState().buff && G.prog.gold > g0, 'clearing gives the song blessing and gold');
+    G.ariaStart();
+    G.ARIA.fake = G.ARIA.end + 0.1; G.ariaTick();
+    assert(G.ARIA.result.rank === 'C' && G.ARIA.cnt[3] === G.ARIA.notes.length, 'unplayed notes count as misses');
+    G.ariaClose(); G.ARIA.fake = null;
+    assert(!G.ARIA.on && !G.paused && $('ariaOv').hidden, 'closing returns to the field');
+    G.enterDungeon(1); frames(3);
+    assert(!G.ariaState().buff, 'the song blessing is used at the start of the next dive');
+    G.enterMap(0, null); frames(3);
+  }
   // regression: audit fixes
   {
     G.prog.wb = { wk: G.weekKey(), dmg: 1234, claimed: false, day: 1, tries: 2 };

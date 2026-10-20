@@ -156,6 +156,17 @@ button{font-family:inherit;cursor:pointer;-webkit-tap-highlight-color:transparen
 .combo{position:absolute;right:76px;top:36%;z-index:5;text-align:right;pointer-events:none;color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.7);}
 .combo[hidden]{display:none;}
 .opov{position:absolute;inset:0;z-index:45;background:#000;opacity:0;transition:opacity .6s ease;}
+.ariaov{position:absolute;inset:0;z-index:30;display:grid;place-items:center;padding:12px;background:#0b0820;}
+.ariaov[hidden]{display:none;}
+#ariaCv{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;}
+.ariapanel{position:relative;z-index:1;}
+.ariapanel[hidden]{display:none;}
+.ariapanel .chips{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px;}
+.ariaofs{display:flex;align-items:center;gap:8px;margin:0 0 14px;font-size:13px;font-weight:800;}
+.ariaofs span{flex:1;}
+.ariaofs b{min-width:4.5em;text-align:center;}
+.ariares p{margin:0 0 6px;font-size:13.5px;font-weight:800;}
+.aria{background:radial-gradient(circle at 32% 25%,rgba(255,255,255,.3),rgba(255,255,255,0) 60%),linear-gradient(135deg,#f6b93b,#8e6bff) !important;color:#fff !important;}
 .opov.on{opacity:1;}
 .opov[hidden],.opsplash[hidden],.opskip[hidden]{display:none;}
 #opCv{position:absolute;inset:0;width:100%;height:100%;display:block;}
@@ -418,6 +429,7 @@ button{font-family:inherit;cursor:pointer;-webkit-tap-highlight-color:transparen
     <button id="ultBtn" class="act ult" type="button" aria-label="奥義" hidden><span class="lbl">奥義</span><b id="ultPct">0%</b></button>
     <button id="morphBtn" class="act cd" type="button"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M10 21a14 14 0 0 1 25-8" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/><path d="M36 5v9h-9" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><path d="M38 27a14 14 0 0 1-25 8" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/><path d="M12 43v-9h9" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg><span id="morphLabel" class="lbl">術へ変身</span></button>
     <button id="potionBtn" class="act cd" type="button" aria-label="回復薬を使う"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M14.6 30h18.8l3.7 6.3A4 4 0 0 1 33.6 42H14.4a4 4 0 0 1-3.5-5.8z" style="fill:var(--hp)"/><path d="M19 5h10M21 5v10L10 34a7 7 0 0 0 6 10h16a7 7 0 0 0 6-10L27 15V5" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linejoin="round" stroke-linecap="round"/></svg><b id="potionCount">5</b></button>
+    <button id="ariaBtn" class="act shop aria" type="button" hidden aria-label="アリアの演奏（リズムゲーム）"><span class="lbl">♪演奏</span><b>アリア</b></button>
     <button id="shopBtn" class="act shop" type="button" hidden aria-label="回復薬を買う 20G"><span class="lbl">回復薬</span><b>20G</b><span id="shopGold" hidden></span></button>
   </div>
   <div class="actions">
@@ -511,6 +523,19 @@ button{font-family:inherit;cursor:pointer;-webkit-tap-highlight-color:transparen
       <div class="head"><h2 id="npcTitle"></h2><button id="npcClose" class="close" type="button">閉じる</button></div>
       <p id="npcLine" class="lead"></p>
       <div id="npcBody"></div>
+    </div>
+  </div>
+  <div id="ariaOv" class="ariaov" hidden>
+    <canvas id="ariaCv" aria-label="アリアの演奏"></canvas>
+    <button id="ariaStop" class="opskip" type="button" hidden>やめる</button>
+    <div id="ariaPanel" class="panel ariapanel" role="dialog" aria-modal="true" aria-labelledby="ariaTitle">
+      <h2 id="ariaTitle">アリアの演奏</h2>
+      <p id="ariaLead" class="lead"></p>
+      <div id="ariaRes" class="ariares" hidden></div>
+      <div id="ariaDiffs" class="chips"></div>
+      <div class="ariaofs"><span>タイミング調整</span><button id="ariaOfsDn" class="close" type="button" aria-label="判定を早める">－</button><b id="ariaOfsVal">+0ms</b><button id="ariaOfsUp" class="close" type="button" aria-label="判定を遅らせる">＋</button></div>
+      <button id="ariaGo" class="primary" type="button">はじめる</button>
+      <button id="ariaQuit" class="ghost" type="button">キャンプへ戻る</button>
     </div>
   </div>
   <div id="opOv" class="opov" hidden><canvas id="opCv" aria-label="オープニング"></canvas><button id="opSkip" class="opskip" type="button">SKIP ▸▸</button></div>
