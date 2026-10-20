@@ -502,6 +502,30 @@ const assert = (c, msg) => { if (!c) { errors.push('ASSERT FAIL: ' + msg); conso
     assert(!G.ariaState().buff, 'the song blessing is used at the start of the next dive');
     G.enterMap(0, null); frames(3);
   }
+  // borrowed mechanics: legendary powers, dodge / perfect dodge, boss break
+  {
+    const L = G.genItem(20, 3, 'acc');
+    assert(L.pow && G.LPOW[L.pow], 'legendary items roll a unique power: ' + L.pow);
+    assert(G.cleanItem(Object.assign({}, L)).pow === L.pow && G.cleanItem(Object.assign({}, L, { pow: '__proto__' })).pow === undefined, 'saved powers are validated');
+    L.pow = 'soul'; G.prog.eq.acc = L; G.refreshGear();
+    assert(G.hasPow('soul'), 'equipped legendary power is active');
+    G.enterMap(0, null); frames(3); G.paused = false;
+    const pl = G.player; pl.dead = false; G.refreshD(); pl.hp = G.D.maxHp; pl.cd = {};
+    const x0 = pl.x, y0 = pl.y; pl.dir = 2;
+    G.startDodge(1);
+    for (let i = 0; i < 20; i++) G.step(0.02);
+    assert(Math.hypot(pl.x - x0, pl.y - y0) > 1 || G.blockedAt(x0 + 1, y0 + 1, 0.25), 'dodge dashes the hero: ' + Math.hypot(pl.x - x0, pl.y - y0).toFixed(2));
+    pl.cd = {}; G.startDodge(1); const hp0 = pl.hp;
+    G.hurtPlayer(9999);
+    assert(pl.hp === hp0 && pl.critT > 0 && G.slowMo > 0, 'a hit during the dodge is avoided and triggers the perfect dodge');
+    for (let i = 0; i < 30; i++) G.step(0.1);
+    G.enterDungeon(5); frames(5);
+    const b = G.bossRef;
+    G.staggerAdd(b, b.maxHp * 0.2, true);
+    assert(b.brkT > 0 && b.stunT > 0, 'filling the stagger gauge breaks the boss');
+    G.prog.eq.acc = null; G.refreshGear();
+    G.enterMap(0, null); frames(3);
+  }
   // regression: audit fixes
   {
     G.prog.wb = { wk: G.weekKey(), dmg: 1234, claimed: false, day: 1, tries: 2 };

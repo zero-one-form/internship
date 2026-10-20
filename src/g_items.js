@@ -40,7 +40,7 @@
   const loot = [];
   let itemSeq = 1, selItem = null, GEAR = emptyGear();
   function emptyGear() {
-    const g = { swordAtk: 0, staffAtk: 0, hpB: 0, drB: 0, mpB: 0, sk: {} };
+    const g = { swordAtk: 0, staffAtk: 0, hpB: 0, drB: 0, mpB: 0, sk: {}, pow: {} };
     for (const k in OPTS) g[k] = 0;
     return g;
   }
@@ -79,14 +79,16 @@
     if (il >= 100) name = ['真・', '極・', '神・'][Math.min(2, Math.floor((il - 100) / 100))] + name;
     if (rar === 3) name = '「' + EPI[(Math.random() * EPI.length) | 0] + '」' + name;
     else if (rar >= 1 && opts.length && opts[0].k !== 'skill') name = OPTS[opts[0].k].p + name;
-    return { id: ++itemSeq, type, il, rar, name, opts, plus: 0, isNew: true };
+    const it = { id: ++itemSeq, type, il, rar, name, opts, plus: 0, isNew: true };
+    if (rar === 3) it.pow = rollPow();
+    return it;
   }
   function cleanItem(it) {
     if (!it || typeof it !== 'object' || !TYPE_INFO[it.type]) return null;
     const num = (v, lo, hi, d) => (typeof v === 'number' && isFinite(v) ? clamp(v, lo, hi) : d);
     const own = (o, k) => typeof k === 'string' && Object.prototype.hasOwnProperty.call(o, k);
     const opts = Array.isArray(it.opts) ? it.opts.filter((o) => o && (o.k === 'skill' ? own(SKD, o.sid) : own(OPTS, o.k)) && typeof o.v === 'number' && isFinite(o.v)).slice(0, 6).map((o) => (o.k === 'skill' ? { k: 'skill', sid: o.sid, v: clamp(Math.round(o.v), 1, 3) } : { k: o.k, v: clamp(o.v, 0, 200) })) : [];
-    return { id: Math.floor(num(it.id, 1, 1e12, ++itemSeq)), type: it.type, il: Math.round(num(it.il, 1, 999, 1)), rar: Math.round(num(it.rar, 0, 3, 0)), name: String(it.name || TYPE_INFO[it.type].names[0]).slice(0, 40), opts, plus: Math.round(num(it.plus, 0, 10, 0)), isNew: !!it.isNew, lock: !!it.lock };
+    return { id: Math.floor(num(it.id, 1, 1e12, ++itemSeq)), type: it.type, il: Math.round(num(it.il, 1, 999, 1)), rar: Math.round(num(it.rar, 0, 3, 0)), name: String(it.name || TYPE_INFO[it.type].names[0]).slice(0, 40), opts, plus: Math.round(num(it.plus, 0, 10, 0)), isNew: !!it.isNew, lock: !!it.lock, pow: own(LPOW, it.pow) ? it.pow : undefined };
   }
   function giveStarter() {
     prog.eq.sword = genItem(1, 0, 'sword');
@@ -102,6 +104,7 @@
       const b = itemBase(it);
       if (t === 'sword') g.swordAtk += b; else if (t === 'staff') g.staffAtk += b; else if (t === 'head') g.hpB += b; else if (t === 'body') g.drB += b; else g.mpB += b;
       for (const o of it.opts) { if (o.k === 'skill') g.sk[o.sid] = (g.sk[o.sid] || 0) + o.v; else g[o.k] += o.v; }
+      if (it.pow) g.pow[it.pow] = 1;
     }
     GEAR = g;
     refreshD();
@@ -116,7 +119,7 @@
       loot.push({ x: e.x + rand(-0.9, 0.9), y: e.y + rand(-0.9, 0.9), it, t: 0, sx: e.x, sy: e.y });
       if (it.rar >= 3) recAdd('legends');
       if (it.rar >= 2) addVfx({ k: 'drop', x: e.x, y: e.y, c: it.rar, life: it.rar >= 3 ? 1.1 : 0.7 });
-      if (it.rar === 3) { toast('レジェンド装備が出た！'); sfx('legend'); addShake(6); }
+      if (it.rar === 3) { toast('レジェンド装備が出た！「' + LPOW[it.pow].name + '」'); sfx('legend'); addShake(6); legendDropMoment(e); }
     }
   }
   function lootUpdate(dt) {
@@ -291,6 +294,7 @@
     const h = document.createElement('h4'); h.className = 'itn r' + it.rar; h.textContent = it.name + (it.plus ? ' +' + it.plus : '');
     box.append(h, elP('itm', RAR[it.rar].name + '／' + TYPE_INFO[it.type].name + '／アイテムLv' + it.il), elP('itb', TYPE_INFO[it.type].baseTxt(itemBase(it))));
     if (it.opts.length) { const ul = document.createElement('ul'); ul.className = 'ito'; for (const o of it.opts) { const li = document.createElement('li'); li.textContent = optText(o); ul.appendChild(li); } box.append(ul); }
+    if (it.pow) { const pp = document.createElement('p'); pp.className = 'itp'; pp.textContent = powText(it); box.append(pp); }
     if (selItem.where === 'inv') {
       const cur = prog.eq[it.type], diff = Math.round((itemBase(it) - (cur ? itemBase(cur) : 0)) * 10) / 10;
       box.append(elP('cmp ' + (diff >= 0 ? 'up' : 'down'), (cur ? '装備中より' : '何も装備していない枠。') + '基本性能 ' + (diff >= 0 ? '+' : '') + diff));

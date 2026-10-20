@@ -120,6 +120,11 @@ button{font-family:inherit;cursor:pointer;-webkit-tap-highlight-color:transparen
 .boss{position:absolute;top:212px;left:50%;z-index:6;width:min(78vw,330px);transform:translateX(-50%);padding:6px 10px 8px;border-radius:12px;text-align:center;font-size:13px;font-weight:800;pointer-events:none;}
 .boss[hidden]{display:none;}
 .bb{position:relative;height:10px;margin-top:4px;border-radius:5px;background:var(--track);overflow:hidden;}
+.bb.stg{height:5px;margin-top:3px;}
+.bb.stg i{background:linear-gradient(90deg,#ffe9a0,#ffb020);}
+.boss.brk .bb.stg i{background:linear-gradient(90deg,#fff,#ffd36e);animation:brkp .3s ease-in-out infinite alternate;}
+@keyframes brkp{from{opacity:.6}to{opacity:1}}
+.itp{margin:6px 0;padding:6px 8px;border-radius:8px;background:rgba(255,122,42,.14);color:#e8601a;font-size:12.5px;font-weight:800;line-height:1.5;}
 .bb i{position:absolute;inset:0;transform-origin:0 50%;background:linear-gradient(180deg,#ff8a6a,#c0263c);}
 .note{position:absolute;left:50%;top:296px;z-index:8;display:flex;align-items:center;gap:8px;width:max-content;max-width:min(92%,440px);padding:7px 8px 7px 12px;border-radius:14px;transform:translateX(-50%);font-size:12.5px;font-weight:800;}
 .note[hidden]{display:none;}
@@ -419,7 +424,7 @@ button{font-family:inherit;cursor:pointer;-webkit-tap-highlight-color:transparen
   <div class="mm glass" aria-label="ミニマップ"><canvas id="minimap" width="256" height="140"></canvas><span id="mapName" class="mapname"></span></div>
   <div class="zoom"><button id="zoomOut" class="glass" type="button" aria-label="縮小">－</button><button id="zoomIn" class="glass" type="button" aria-label="拡大">＋</button></div>
   <div id="banner" class="banner" aria-live="polite"><b id="bannerName"></b><span id="bannerRec"></span></div>
-  <div id="bossBar" class="boss glass" hidden><span id="bossName"></span><div class="bb"><i id="bossFill"></i></div></div>
+  <div id="bossBar" class="boss glass" hidden><span id="bossName"></span><div class="bb"><i id="bossFill"></i></div><div class="bb stg" aria-label="ブレイクゲージ"><i id="bossStg"></i></div></div>
   <div id="fade" class="fade"></div>
   <div id="toast" class="toast glass" role="status" aria-live="polite"></div>
   <div id="log" class="log" aria-live="polite"></div>

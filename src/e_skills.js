@@ -5,8 +5,8 @@
     { id: 'whirl', form: 'blade', tier: 1, act: true, name: '旋風斬', short: '旋風', lv: 1, max: 10, cd: 2.4, mp: (l) => 10 + l,
       desc: (l) => '周りの敵すべてに攻撃力の' + (200 + 30 * (l - 1)) + '%' },
     { id: 'sword', form: 'blade', tier: 1, act: false, name: '剣術修練', lv: 1, max: 10, desc: (l) => '剣の型の攻撃力 +' + 4 * l + '%' },
-    { id: 'sprint', form: 'both', tier: 1, act: true, name: '疾駆', short: '疾駆', lv: 2, max: 10, cd: 15, mp: () => 8,
-      desc: (l) => '5秒間 移動の速さ +' + (40 + 3 * l) + '%' },
+    { id: 'sprint', form: 'both', tier: 1, act: true, name: '疾駆（回避）', short: '回避', lv: 1, max: 10, cd: 2.2, mp: () => 4,
+      desc: (l) => '素早く跳んで0.3秒無敵。直後' + (1.2 + 0.1 * l).toFixed(1) + '秒 移動の速さ +' + (40 + 3 * l) + '%。攻撃をぎりぎりでかわすと「見切り」（時間がゆっくりになり、2秒間すべて会心）' },
     { id: 'gale', form: 'blade', tier: 2, act: true, name: '疾風突き', short: '疾風', lv: 4, pre: ['whirl', 3], max: 10, cd: 4, mp: (l) => 12 + l,
       desc: (l) => '敵まで一気に踏み込み攻撃力の' + (300 + 40 * (l - 1)) + '%、' + (0.6 + 0.05 * l).toFixed(2) + '秒気絶' },
     { id: 'bash', form: 'blade', tier: 2, act: true, name: '盾打ち', short: '盾打', lv: 4, max: 10, cd: 5, mp: (l) => 10 + l,
@@ -118,8 +118,7 @@
       return true;
     },
     sprint(l) {
-      player.sprintT = 5; player.sprintLv = l;
-      refreshD();
+      startDodge(l);
       burst(player.x, player.y, 2, 'dust', 10, '', 2);
       addFx({ k: 'auraburst', x: player.x, y: player.y, t: 0, life: 0.5, c: 'white' });
       return true;
@@ -141,7 +140,8 @@
       const a = aimDir(2.4), ux = a[0], uy = a[1];
       const mul = 1.5 + 0.2 * (l - 1), stun = 1 + 0.05 * l;
       lineHit(ux, uy, 1.9, 1.0, (e) => {
-        hitEnemy(e, D.atk * mul);
+        stgBoost = 4;
+        try { hitEnemy(e, D.atk * mul); } finally { stgBoost = 1; }
         if (!e.dead) { e.stunT = Math.max(e.stunT || 0, stun); for (let k = 0; k < 4; k++) moveEnemy(e, e.x + ux * 0.25, e.y + uy * 0.25); }
       });
       addFx({ k: 'impact', x: player.x + ux * 0.9, y: player.y + uy * 0.9, t: 0, life: 0.35 });
@@ -288,6 +288,7 @@
   }
   function useSkill() { castSkill(0); }
   function skillsUpdate(dt) {
+    dodgeUpdate(dt);
     let changed = false;
     for (const k of ['auraT', 'shiftT', 'sprintT', 'cryT', 'healT', 'frenzyT']) {
       const before = player[k] || 0;

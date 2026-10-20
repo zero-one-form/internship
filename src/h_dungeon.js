@@ -53,6 +53,7 @@
   function openStairs() {
     if (stairsOpen) return;
     stairsOpen = true;
+    if (!WB.on) { addSlowMo(0.5); zoomPunch(0.03); }
     const t = farTile();
     const last = curFloor >= ABYSS_MAX;
     const pt = last ? { x: t[0], y: t[1], to: 0, arrive: 1, label: '地上へ帰還' } : { x: t[0], y: t[1], to: 3, arrive: 0, next: true, label: 'B' + (curFloor + 1) + 'F（' + themeOf(curFloor + 1).name + '）へ' };

@@ -165,6 +165,7 @@
     }
     box.append(head, elP('itb', TYPE_INFO[it.type].baseTxt(itemBase(it))));
     if (it.opts.length) { const ul = document.createElement('ul'); ul.className = 'ito'; for (const o of it.opts) { const li = document.createElement('li'); li.textContent = optText(o); ul.appendChild(li); } box.append(ul); }
+    if (it.pow) { const pp = document.createElement('p'); pp.className = 'itp'; pp.textContent = powText(it); box.append(pp); }
     if (inInv) {
       const cur = prog.eq[it.type], a = totalsOf(prog.eq), b = totalsOf(swapped(it));
       box.append(elP('ith', cur ? '装備中の「' + cur.name + (cur.plus ? ' +' + cur.plus : '') + '」と入れ替えたときの変化' : 'この枠は空き。装備したときの変化'));

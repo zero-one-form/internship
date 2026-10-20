@@ -369,7 +369,7 @@
     undead: { hp: 78, dmg: 9, sp: 1.15, exp: 19, aggro: 3.6, atk: 1.45, r: 0.38, armor: 2, vars: 2 }
   };
   function defaultProg() {
-    return { level: 1, exp: 0, stats: { str: 5, agi: 5, vit: 5, int: 5, luk: 5 }, sp: 0, kp: 0, skill: { whirl: 1, chain: 1 }, potions: 5, gold: 0, form: 'blade', intro: false, map: 0, deep: 0, floor: 1, q: { main: 0, mp: 0, ma: false, mn: false, act: [], board: [] }, opt: { autoPot: true, autoTarget: true, autoSell: false, stick: true, shake: true, op: true, bgm: 0.6, se: 0.8 }, cleared: 0, inv: [], eq: { sword: null, staff: null, head: null, body: null, acc: null }, starter: false, rank: 0, rankMax: 0, rankDeep: [], bless: [], phx: false, cls: { blade: null, arcane: null }, pets: null, rec: null, aria: null };
+    return { level: 1, exp: 0, stats: { str: 5, agi: 5, vit: 5, int: 5, luk: 5 }, sp: 0, kp: 0, skill: { whirl: 1, chain: 1, sprint: 1 }, potions: 5, gold: 0, form: 'blade', intro: false, map: 0, deep: 0, floor: 1, q: { main: 0, mp: 0, ma: false, mn: false, act: [], board: [] }, opt: { autoPot: true, autoTarget: true, autoSell: false, stick: true, shake: true, op: true, bgm: 0.6, se: 0.8 }, cleared: 0, inv: [], eq: { sword: null, staff: null, head: null, body: null, acc: null }, starter: false, rank: 0, rankMax: 0, rankDeep: [], bless: [], phx: false, cls: { blade: null, arcane: null }, pets: null, rec: null, aria: null };
   }
   const prog = defaultProg();
   const player = {
@@ -441,6 +441,7 @@
       if (typeof sk.arcane === 'number') prog.skill.chain = Math.max(prog.skill.chain, num(sk.arcane, 1, 1, 10));
       prog.skill.whirl = Math.max(1, prog.skill.whirl);
       prog.skill.chain = Math.max(1, prog.skill.chain);
+      prog.skill.sprint = Math.max(1, prog.skill.sprint);
       prog.potions = num(s.potions, 5, 0, 999);
       prog.gold = num(s.gold, 0, 0, 1e9);
       prog.form = s.form === 'arcane' ? 'arcane' : 'blade';
@@ -457,7 +458,7 @@
           list: Array.isArray(pp.list) ? pp.list.filter((p) => p && okSp.includes(p.sp)).slice(0, 12).map((p) => ({ id: num(p.id, 1, 1, 1e15), sp: p.sp, lvl: num(p.lvl, 1, 1, 30), exp: num(p.exp, 0, 0, 1e6), shiny: !!p.shiny, name: String(p.name || 'ルル').slice(0, 12) })) : [],
           active: typeof pp.active === 'number' ? pp.active : null, ride: !!pp.ride }; }
       { const cc = s.cls && typeof s.cls === 'object' ? s.cls : {}; prog.cls = { blade: ['saint', 'guard'].includes(cc.blade) ? cc.blade : null, arcane: ['star', 'soul'].includes(cc.arcane) ? cc.arcane : null }; }
-      { const rr = s.rec && typeof s.rec === 'object' ? s.rec : {}; prog.rec = {}; for (const k of ['kills', 'elites', 'bosses', 'legends', 'combo', 'chests', 'goblins', 'deaths']) prog.rec[k] = num(rr[k], 0, 0, 1e9); prog.rec.play = typeof rr.play === 'number' && isFinite(rr.play) ? Math.max(0, rr.play) : 0; }
+      { const rr = s.rec && typeof s.rec === 'object' ? s.rec : {}; prog.rec = {}; for (const k of ['kills', 'elites', 'bosses', 'legends', 'combo', 'chests', 'goblins', 'deaths', 'dodges']) prog.rec[k] = num(rr[k], 0, 0, 1e9); prog.rec.play = typeof rr.play === 'number' && isFinite(rr.play) ? Math.max(0, rr.play) : 0; }
       prog.cleared = typeof s.cleared === 'number' && isFinite(s.cleared) ? clamp(Math.floor(s.cleared), 0, 9999) : 0;
       if (typeof prog.deep === 'number') prog.deep = Math.min(50, prog.deep);
       const oo = s.opt && typeof s.opt === 'object' ? s.opt : {};
@@ -586,6 +587,7 @@
       e.atkT = Math.max(0, e.atkT - dt);
       e.lunge = Math.max(0, e.lunge - dt);
       e.stunT = Math.max(0, (e.stunT || 0) - dt);
+      if (e.brkT) e.brkT = Math.max(0, e.brkT - dt);
       e.slowT = Math.max(0, (e.slowT || 0) - dt);
       e.weakT = Math.max(0, (e.weakT || 0) - dt);
       if (e.stunT > 0) { e.moving = false; continue; }
@@ -648,9 +650,10 @@
   function hitEnemy(e, base) {
     if (e.dead) return;
     if (e.shieldT > 0) { addText(e.x, e.y, '無効', 'hit', bodyH(e) + 18); return; }
-    const crit = Math.random() < D.crit;
-    const dmg = Math.max(1, Math.round(base * rand(0.9, 1.1) * (crit ? D.critMul : 1) - e.armor));
+    const crit = player.critT > 0 || Math.random() < D.crit;
+    const dmg = Math.max(1, Math.round(base * legendDmgMul(e) * rand(0.9, 1.1) * (crit ? D.critMul : 1) - e.armor));
     e.hp -= dmg;
+    legendOnHit(e, dmg, crit);
     wbHit(e, dmg);
     e.hitT = 0.12;
     sfx(crit ? 'crit' : 'hit');
@@ -678,6 +681,7 @@
     if (e.elite) log('強い個体を倒した');
     dungeonKill(e);
     questKill(e);
+    legendOnKill(e);
     dropLoot(e);
     gainExp(Math.round(exp * (1 + GEAR.exp / 100) * comboMul() * floorExpMul()));
   }
@@ -707,6 +711,8 @@
     classOnHurt();
     let dmg = Math.max(1, Math.round(raw * rand(0.9, 1.1) * (1 - D.guard)));
     if (cap) dmg = Math.min(dmg, Math.round(D.maxHp * cap));
+    dmg = legendOnHurt(dmg);
+    if (dmg < 0) return;
     if (D.shield > 0 && player.mp > 0) { const ab = Math.min(player.mp, dmg * D.shield); player.mp -= ab; dmg = Math.max(0, Math.round(dmg - ab)); }
     player.hp -= dmg;
     onHurtFeel(dmg);
@@ -780,6 +786,7 @@
     if (paused || player.dead || player.morphT > 0) return;
     player.form = player.form === 'blade' ? 'arcane' : 'blade';
     prog.form = player.form;
+    legendOnMorph();
     player.morphT = D.morphCd;
     if (prog.skill.shift) player.shiftT = 4;
     setFormAttr();

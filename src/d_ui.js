@@ -3,7 +3,7 @@
   const dom = {};
   const lastV = {};
   function cacheDom() {
-    const ids = ['ariaBtn', 'goldHud', 'xpLine', 'lvText', 'formName', 'hpFill', 'hpText', 'mpFill', 'mpText', 'xpFill', 'morphBtn', 'morphLabel', 'potionBtn', 'potionCount', 'shopBtn', 'shopGold', 'ptBadge', 'bagDot', 'bossBar', 'bossName', 'bossFill'];
+    const ids = ['ariaBtn', 'goldHud', 'xpLine', 'lvText', 'formName', 'hpFill', 'hpText', 'mpFill', 'mpText', 'xpFill', 'morphBtn', 'morphLabel', 'potionBtn', 'potionCount', 'shopBtn', 'shopGold', 'ptBadge', 'bagDot', 'bossBar', 'bossName', 'bossFill', 'bossStg'];
     for (const id of ids) dom[id] = $(id);
   }
   function setT(id, v) { if (lastV[id] !== v) { lastV[id] = v; dom[id].textContent = v; } }
@@ -44,7 +44,7 @@
     if (time - trackLast > 0.25 || time < trackLast) { trackLast = time; updateTracker(); floorHud(); }
     const bossOn = !!(bossRef && !bossRef.dead && curMap === 3);
     setH('bossBar', !bossOn);
-    if (bossOn) { setT('bossName', bossName(bossRef) + '　Lv' + bossRef.lvl + (bossRef.enraged ? '　怒り' : bossRef.phase === 2 ? '　本気' : '')); setS('bossFill', bossRef.hp / bossRef.maxHp); }
+    if (bossOn) { setT('bossName', bossName(bossRef) + '　Lv' + bossRef.lvl + (bossRef.brkT > 0 ? '　ブレイク！' : bossRef.enraged ? '　怒り' : bossRef.phase === 2 ? '　本気' : '')); setS('bossFill', bossRef.hp / bossRef.maxHp); setS('bossStg', bossRef.brkT > 0 ? bossRef.brkT / 4 : (bossRef.stg || 0) / 100); dom.bossBar.classList.toggle('brk', bossRef.brkT > 0); }
     if (curMap === 3) {
       const cap = WB.on ? '世界の裂け目' : 'B' + curFloor + 'F ' + (stairsOpen ? '門が開いた' : FLOOR.obj === 'boss' ? 'ボスを倒せ' : FLOOR.obj === 'kill' ? '撃破 ' + Math.min(floorKills, floorNeed) + '/' + floorNeed : FLOOR.obj === 'survive' ? '耐久 ' + Math.max(0, Math.ceil(FLOOR.timer)) + '秒' : OBJ_INFO[FLOOR.obj] + ' ' + FLOOR.done + '/' + FLOOR.goal);
       const mn = $('mapName');
@@ -304,7 +304,7 @@
     lastTs = ts;
     try {
       time += dt;
-      if (!paused) { const sd = hitStop > 0 ? dt * 0.1 : dt; hitStop = Math.max(0, hitStop - dt); update(sd); }
+      if (!paused) { const sd = hitStop > 0 ? dt * 0.1 : slowMo > 0 ? dt * 0.3 : dt; hitStop = Math.max(0, hitStop - dt); slowMo = Math.max(0, slowMo - dt); update(sd); }
       if (!END && !OP.on && !OP.capturing && !ARIA.on) render();
       updateHud();
       feelFrame(dt);
@@ -375,6 +375,7 @@
         findPath, spawnPack, blockedAt, inCamp, gainExp, hurtPlayer, expNeed, chunkCache, castSkill, learn, SKD, fields, meteors,
         get dash() { return dash; },
         ARIA, ariaOpen, ariaStart, ariaHit, ariaTick, ariaClose, ariaChart, ariaState, ariaDiveStart,
+        LPOW, hasPow, startDodge, perfectDodge, staggerAdd, get slowMo() { return slowMo; }, makeEnemy,
         save, load, cleanItem, genBounty, ABYSS_MAX_F: ABYSS_MAX, refreshD, makeTestElite() { const e = makeEnemy('goblin', player.x + 3, player.y, 5, ++packSeq, true); enemies.push(e); return e; }
       };
     }

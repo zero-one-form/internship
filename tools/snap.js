@@ -34,6 +34,8 @@ async function browserPath() {
     ['forest', (G) => { G.enterMap(0, 0); }],
     ['abyss_b1', (G) => { G.enterDungeon(1); }],
     ['abyss_b5_boss', (G) => { G.enterDungeon(5); }],
+    ['boss_break', (G) => { const b = G.bossRef; G.player.x = b.x + 2; G.player.y = b.y; b.state = 'chase'; G.staggerAdd(b, b.maxHp * 0.06, false); G.hitEnemy(b, 500); }],
+    ['boss_broken', (G) => { const b = G.bossRef; G.staggerAdd(b, b.maxHp * 0.2, true); }],
     ['abyss_b23', (G) => { G.enterDungeon(23); }],
     ['abyss_b50', (G) => { G.enterDungeon(50); }],
     ['camp', (G) => { G.enterMap(0, null); G.player.x = G.SPAWN.x; G.player.y = G.SPAWN.y; }],
