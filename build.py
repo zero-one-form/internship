@@ -47,7 +47,9 @@ def build_site():
             shutil.copy(os.path.join(d, f), os.path.join(site, 'art', f)); art[name] = 'art/' + f; files.append('art/' + f)
     for f in ('flare_data.js', 'song.js'):
         shutil.copy(os.path.join(ROOT, 'assets', f), os.path.join(site, f))
-    pwa = ('<link rel="manifest" href="manifest.webmanifest">\n<meta name="theme-color" content="#0b0e24">\n'
+    # not for search engines: only people who have the link should find it
+    pwa = ('<meta name="robots" content="noindex, nofollow, noarchive, noimageindex">\n<meta name="googlebot" content="noindex, nofollow">\n'
+           '<link rel="manifest" href="manifest.webmanifest">\n<meta name="theme-color" content="#0b0e24">\n'
            '<meta name="apple-mobile-web-app-capable" content="yes">\n<meta name="mobile-web-app-capable" content="yes">\n'
            '<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">\n<link rel="apple-touch-icon" href="icon-192.png">\n<link rel="icon" href="icon-192.png">\n')
     h = head[:-len('<script>\n')].replace('</head>', pwa + '</head>', 1)
