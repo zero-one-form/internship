@@ -36,7 +36,7 @@ setTimeout(async () => {
   if (!G) { console.log('no hook'); process.exit(2); }
   $('startBtn').click();
   G.paused = false;
-  G.prog.opt.auto = true;
+  G.prog.opt.auto = true; G.prog.opt.autoStat = true;
   if (process.env.SIM_HEROES) { G.heroS('mina').j = true; G.storySeen().push('mina_join'); }
   const DT = 0.05, rows = [];
   let bestDeep = 0, deathsAtBest = 0, farmUntil = 0, nextShop = 600, doShop = false;

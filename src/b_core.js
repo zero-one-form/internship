@@ -531,7 +531,7 @@
       prog.cleared = typeof s.cleared === 'number' && isFinite(s.cleared) ? clamp(Math.floor(s.cleared), 0, 9999) : 0;
       if (typeof prog.deep === 'number') prog.deep = Math.min(50, prog.deep);
       const oo = s.opt && typeof s.opt === 'object' ? s.opt : {};
-      prog.opt = { autoPot: oo.autoPot !== false, autoTarget: oo.autoTarget !== false, autoSell: !!oo.autoSell, stick: oo.stick !== false, lite: !!oo.lite, shake: oo.shake !== false, op: oo.op !== false, bgm: typeof oo.bgm === 'number' && isFinite(oo.bgm) ? clamp(oo.bgm, 0, 1) : 0.6, se: typeof oo.se === 'number' && isFinite(oo.se) ? clamp(oo.se, 0, 1) : 0.8, ariaOfs: typeof oo.ariaOfs === 'number' && isFinite(oo.ariaOfs) ? clamp(oo.ariaOfs, -0.3, 0.3) : 0 };
+      prog.opt = { autoPot: oo.autoPot !== false, autoTarget: oo.autoTarget !== false, autoSell: !!oo.autoSell, stick: oo.stick !== false, lite: !!oo.lite, shake: oo.shake !== false, op: oo.op !== false, bgm: typeof oo.bgm === 'number' && isFinite(oo.bgm) ? clamp(oo.bgm, 0, 1) : 0.6, se: typeof oo.se === 'number' && isFinite(oo.se) ? clamp(oo.se, 0, 1) : 0.8, ariaOfs: typeof oo.ariaOfs === 'number' && isFinite(oo.ariaOfs) ? clamp(oo.ariaOfs, -0.3, 0.3) : 0, autoStat: !!oo.autoStat, diff: DIFFS[oo.diff] ? oo.diff : 'normal' };
       const qq = s.q && typeof s.q === 'object' ? s.q : {};
       const okB = (b) => b && typeof b === 'object' && ['kill', 'elite', 'floor'].includes(b.k) && typeof b.n === 'number' && isFinite(b.n) && b.rew && typeof b.rew === 'object' && (b.k !== 'kill' || ['goblin', 'ant', 'undead'].includes(b.what));
       const fixB = (b) => ({ k: b.k, what: b.k === 'kill' ? b.what : undefined, n: num(b.n, 1, 1, 99), p: num(b.p, 0, 0, 99), nt: !!b.nt, rew: { gold: num(b.rew.gold, 0, 0, 1e7), exp: num(b.rew.exp, 0, 0, 1e9), pot: num(b.rew.pot, 0, 0, 99), item: num(b.rew.item, 0, 0, 3) } });
@@ -606,15 +606,20 @@
   }
 
   /* ================= enemies ================= */
+  // enemy strength setting: 'easy' is the original tuning; the default 'normal' was raised after play feedback
+  const DIFFS = { easy: { name: 'やさしい', hp: 1, dmg: 1, exp: 1 }, normal: { name: 'ふつう', hp: 2.4, dmg: 1.8, exp: 1 }, oni: { name: '鬼', hp: 4, dmg: 2.8, exp: 1.15 } };
+  function diff() { return DIFFS[(prog.opt && prog.opt.diff) || 'normal'] || DIFFS.normal; }
+  // the extra strength ramps in between enemy level 5 and 30, so the opening hours stay gentle
+  function diffK(base, lvl) { return 1 + (base - 1) * clamp((lvl - 5) / 25, 0, 1); }
   function makeEnemy(type, x, y, lvl, pack, elite) {
-    const T = ETYPES[type];
-    const hp = Math.round(T.hp * (1 + 0.38 * (lvl - 1)) * (elite ? 3 : 1));
+    const T = ETYPES[type], DF = diff();
+    const hp = Math.round(T.hp * (1 + 0.38 * (lvl - 1)) * (elite ? 3 : 1) * diffK(DF.hp, lvl));
     return {
       type, x, y, hx: x, hy: y, wx: x, wy: y, wT: rand(0, 3), lvl, pack, elite,
       maxHp: hp, hp,
-      dmg: T.dmg * (1 + 0.26 * (lvl - 1)) * (elite ? 1.4 : 1),
+      dmg: T.dmg * (1 + 0.26 * (lvl - 1)) * (elite ? 1.4 : 1) * diffK(DF.dmg, lvl),
       speed: T.sp * (elite ? 1.05 : 1),
-      exp: T.exp * (1 + 0.45 * (lvl - 1)) * (elite ? 3 : 1),
+      exp: T.exp * (1 + 0.45 * (lvl - 1)) * (elite ? 3 : 1) * diffK(DF.exp, lvl),
       aggro: T.aggro, atkInt: T.atk, r: T.r * (elite ? 1.2 : 1),
       armor: T.armor + (type === 'undead' ? lvl * 0.6 : 0),
       cv: Math.floor(Math.random() * T.vars),

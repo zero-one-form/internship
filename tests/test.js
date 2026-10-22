@@ -726,6 +726,27 @@ const assert = (c, msg) => { if (!c) { errors.push('ASSERT FAIL: ' + msg); conso
     assert(G.mainDone(), 'reaching B21 completes it');
     Object.assign(q, q0); G.prog.deep = d0;
   }
+  // feedback round: no survive floors, stats stay manual under AUTO, 300 slots, enemy strength
+  {
+    let surv = 0; for (let f = 3; f <= 40; f++) { G.enterDungeon(f); frames(1); if (G.FLOOR.obj === 'survive') surv++; for (let q = 0; q < 3; q++) { if (!$('blessDlg').hidden) w.document.querySelector('#blessCards .bcard').click(); } }
+    assert(surv === 0, 'survive floors no longer come up');
+    G.enterMap(0, null); frames(3); G.paused = false;
+    const pl = G.player; pl.dead = false; pl.x = G.SPAWN.x + 6; pl.y = G.SPAWN.y + 6; G.prog.sp = 6; G.prog.opt.auto = true; G.prog.opt.autoStat = false;
+    for (let i = 0; i < 20; i++) G.step(0.05);
+    assert(G.prog.sp === 6, 'AUTO leaves stat points for the player unless asked to spend them');
+    G.prog.opt.autoStat = true; for (let i = 0; i < 20; i++) G.step(0.05);
+    assert(G.prog.sp === 0, 'with the option on, AUTO spends them');
+    G.prog.opt.auto = false; G.prog.opt.autoStat = false;
+    assert(G.INV_MAX === 300, 'the bag holds 300 items');
+    G.prog.opt.diff = 'easy'; const e1 = G.makeEnemy('goblin', 1, 1, 40, 0, false); G.prog.opt.diff = 'oni'; const e2 = G.makeEnemy('goblin', 1, 1, 40, 0, false);
+    assert(e2.maxHp > e1.maxHp * 2.5 && e2.dmg > e1.dmg * 2 && e2.exp > e1.exp, 'enemy strength setting scales HP, damage and experience');
+    G.prog.opt.diff = 'normal'; G.save(); G.load();
+    assert(G.prog.opt.diff === 'normal' && G.diff().hp > 1, 'the default enemy strength is the raised one and the setting survives a reload');
+    const leg = G.genItem(30, 3, 'sword'); G.prog.inv.push(leg); G.openSheet(); G.setTab('gear');
+    $('bulkBtn').click(); w.document.querySelector('#bulkBar [data-pick="3"]').click(); const g0 = G.prog.gold; $('bulkGo').click();
+    assert(!G.prog.inv.includes(leg) && G.prog.gold > g0, 'bulk sell can include legendary gear');
+    G.closeSheet();
+  }
   // forging minigame (enhance with timing strikes)
   {
     G.enterMap(0, null); frames(3); G.paused = false;

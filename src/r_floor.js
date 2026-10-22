@@ -88,7 +88,7 @@
     while (FLOOR.mods.length < nm) { const k = keys[randi(0, keys.length - 1)]; if (!FLOOR.mods.includes(k)) FLOOR.mods.push(k); }
     FLOOR.bonus = FLOOR.mods.reduce((a, k) => a + MODS[k][2], 0);
     let obj = 'kill';
-    if (f >= 3) { const pool = ['kill', 'bounty', 'treasure', 'survive', 'seal'].filter((o) => o !== FLOOR.last); obj = pool[randi(0, pool.length - 1)]; }
+    if (f >= 3) { const pool = ['kill', 'bounty', 'treasure', 'seal'] /* 耐久 removed from the rotation (tedious); FLOOR.force can still pick it */.filter((o) => o !== FLOOR.last); obj = pool[randi(0, pool.length - 1)]; }
     if (FLOOR.force) { obj = FLOOR.force; FLOOR.force = null; }
     FLOOR.obj = obj; FLOOR.last = obj;
     if (obj === 'kill') FLOOR.goal = floorNeed = Math.round(floorNeed * (FLOOR.mods.includes('horde') ? 1.3 : 1));

@@ -87,6 +87,8 @@ async function browserPath() {
     ['epi_name', (G) => { while (G.talkCur) G.talkAdvance(); G.enterMap(0, null); G.player.x = G.SPAWN.x; G.player.y = G.SPAWN.y; G.paused = false; G.playScene('epi_name'); for (let k = 0; k < 4; k++) G.talkAdvance(); }],
     ['epi_shion', (G) => { while (G.talkCur) G.talkAdvance(); G.playScene('epi_shion'); G.talkAdvance(); G.talkAdvance(); }],
     ['stella_name', (G) => { while (G.talkCur) G.talkAdvance(); G.playScene('stella_name'); G.talkAdvance(); }],
+    ['opt_diff', (G) => { while (G.talkCur) G.talkAdvance(); G.openSheet(); G.setTab('opt'); const pn = document.querySelector('#sheet .panel'); pn.scrollTop = 260; }],
+    ['bulk_legend', (G) => { G.closeSheet(); for (let i = 0; i < 40; i++) G.prog.inv.push(G.genItem(30, i % 4)); G.openSheet(); G.setTab('gear'); document.getElementById('bulkBtn').click(); document.querySelector('#bulkBar [data-pick="3"]').click(); }],
     ['login', (G) => { while (G.talkCur) G.talkAdvance(); G.prog.opt.auto = false; const L = G.loginState(); L.last = 0; L.n = 6; G.loginChecked = false; G.loginTick(true); }],
     ['hero_tab', (G) => { document.getElementById('petOk').click(); G.prog.opt.auto = false; G.heroS('mina').aff = 70; G.openSheet(); G.setTab('pet'); }],
   ];

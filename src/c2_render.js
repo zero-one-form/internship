@@ -336,41 +336,49 @@
       for (let k = 0; k < arr.length - cap; k++) if (arr[k][1].used < chunkClock) chunkCache.delete(arr[k][0]);
     }
   }
+  // ripples and glints on open water. Cheap on purpose: no clip path (ripples only on tiles away from the shore,
+  // so they stay inside the water) and strokes batched by brightness, a few draw calls per frame instead of hundreds.
+  const RIP_LV = 6;
   function drawWaterAnim() {
-    const vis = [];
+    const wd = WATER_D * zoom, day = 1 - envDark * 0.6;
+    const paths = [], glint = [];
+    for (let n = 0; n < RIP_LV; n++) paths.push(null);
+    let any = false;
     for (const k of waterList) {
       const i = k % MW, j = (k / MW) | 0, x0 = isoX(i, j), y0 = isoY(i, j);
       if (x0 < -HW * 2 || x0 > W + HW * 2 || y0 < -HH * 3 || y0 > H + HH) continue;
-      vis.push(i, j);
-    }
-    if (!vis.length) return;
-    const wd = WATER_D * zoom;
-    ctx.save();
-    ctx.beginPath();
-    const wbs = [];
-    for (let n = 0; n < vis.length; n += 2) waterBlobs(vis[n], vis[n + 1], wbs);
-    for (const b of wbs) { const rx = b[2] * 45.25 * zoom, cx = isoX(b[0], b[1]), cy = isoY(b[0], b[1]) + wd; ctx.moveTo(cx + rx, cy); ctx.ellipse(cx, cy, rx, rx / 2, 0, 0, TAU); }
-    ctx.clip();
-    ctx.lineCap = 'round';
-    const day = 1 - envDark * 0.6;
-    for (let n = 0; n < vis.length; n += 2) {
-      const i = vis[n], j = vis[n + 1];
+      if (!(isWet(i + 1, j) && isWet(i - 1, j) && isWet(i, j + 1) && isWet(i, j - 1))) continue;
       for (let q = 0; q < 2; q++) {
         const h = hash2(i, j, q + 5), u = ((time * (0.05 + h * 0.06) + h) % 1);
-        const cx = i + 0.1 + u * 0.8, cy = j + 0.2 + hash2(i, j, q + 9) * 0.6;
-        const x0 = isoX(cx, cy), y0 = isoY(cx, cy) + wd;
         const a = (0.1 + 0.12 * Math.sin(time * 1.8 + h * 20)) * day * Math.sin(u * Math.PI);
         if (a <= 0.01) continue;
-        ctx.strokeStyle = 'rgba(210,244,255,' + a.toFixed(3) + ')';
-        ctx.lineWidth = 1.3;
-        ctx.beginPath(); ctx.moveTo(x0 - 7 * zoom, y0 - 3.5 * zoom); ctx.lineTo(x0 + 7 * zoom, y0 + 3.5 * zoom); ctx.stroke();
+        const cx = i + 0.1 + u * 0.8, cy = j + 0.2 + hash2(i, j, q + 9) * 0.6, px = isoX(cx, cy), py = isoY(cx, cy) + wd;
+        const lv = Math.min(RIP_LV - 1, Math.floor(a / 0.22 * RIP_LV));
+        (paths[lv] || (paths[lv] = [])).push(px, py);
+        any = true;
       }
-      if (envDark < 0.5 && hash2(i, j, Math.floor(time * 1.5)) < 0.06) {
-        const gx = isoX(i + 0.5, j + 0.5), gy = isoY(i + 0.5, j + 0.5) + wd;
-        const tw = 0.5 + 0.5 * Math.sin(time * 9 + i), r = 3 * zoom * tw;
-        ctx.strokeStyle = 'rgba(255,255,255,' + (0.7 * tw).toFixed(3) + ')'; ctx.lineWidth = 1;
-        ctx.beginPath(); ctx.moveTo(gx - r, gy); ctx.lineTo(gx + r, gy); ctx.moveTo(gx, gy - r * 0.6); ctx.lineTo(gx, gy + r * 0.6); ctx.stroke();
+      if (envDark < 0.5 && hash2(i, j, Math.floor(time * 1.5)) < 0.06) glint.push(i, j);
+    }
+    if (!any && !glint.length) return;
+    ctx.save();
+    ctx.lineCap = 'round'; ctx.lineWidth = 1.3;
+    for (let n = 0; n < RIP_LV; n++) {
+      const P = paths[n];
+      if (!P) continue;
+      ctx.strokeStyle = 'rgba(210,244,255,' + ((n + 0.5) / RIP_LV * 0.22).toFixed(3) + ')';
+      ctx.beginPath();
+      for (let m = 0; m < P.length; m += 2) { ctx.moveTo(P[m] - 7 * zoom, P[m + 1] - 3.5 * zoom); ctx.lineTo(P[m] + 7 * zoom, P[m + 1] + 3.5 * zoom); }
+      ctx.stroke();
+    }
+    ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(255,255,255,0.55)';
+    if (glint.length) {
+      ctx.beginPath();
+      for (let n = 0; n < glint.length; n += 2) {
+        const i = glint[n], j = glint[n + 1], gx = isoX(i + 0.5, j + 0.5), gy = isoY(i + 0.5, j + 0.5) + wd;
+        const r = 3 * zoom * (0.5 + 0.5 * Math.sin(time * 9 + i));
+        ctx.moveTo(gx - r, gy); ctx.lineTo(gx + r, gy); ctx.moveTo(gx, gy - r * 0.6); ctx.lineTo(gx, gy + r * 0.6);
       }
+      ctx.stroke();
     }
     ctx.restore();
   }
@@ -468,13 +476,11 @@
         };
         const tg = player.target;
         const near = (!player.dead && covers(player.x, player.y, 30)) || (tg && !tg.dead && covers(tg.x, tg.y, bodyH(tg)));
-        const sway = p.kind === 'spire' ? 0 : Math.sin(time * 1.3 + p.ph) * 0.028 + Math.sin(time * 2.3 + p.ph * 2) * 0.01;
-        ctx.save();
-        ctx.translate(x0, y0);
-        ctx.transform(1, 0, sway, 1, 0, 0);
+        // sway as a small sideways drift: a skew transform per tree was the main cost on tree-heavy maps
+        const sway = p.kind === 'spire' ? 0 : (Math.sin(time * 1.3 + p.ph) * 0.028 + Math.sin(time * 2.3 + p.ph * 2) * 0.01) * sp.h * z * 0.3;
         if (near) ctx.globalAlpha = 0.42;
-        ctx.drawImage(sp.img, -sp.ax * z, -sp.ay * z, sp.w * z, sp.h * z);
-        ctx.restore();
+        ctx.drawImage(sp.img, x0 - sp.ax * z + sway, y0 - sp.ay * z, sp.w * z, sp.h * z);
+        if (near) ctx.globalAlpha = 1;
         break;
       }
       case 'bush': drawSpr(SPR.bushes[p.v], x0, y0, false, 1, p.s); break;

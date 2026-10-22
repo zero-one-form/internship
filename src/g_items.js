@@ -1,6 +1,6 @@
 
   /* ================= equipment & loot ================= */
-  const INV_MAX = 36, IL_MAX = 400;
+  const INV_MAX = 300, IL_MAX = 400;
   const FLAT_OPTS = ['str', 'agi', 'vit', 'int', 'luk', 'hp', 'mp'];
   const SLOT_TYPES = ['sword', 'staff', 'head', 'body', 'acc'];
   const TYPE_INFO = {

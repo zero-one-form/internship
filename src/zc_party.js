@@ -179,7 +179,7 @@
     if (autoHold > 0) { autoHold -= dt; return; }
     if (stick.active || drag.active) { autoHold = 2.5; return; }
     if (transit) return;
-    if (prog.sp > 0) { const pat = player.form === 'blade' ? ['str', 'str', 'vit', 'agi'] : ['int', 'int', 'vit', 'luk']; let i = 0; while (prog.sp > 0) { prog.stats[pat[i++ % 4]]++; prog.sp--; } refreshD(); }
+    if (prog.sp > 0 && opt().autoStat) { const pat = player.form === 'blade' ? ['str', 'str', 'vit', 'agi'] : ['int', 'int', 'vit', 'luk']; let i = 0; while (prog.sp > 0) { prog.stats[pat[i++ % 4]]++; prog.sp--; } refreshD(); }
     // in the abyss: once the gate is open, head for it (only fight what is in the way);
     // before that, floor objectives (chests, seals, bounties, the boss) come first
     const dive = curMap === 3 && !WB.on;

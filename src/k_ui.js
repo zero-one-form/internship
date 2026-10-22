@@ -7,7 +7,8 @@
     ['stick', '移動スティックを使う', '画面左下をなぞって移動する'],
     ['shake', '画面の揺れ・振動', '強い一撃や撃破で画面を揺らし、対応するスマホでは振動させる'],
     ['op', '起動時にオープニングを流す', 'ゲームを開くたびにオープニングから始める'],
-    ['lite', '軽量モード', '画質と演出を抑えて動作を軽くする（古いスマホ向け）']
+    ['lite', '軽量モード', '画質と演出を抑えて動作を軽くする（古いスマホ向け）'],
+    ['autoStat', 'AUTO中にステータスを自動で振る', 'オフなら、たまったポイントを自分で振れる']
   ];
   function opt() { if (!prog.opt) prog.opt = { autoPot: true, autoTarget: true, autoSell: false, stick: true }; return prog.opt; }
   const stick = { active: false, id: null, bx: 0, by: 0, dx: 0, dy: 0 };
@@ -293,6 +294,14 @@
       cb.addEventListener('change', () => { opt()[k] = cb.checked; save(); if (k === 'lite') resize(); });
       row.append(tx, cb);
       box.appendChild(row);
+    }
+    { // enemy strength
+      const row = document.createElement('div'); row.className = 'opt optcol';
+      const tx = document.createElement('span'); const n = document.createElement('span'); n.className = 'nm'; n.textContent = '敵の強さ';
+      const hh = document.createElement('span'); hh.className = 'hint'; hh.textContent = '新しく出てくる敵から変わる'; tx.append(n, hh);
+      const chips = document.createElement('div'); chips.className = 'chips';
+      for (const k in DIFFS) { const c = document.createElement('button'); c.type = 'button'; c.className = 'chip' + (diff() === DIFFS[k] ? ' on' : ''); c.textContent = DIFFS[k].name; c.addEventListener('click', () => { opt().diff = k; save(); renderOpt(); }); chips.append(c); }
+      row.append(tx, chips); box.appendChild(row);
     }
     rankRow(box);
     { const ob = elBtn('オープニングを見る', 'ghost', () => { closeSheet(); opWatch(); }); box.appendChild(ob); }
