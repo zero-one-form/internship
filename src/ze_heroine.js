@@ -54,6 +54,31 @@
     }
   };
   const HERO_IDS = Object.keys(HEROINES);
+  // gifts: the gold sink. Each gift raises affection by half a level; the price grows with the level.
+  const GIFTS = {
+    mina: ['ハーブティー', 'ふふ、いい香り。今度、一緒に飲みましょう？'],
+    aria: ['オルゴール', '……きれいなおと。ずっと、きいてたい'],
+    karen: ['金の足飾り', 'わ、わかってるじゃない！ 次の舞で着けるね！'],
+    setsuna: ['雪の結晶のブローチ', 'まあ……。一生、大切にいたします'],
+    riko: ['ホネ吉用のリボン', 'ホ、ホネ吉、すっごく似合ってるよ……！'],
+    nefi: ['星見の枕', 'ふわぁ……。これで、もっとよく眠れるのです'],
+    yuzu: ['珍しい薬草', '……へえ、いい目利きじゃん。ありがと'],
+    luna: ['紅いバラ', 'と、当然の献上品なのだわ！ ……うれしいのだわ'],
+    shion: ['上等な砥石', '……感謝する。……大事に使う'],
+    stella: ['古い星図', 'わあ！ この星座、はじめて見た！ ありがとう！']
+  };
+  const GIFT_AFF = 15;
+  function giftCost(id) { return 10000 * Math.pow(affLv(id) + 1, 2); }
+  function giveGift(id) {
+    const S = heroS(id), c = giftCost(id);
+    if (!S.j || affLv(id) >= AFF_MAX) return false;
+    if (prog.gold < c) { toast('ゴールドが足りない（' + c.toLocaleString() + 'G）'); return false; }
+    const lv0 = affLv(id);
+    prog.gold -= c; S.aff += GIFT_AFF;
+    toast(HEROINES[id].name + '「' + GIFTS[id][1] + '」' + (affLv(id) > lv0 ? '　好感度 Lv' + affLv(id) + '！' : ''));
+    sfx('quest'); save();
+    return true;
+  }
   const AFF_STEP = 30, AFF_MAX = 10, ULT_NEED = 90, HERO_MAX_OUT = 3, HERO_DMG = 0.6, HERO_ULT = 0.7; // tuned with tools/sim.js (SIM_HEROES=1) // at most three heroines travel together
   // scenes: [speaker, expression, text]; speaker '' = narration, '?' = an unseen voice
   const SCENES = {
@@ -690,6 +715,7 @@
         drawBust(cv.getContext('2d'), id, cv.width, cv.height, 'smile');
         info.append(elP('qg', H.name + '　' + H.title), elP('qh', '好感度 Lv' + affLv(id) + (affLv(id) < AFF_MAX ? '（次まで ' + (AFF_STEP - S.aff % AFF_STEP) + '）' : '（最大）') + '　奥義 ' + Math.floor(S.ult / ULT_NEED * 100) + '%'), elP('qr', H.d), elP('qr', '奥義「' + H.ult + '」：' + H.ultD));
         const acts = document.createElement('div'); acts.className = 'ita';
+        if (affLv(id) < AFF_MAX) acts.append(elBtn('贈り物：' + GIFTS[id][0] + '（' + giftCost(id).toLocaleString() + 'G）', 'ghost small', () => { if (giveGift(id)) renderPets(); }));
         const tk = talkReady(id);
         if (tk) acts.append(elBtn('話す（新しい話）', 'primary small', () => { closeSheet(); playScene(tk[0]); }));
         const isOut = heroOut().includes(id);

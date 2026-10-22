@@ -68,7 +68,8 @@ async function browserPath() {
     ['talk_shion', (G) => { while (G.talkCur) G.talkAdvance(); G.playScene('shion_join'); G.talkAdvance(); G.talkAdvance(); }],
     ['heroines_field', (G) => { while (G.talkCur) G.talkAdvance(); for (const id of Object.keys(G.HEROINES)) { G.heroS(id).j = true; G.heroS(id).out = ['luna', 'shion', 'stella'].includes(id); } G.prog.story = Object.keys(G.SCENES); G.enterDungeon(21); G.prog.opt.auto = true; }],
     ['cutin', (G) => { G.heroS('karen').ult = 60; G.heroUlt('karen'); }],
-    ['hero_tab', (G) => { G.prog.opt.auto = false; G.heroS('mina').aff = 70; G.openSheet(); G.setTab('pet'); }],
+    ['login', (G) => { while (G.talkCur) G.talkAdvance(); G.prog.opt.auto = false; const L = G.loginState(); L.last = 0; L.n = 6; G.loginChecked = false; G.loginTick(true); }],
+    ['hero_tab', (G) => { document.getElementById('petOk').click(); G.prog.opt.auto = false; G.heroS('mina').aff = 70; G.openSheet(); G.setTab('pet'); }],
   ];
   for (const [name, fn] of steps) {
     const ok = await p.evaluate((src) => { const G = window.__G; if (!G) return false; try { G.closeSheet && G.closeSheet(); } catch (e) {} (0, eval)('(' + src + ')')(G); return true; }, fn.toString());

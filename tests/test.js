@@ -704,6 +704,28 @@ const assert = (c, msg) => { if (!c) { errors.push('ASSERT FAIL: ' + msg); conso
     assert(G.heroJoined('mina') && G.affLv('mina') === 3 && G.storySeen().includes('aria_join'), 'heroine progress survives a reload');
     G.qState().main = q0; G.enterMap(0, null); frames(3); G.paused = false;
   }
+  // gifts (gold sink) and the login bonus
+  {
+    G.enterMap(0, null); frames(3); G.paused = false;
+    const S = G.heroS('mina'); S.j = true; S.aff = 0; G.prog.gold = 1e6;
+    const c0 = G.giftCost('mina'), g0 = G.prog.gold;
+    assert(G.giveGift('mina') && G.prog.gold === g0 - c0 && S.aff === 15, 'a gift costs gold and raises affection by half a level');
+    G.giveGift('mina');
+    assert(G.affLv('mina') === 1 && G.giftCost('mina') === 4 * c0, 'gifts get pricier as affection grows');
+    G.prog.gold = 0; const a0 = S.aff;
+    assert(!G.giveGift('mina') && S.aff === a0, 'no gift without enough gold');
+    const L = G.loginState(); L.last = 0; L.n = 0; G.loginChecked = false; G.prog.potions = 0;
+    G.loginTick(true);
+    assert(L.n === 1 && G.prog.potions === 3 && !$('petDlg').hidden && G.paused, 'first login of the day shows day 1 and hands over potions');
+    $('petOk').click();
+    G.loginChecked = false; G.loginTick(true);
+    assert(L.n === 1, 'the bonus is given once per day');
+    L.last = 0; G.loginChecked = false; const gold1 = G.prog.gold; G.loginTick(true);
+    assert(L.n === 2 && G.prog.gold > gold1, 'the next day gives day 2 (gold)');
+    $('petOk').click(); G.paused = false;
+    G.save(); G.prog.login = null; G.load();
+    assert(G.loginState().n === 2, 'login streak survives a reload');
+  }
   // first-time tips
   {
     G.enterMap(0, null); frames(3); G.paused = false; G.player.dead = false;
