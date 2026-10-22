@@ -147,12 +147,24 @@ High-quality anime game character illustration, cel shading, clean thin lineart,
 Bust portrait from chest up of a lively confident girl around 17, a fire dancer: long crimson-red hair in a high ponytail with flame-orange tips, a golden flame-shaped hair ornament, big bright amber-orange eyes, confident cheeky grin showing a small fang, red and gold dancer outfit with a flowing sheer orange shawl and gold bangles, a few small embers floating around her.
 ```
 
-## 6. 今後の候補（地層ごとに1人）
+## 6. セツナ・リコ・ネフィ ✅
+
+| | セツナ（`setsuna`） | リコ（`riko`） | ネフィ（`nefi`） |
+|---|---|---|---|
+| 地層・加入 | 氷晶の洞：B17で出会い B18で加入 | 骸の納骨堂：B22で出会い B23で加入 | 砂に沈んだ神殿：B27で出会い B28で加入 |
+| 人物 | 百年眠っていた氷の国の最後の王女。礼儀正しく寂しがり。「〜です」「わたくし」 | 気弱な死霊術師。骸骨の友だち「ホネ吉」。「ひぅっ」「ご、ごめんなさい」 | 神殿の留守番の巫女。おっとり、古いことばを混ぜる。「〜なのです」「ラ・メス」 |
+| 戦い方 | 後衛。氷の矢 | おばけが敵から敵へ跳ねる（雷・最大3体） | 太陽の杖から光の玉 |
+| 奥義 | 「氷華の檻」：氷の大ダメージ＋8秒間 被ダメージ-30% | 「おともだち大行進」：雷の大ダメージ＋HP25%回復 | 「砂陽の祈り」：大ダメージ＋10秒間 HPが1残る |
+
+白い服やおばけのように白い部分が多い絵は `tools/cutout.py --keep-white` で切り抜く（囲まれた白を消す処理を止める）。
+
+## 7. 今後の候補（まだいない地層）
 
 | 地層 | 名前（仮） | 役どころ | 元素 |
 |---|---|---|---|
-| 氷晶の洞 | セツナ | 氷の国の姫。礼儀正しく寂しがり | 氷 |
-| 骸の納骨堂 | リコ | 気弱な死霊術師。骸骨の友だちがいる | 雷 |
-| 砂に沈んだ神殿 | ネフィ | 神殿の巫女。古代語で話すおっとり者 | 回復 |
+| 毒霧の底（B31〜35） | ユズ | 毒をあやつる薬師。皮肉屋だが面倒見がいい | 毒（新規） |
+| 血涙の回廊（B36〜40） | ルナ | 吸血鬼の末裔。誇り高く甘えん坊 | 吸収 |
+| 虚無の淵（B41〜45） | シオン | 記憶を失った騎士。無口で真面目 | 盾役 |
+| 星の終わる場所（B46〜50） | ステラ | 星を読む少女。物語の終わりの鍵 | 星 |
 
-設定が固まったら、同じ形でプロンプトを追加する。
+絵は `tools/art/gemini_gen.py` で生成する（キーは環境変数 `GEMINI_API_KEY`）。1枚目の立ち絵を2〜3案作って選び、残りはそれを `--ref` に渡して顔をそろえる。

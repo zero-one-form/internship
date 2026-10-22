@@ -16,6 +16,21 @@
       name: 'カレン', title: '灼熱の踊り子', col: '#ff7a3c', hair: ['#e8443a', '#ff9a3c'], cloth: ['#d8342c', '#f2b84a'], eye: '#ffa040',
       ult: '紅蓮の舞', ultD: 'まわりの敵すべてに炎の大ダメージ。8秒間 カレンの舞が倍の速さになる',
       d: '前に出て敵の群れの中で舞い、炎でまとめて焼く。奥義「紅蓮の舞」'
+    },
+    setsuna: {
+      name: 'セツナ', title: '氷晶の姫', col: '#6aa8ff', hair: ['#a8d4ff', '#5a9ae8'], cloth: ['#2a4a8a', '#cfe4ff'], eye: '#3a7ae0',
+      ult: '氷華の檻', ultD: 'まわりの敵すべてに氷の大ダメージ。8秒間 主人公の受けるダメージを30%減らす',
+      d: '後ろから氷の矢で敵を凍えさせる。奥義「氷華の檻」'
+    },
+    riko: {
+      name: 'リコ', title: '気弱な死霊術師', col: '#9a7ad8', hair: ['#c8bce0', '#8a7ab0'], cloth: ['#2a2230', '#6a4a9a'], eye: '#8a5ad8',
+      ult: 'おともだち大行進', ultD: 'まわりの敵すべてに雷の大ダメージ。倒した魂で主人公のHPを25%回復',
+      d: 'おばけの友だちが敵から敵へ跳ねる（雷・最大3体）。奥義「おともだち大行進」'
+    },
+    nefi: {
+      name: 'ネフィ', title: '砂の神殿の巫女', col: '#2fb8a8', hair: ['#f2d08a', '#c89a4a'], cloth: ['#f4f0e0', '#3ab8a8'], eye: '#2a9a8a',
+      ult: '砂陽の祈り', ultD: 'まわりの敵に大ダメージ。10秒間 主人公はどんな攻撃でもHPが1残る',
+      d: '太陽の杖から光の玉を放つ。奥義「砂陽の祈り」でピンチを耐えしのぐ'
     }
   };
   const HERO_IDS = Object.keys(HEROINES);
@@ -108,6 +123,85 @@
       ['karen', 'normal', 'ねえ、全部終わったら、アタシの舞を一番前で見てよ'],
       ['karen', 'smile', '観客はアンタひとりでいい。……なんてね！ 顔、赤いわよ？']
     ],
+    setsuna_meet: [
+      ['', '', '凍てついた広間の奥に、氷の玉座があった。そこに座る少女は、まつげまで白く凍っていた。'],
+      ['setsuna', 'normal', '……旅の方、ですか。このような場所まで。わたくしはセツナ。氷晶の国の……最後の王女です'],
+      ['setsuna', 'sad', '国は百年前、深淵の冷気に呑まれました。わたくしだけが、この玉座で眠り続けていたのです'],
+      ['mina', 'sad', '百年……ずっと、ひとりで？'],
+      ['setsuna', 'normal', 'ええ。……少し、先までご一緒してもよろしいでしょうか。人の声を、もう少し聞いていたいのです']
+    ],
+    setsuna_join: [
+      ['setsuna', 'smile', 'あなたの剣が氷を砕くたび、胸の奥があたたかくなります。不思議ですね'],
+      ['setsuna', 'normal', '決めました。わたくしも参ります。国を呑んだ冷気が、どこから来たのか知りたいのです'],
+      ['setsuna', 'sad', '……それに、ひとりの玉座には、もう戻りたくありません'],
+      ['karen', 'smile', 'お姫様、よろしく！ 寒かったらアタシにくっついてな！'],
+      ['', '', 'セツナが仲間になった。']
+    ],
+    setsuna_t1: [
+      ['setsuna', 'normal', 'トマさんに「お姫様」と呼ばれると、少しくすぐったいです'],
+      ['setsuna', 'smile', 'ミーナさんのスープ、百年ぶりの温かい食事でした。……おかわり、してもよろしいでしょうか']
+    ],
+    setsuna_t2: [
+      ['setsuna', 'sad', '眠っている間、ずっと同じ夢を見ていました。誰もいない城で、誰かの足音を待つ夢を'],
+      ['setsuna', 'smile', '……あの足音、あなただったのかもしれませんね']
+    ],
+    setsuna_t3: [
+      ['setsuna', 'normal', 'いつか国を取り戻せたら、あなたを城の舞踏会にお招きします'],
+      ['setsuna', 'smile', '踊りはカレンさんに習っておきますね。……足を踏んでも、笑わないでください']
+    ],
+    riko_meet: [
+      ['', '', '納骨堂の暗がりで、骸骨がカタカタと鳴った。――襲ってこない。むしろ、何かを守るように立っている。'],
+      ['riko', 'sad', 'ひぅっ!? ご、ごめんなさい、ごめんなさい！ この子たち、悪い子じゃないんです……！'],
+      ['riko', 'normal', 'り、リコです。死霊術師、です……いちおう。この子はホネ吉。いちばんの、お友だち'],
+      ['mina', 'smile', '大丈夫よ、怖がらないで。……骸骨さんも、ね'],
+      ['riko', 'smile', 'え、えへへ……ホネ吉、ほめられたね']
+    ],
+    riko_join: [
+      ['riko', 'normal', 'あ、あの！ ……この下の階、すっごく怖いおばけがいるんです。この子たちも、おびえてて'],
+      ['riko', 'sad', 'リコ、ずっと逃げてばっかりで……でも、みなさんと一緒なら、ちょっとだけ、がんばれそうで'],
+      ['riko', 'smile', 'つ、連れていってください！ おばけのお友だち、すっごく働き者なので！'],
+      ['aria', 'smile', 'ホネ吉、いいおと。カタカタ'],
+      ['', '', 'リコが仲間になった。']
+    ],
+    riko_t1: [
+      ['riko', 'normal', 'ガルドさんに、ホネ吉の歯を磨くブラシを作ってもらいました……！'],
+      ['riko', 'smile', 'ホネ吉、ぴかぴか。……えへへ']
+    ],
+    riko_t2: [
+      ['riko', 'sad', '村では「気味が悪い」って言われてました。おばけと話せるの、リコだけだったから'],
+      ['riko', 'normal', 'でも、みなさんは、ホネ吉にも「おはよう」って言ってくれる'],
+      ['riko', 'smile', '……リコ、ここにいて、いいんですよね？']
+    ],
+    riko_t3: [
+      ['riko', 'normal', 'も、もしリコがおばけになっても、あなたのそばに出ますね'],
+      ['riko', 'sad', 'あっ、ち、違うんです！ 怖い意味じゃなくて！ ……ずっと一緒って意味で……ひぅぅ']
+    ],
+    nefi_meet: [
+      ['', '', '砂に埋もれた祭壇で、ひとりの巫女がすやすやと眠っていた。太陽の杖を、大事そうに抱えたまま。'],
+      ['nefi', 'normal', 'ふわぁ……。ラ・メス、旅のひと。……あ、「こんにちは」のことです'],
+      ['nefi', 'smile', 'ネフェルティ……ネフィと呼んでください。この神殿の、お留守番なのです'],
+      ['setsuna', 'normal', 'お留守番……？ 神殿の方々は、どちらに？'],
+      ['nefi', 'sad', '……みんな、砂といっしょに、もっと下へ。ネフィは、ずっと待っているのです']
+    ],
+    nefi_join: [
+      ['nefi', 'normal', 'あなたたちの足音は、太陽みたいにあったかいのです'],
+      ['nefi', 'smile', '待つのは、もうおしまい。ネフィも、みんなを迎えに行くのです。……ハト・ネブ（よろしくおねがいします）'],
+      ['riko', 'smile', 'ね、ネフィさんの杖、きらきらしてて、おばけたちも喜んでます……！'],
+      ['', '', 'ネフィが仲間になった。']
+    ],
+    nefi_t1: [
+      ['nefi', 'normal', 'トマの箱から、むかしの神殿の飾りが出てきたのです。……おいくらで売ってたのかは、聞かないのです'],
+      ['nefi', 'smile', 'ふわぁ。……おひるねの時間なのです']
+    ],
+    nefi_t2: [
+      ['nefi', 'sad', 'ネフィ、みんなの顔を、少しずつ忘れてきているのです。待ちすぎて'],
+      ['nefi', 'normal', 'だから、あなたたちの顔は、毎日ちゃんと見るのです。忘れないように'],
+      ['nefi', 'smile', '……じーっ。今日もいいお顔なのです']
+    ],
+    nefi_t3: [
+      ['nefi', 'normal', '古いことばで「セネブ」は「あなたが元気でありますように」という意味なのです'],
+      ['nefi', 'smile', 'セネブ。……毎朝、あなたに言うことにしたのです']
+    ],
     aria_t1: [
       ['aria', 'normal', 'ミーナのごはん、あたたかい。……あたたかい、すき'],
       ['aria', 'smile', 'あなたの剣のおと、たのしい。ちゃん、ちゃん、って']
@@ -121,7 +215,8 @@
       ['aria', 'normal', 'だから、あなたがわすれても、わたしが、うたってあげる']
     ]
   };
-  const TALKS = { mina: [['mina_t1', 2], ['mina_t2', 5], ['mina_t3', 8]], aria: [['aria_t1', 2], ['aria_t2', 5], ['aria_t3', 8]], karen: [['karen_t1', 2], ['karen_t2', 5], ['karen_t3', 8]] };
+  const TALKS = { mina: [['mina_t1', 2], ['mina_t2', 5], ['mina_t3', 8]], aria: [['aria_t1', 2], ['aria_t2', 5], ['aria_t3', 8]], karen: [['karen_t1', 2], ['karen_t2', 5], ['karen_t3', 8]],
+    setsuna: [['setsuna_t1', 2], ['setsuna_t2', 5], ['setsuna_t3', 8]], riko: [['riko_t1', 2], ['riko_t2', 5], ['riko_t3', 8]], nefi: [['nefi_t1', 2], ['nefi_t2', 5], ['nefi_t3', 8]] };
   const HERO_E = {};
   let talkQ = [], talkCur = null, talkI = 0, talkAutoT = 0, heroAuraT = 0, heroKillN = 0;
 
@@ -136,7 +231,12 @@
   function affLv(id) { return Math.min(AFF_MAX, Math.floor(heroS(id).aff / AFF_STEP)); }
   function heroPow(id) { return 1 + 0.06 * affLv(id); }
   function heroAtkMul() { return (heroOut().includes('aria') ? 1.12 + 0.01 * affLv('aria') : 1) * (player.ariaSongT > 0 ? 1.3 : 1); }
-  function heroGuard(dmg) { return player.minaShieldT > 0 ? Math.round(dmg * 0.6) : dmg; }
+  function heroGuard(dmg) {
+    if (player.minaShieldT > 0) dmg = Math.round(dmg * 0.6);
+    if (player.setsunaT > 0) dmg = Math.round(dmg * 0.7);
+    if (player.nefiT > 0 && dmg >= player.hp) dmg = Math.max(0, Math.ceil(player.hp) - 1); // the prayer leaves 1 HP
+    return dmg;
+  }
 
   /* ---------- art ---------- */
   const heroImgs = {};
@@ -196,7 +296,7 @@
     return E;
   }
   function heroUpdate(dt) {
-    for (const k of ['minaShieldT', 'ariaSongT', 'karenDanceT']) if (player[k] > 0) player[k] = Math.max(0, player[k] - dt);
+    for (const k of ['minaShieldT', 'ariaSongT', 'karenDanceT', 'setsunaT', 'nefiT']) if (player[k] > 0) player[k] = Math.max(0, player[k] - dt);
     const out = heroOut();
     out.forEach((id, i) => heroStep(id, heroEnt(id), i, dt));
     if (autoOn() && !paused && !player.dead) for (const id of out) if (heroS(id).ult >= ULT_NEED && nearest(player.x, player.y, 5, null)) { heroUlt(id); break; }
@@ -205,7 +305,7 @@
     E.anim += dt;
     if (E.map !== curMap || hyp(E.x - player.x, E.y - player.y) > 14) { E.map = curMap; E.x = player.x - 0.8 + idx * 1.6; E.y = player.y + 0.8; }
     const fight = !player.dead && !inCamp(player.x, player.y) ? nearest(player.x, player.y, 7, null) : null;
-    const back = [[-1.3, 1.1], [1.1, 1.3], [0.2, 1.9]][idx % 3];
+    const back = [[-1.3, 1.1], [1.1, 1.3], [0.2, 1.9], [-1.9, 0.1], [1.9, -0.1], [-0.6, 2.5]][idx % 6];
     // the dancer fights in front, inside the pack; the others stay behind the hero
     const front = id === 'karen' && fight && hyp(fight.x - player.x, fight.y - player.y) < 5;
     const tx = front ? fight.x + (player.x - fight.x) * 0.25 : player.x + back[0] * (fight ? 1.6 : 1);
@@ -222,6 +322,21 @@
       E.atkT = 1.6;
       if (player.hp < D.maxHp * 0.85) { const amt = Math.round(D.maxHp * 0.03 * heroPow(id)); player.hp = Math.min(D.maxHp, player.hp + amt); burst(player.x, player.y, 20, 'heal', 6, 'mint', 1.2); return; }
       if (fight) { faceE(E, fight); shots.push({ x: E.x, y: E.y, h: 36, tgt: fight, dmg: D.atk * 0.7 * pw, sp: 11, trail: [], col: 'mint' }); }
+    } else if (id === 'setsuna' || id === 'nefi') {
+      if (E.atkT > 0 || !fight) return;
+      E.atkT = id === 'setsuna' ? 1.5 : 1.7; faceE(E, fight);
+      shots.push({ x: E.x, y: E.y, h: 36, tgt: fight, dmg: D.atk * (id === 'setsuna' ? 0.75 : 0.8) * pw, sp: 12, trail: [], col: id === 'setsuna' ? 'cyan' : 'gold', ctx: { dmg: 1, crit: 0, leech: 0, el: id === 'setsuna' ? 'ice' : null } });
+    } else if (id === 'riko') {
+      if (E.atkT > 0 || !fight) return;
+      E.atkT = 2.0; faceE(E, fight);
+      // a ghost friend hops from enemy to enemy
+      let cur = fight, n = 0; const hit = new Set();
+      withEl('volt', () => {
+        while (cur && n < 3) {
+          hit.add(cur); hitEnemy(cur, D.atk * 0.65 * pw); addVfx({ k: 'ring', x: cur.x, y: cur.y, R: 0.9, c: '190,160,255', w: 4, life: 0.35 });
+          n++; const c0 = cur; cur = enemies.filter((e) => !e.dead && !hit.has(e) && hyp(e.x - c0.x, e.y - c0.y) < 3.5).sort((a, b) => hyp(a.x - c0.x, a.y - c0.y) - hyp(b.x - c0.x, b.y - c0.y))[0];
+        }
+      });
     } else if (id === 'karen') {
       if (E.atkT > 0 || !fight) return;
       E.atkT = player.karenDanceT > 0 ? 0.9 : 1.8;
@@ -249,7 +364,7 @@
       const hgt = 70 * zoom, wd = hgt * im.naturalWidth / im.naturalHeight;
       ctx.save(); ctx.translate(x0, y0 - fl); if (E.faceLeft) ctx.scale(-1, 1); ctx.drawImage(im, -wd / 2, -hgt, wd, hgt); ctx.restore();
     } else drawHeroinePH(ctx, E.hid, x0, y0 - fl, 1.25 * zoom, E.anim, E.faceLeft, 'normal');
-    emis.push([{ aria: 'violet', karen: 'warm' }[E.hid] || 'mint', x0, y0 - fl - 30 * zoom, 26 * zoom, 0.25]);
+    emis.push([{ aria: 'violet', karen: 'warm', setsuna: 'cyan', riko: 'violet', nefi: 'gold' }[E.hid] || 'mint', x0, y0 - fl - 30 * zoom, 26 * zoom, 0.25]);
   }
   function heroOnKill(e) {
     const out = heroOut();
@@ -269,6 +384,21 @@
     if (id === 'mina') {
       player.hp = Math.min(D.maxHp, player.hp + D.maxHp * 0.6); player.minaShieldT = 6;
       addVfx({ k: 'pillar', x: player.x, y: player.y, c: '140,230,160', life: 1 }); burst(player.x, player.y, 20, 'heal', 30, 'mint', 2);
+    } else if (id === 'setsuna') {
+      withEl('ice', () => { for (const e of enemies) if (!e.dead && hyp(e.x - player.x, e.y - player.y) < 6) hitEnemy(e, D.atk * 4.5 * heroPow(id)); });
+      player.setsunaT = 8;
+      addVfx({ k: 'ring', x: player.x, y: player.y, R: 6, c: '150,200,255', w: 14, life: 0.8 }); addVfx({ k: 'sflash', c: '200,230,255', a: 0.3, life: 0.5 });
+      addShake(8); zoomPunch(0.05);
+    } else if (id === 'riko') {
+      withEl('volt', () => { for (const e of enemies) if (!e.dead && hyp(e.x - player.x, e.y - player.y) < 7) hitEnemy(e, D.atk * 4 * heroPow(id)); });
+      player.hp = Math.min(D.maxHp, player.hp + D.maxHp * 0.25);
+      addVfx({ k: 'ring', x: player.x, y: player.y, R: 7, c: '180,150,255', w: 12, life: 0.8 }); burst(player.x, player.y, 20, 'heal', 24, 'violet', 2);
+      addShake(8); zoomPunch(0.05);
+    } else if (id === 'nefi') {
+      for (const e of enemies) if (!e.dead && hyp(e.x - player.x, e.y - player.y) < 6) hitEnemy(e, D.atk * 3.5 * heroPow(id));
+      player.nefiT = 10;
+      addVfx({ k: 'pillar', x: player.x, y: player.y, c: '255,220,120', life: 1.2 }); addVfx({ k: 'sflash', c: '255,230,160', a: 0.3, life: 0.5 });
+      addShake(6); zoomPunch(0.05);
     } else if (id === 'karen') {
       withEl('fire', () => { for (const e of enemies) if (!e.dead && hyp(e.x - player.x, e.y - player.y) < 6) hitEnemy(e, D.atk * 5.5 * heroPow(id)); });
       player.karenDanceT = 8;
@@ -326,6 +456,7 @@
   function talkDone(key) {
     if (!storySeen().includes(key)) storySeen().push(key);
     if (key === 'mina_join') { const S = heroS('mina'); S.j = true; S.out = true; toast('ミーナが仲間になった！（「仲間」タブで会話できる）'); sfx('level'); }
+    for (const id of ['setsuna', 'riko', 'nefi']) if (key === id + '_join') { const S = heroS(id); S.j = true; S.out = true; toast(HEROINES[id].name + 'が仲間になった！'); sfx('level'); }
     if (key === 'karen_join') { const S = heroS('karen'); S.j = true; S.out = true; toast('カレンが仲間になった！'); sfx('level'); }
     if (key === 'aria_join') { const S = heroS('aria'); S.j = true; S.out = true; toast('アリアが仲間になった！'); sfx('level'); }
     for (const id of HERO_IDS) for (const [k] of TALKS[id]) if (k === key) { prog.gold += 500 * (1 + affLv(id)); heroS(id).seen.push(k); toast(HEROINES[id].name + 'との距離が縮まった（' + 500 * (1 + affLv(id)) + 'G）'); }
@@ -344,6 +475,12 @@
       once('aria_voice', curFloor >= 11 && heroJoined('mina'));
       once('karen_meet', curFloor >= 13 && heroJoined('mina'));
       once('karen_join', curFloor >= 14 && seen.includes('karen_meet') && (curFloor > 14 || stairsOpen));
+      once('setsuna_meet', curFloor >= 17 && heroJoined('mina'));
+      once('setsuna_join', curFloor >= 18 && seen.includes('setsuna_meet') && (curFloor > 18 || stairsOpen));
+      once('riko_meet', curFloor >= 22 && heroJoined('mina'));
+      once('riko_join', curFloor >= 23 && seen.includes('riko_meet') && (curFloor > 23 || stairsOpen));
+      once('nefi_meet', curFloor >= 27 && heroJoined('mina'));
+      once('nefi_join', curFloor >= 28 && seen.includes('nefi_meet') && (curFloor > 28 || stairsOpen));
       once('aria_meet', curFloor >= 15 && seen.includes('aria_voice') && (curFloor > 15 || stairsOpen));
       once('aria_join', curFloor >= 20 && seen.includes('aria_meet') && (curFloor > 20 || stairsOpen));
       once('story_b30', curFloor >= 30 && heroJoined('aria') && (curFloor > 30 || stairsOpen));

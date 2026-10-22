@@ -4,7 +4,8 @@
 Removes a plain white background (flood fill from the edges, so white inside the character is kept),
 trims to the character, resizes and saves WebP into assets/heroines/.
 
-Usage: python3 tools/cutout.py <image> [<image> ...] [--name mina_bust_normal]
+Usage: python3 tools/cutout.py <image> [<image> ...] [--name mina_bust_normal] [--keep-white]
+  --keep-white: do not remove enclosed white pockets (for white gloves, fur, ghosts...).
   The output name defaults to the input file name (e.g. mina_bust_smile.png -> mina_bust_smile.webp).
   Names: <id>_bust_normal / <id>_bust_smile / <id>_bust_sad / <id>_chibi   (id: mina, aria, ...)
 """
@@ -17,7 +18,7 @@ OUT = os.path.join(ROOT, 'assets', 'heroines')
 KEY = (255, 0, 255)
 
 
-def cutout(src, name):
+def cutout(src, name, keep_white=False):
     im = Image.open(src).convert('RGBA')
     if im.getextrema()[3][0] < 250:
         cut = im  # already has transparency
@@ -53,7 +54,7 @@ def cutout(src, name):
                 if a is not None:
                     r, _, b = op[x, y]
                     a[0] += r; a[1] += b; a[2] += 1
-        drop = {c for c, (r, b, n) in acc.items() if b / n > 251 and (r - b) / n < 3}
+        drop = set() if keep_white else {c for c, (r, b, n) in acc.items() if b / n > 251 and (r - b) / n < 3}
         mask = Image.new('L', (w, h), 255)
         mp = mask.load()
         for y in range(h):
@@ -80,13 +81,14 @@ def main(argv):
     if not argv:
         print(__doc__)
         return 1
-    name = None
+    name, keep = None, '--keep-white' in argv
+    argv = [a for a in argv if a != '--keep-white']
     if '--name' in argv:
         i = argv.index('--name')
         name = argv[i + 1]
         del argv[i:i + 2]
     for src in argv:
-        cutout(src, name or os.path.splitext(os.path.basename(src))[0])
+        cutout(src, name or os.path.splitext(os.path.basename(src))[0], keep)
     return 0
 
 
