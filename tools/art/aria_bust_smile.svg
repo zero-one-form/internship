@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="768" height="1024" viewBox="0 0 768 1024"><defs>
+  <linearGradient id="hair" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset=".55" stop-color="#ece6ff"/><stop offset="1" stop-color="#b8a2f2"/></linearGradient>
+  <linearGradient id="hairBack" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ece6ff"/><stop offset="1" stop-color="#b8a2f2"/></linearGradient>
+  <radialGradient id="iris" cx=".5" cy=".62" r=".62"><stop offset="0" stop-color="#fff4b8"/><stop offset=".45" stop-color="#f2c23c"/><stop offset="1" stop-color="#a8661a"/></radialGradient>
+  <linearGradient id="cloth" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset=".6" stop-color="#f4ecdc"/><stop offset="1" stop-color="#d9c9a8"/></linearGradient>
+  <linearGradient id="skin" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff3ee"/><stop offset="1" stop-color="#f4d4cc"/></linearGradient>
+  <radialGradient id="blush" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ff8fa0" stop-opacity=".55"/><stop offset="1" stop-color="#ff8fa0" stop-opacity="0"/></radialGradient>
+  <radialGradient id="glow" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff6c8" stop-opacity=".95"/><stop offset="1" stop-color="#fff6c8" stop-opacity="0"/></radialGradient>
+  <radialGradient id="halo" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#f4eeff" stop-opacity=".75"/><stop offset=".6" stop-color="#d9ccff" stop-opacity=".25"/><stop offset="1" stop-color="#d9ccff" stop-opacity="0"/></radialGradient>
+  <filter id="soft" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="6"/></filter>
+</defs>
+<circle cx="384" cy="440" r="380" fill="url(#halo)"/>
+<path d="M150 280 L155 295 L170 300 L155 305 L150 320 L145 305 L130 300 L145 295 Z" fill="#fff6c8" opacity=".9"/><path d="M620 232 L627 253 L648 260 L627 267 L620 288 L613 267 L592 260 L613 253 Z" fill="#fff6c8" opacity=".9"/><path d="M120 624 L124 636 L136 640 L124 644 L120 656 L116 644 L104 640 L116 636 Z" fill="#fff6c8" opacity=".9"/><path d="M660 538 L665.5 554.5 L682 560 L665.5 565.5 L660 582 L654.5 565.5 L638 560 L654.5 554.5 Z" fill="#fff6c8" opacity=".9"/><path d="M200 842 L204.5 855.5 L218 860 L204.5 864.5 L200 878 L195.5 864.5 L182 860 L195.5 855.5 Z" fill="#fff6c8" opacity=".9"/><path d="M590 796 L596 814 L614 820 L596 826 L590 844 L584 826 L566 820 L584 814 Z" fill="#fff6c8" opacity=".9"/><path d="M680 406 L683.5 416.5 L694 420 L683.5 423.5 L680 434 L676.5 423.5 L666 420 L676.5 416.5 Z" fill="#fff6c8" opacity=".9"/>
+<!-- long back hair, fading to lavender -->
+<path d="M206 360 Q190 210 384 172 Q578 210 562 360 Q600 600 640 1024 L128 1024 Q168 600 206 360 Z" fill="url(#hairBack)"/>
+<path d="M200 600 Q180 820 150 1024 M568 600 Q590 820 618 1024 M240 700 Q230 860 222 1024 M528 700 Q540 860 548 1024" fill="none" stroke="#8c7ac8" stroke-width="3" opacity=".35"/>
+<!-- dress -->
+<path d="M150 1024 Q160 770 262 690 Q312 652 350 640 Q384 664 418 640 Q456 652 506 690 Q608 770 618 1024 Z" fill="url(#cloth)" stroke="#b89a5a" stroke-width="4"/>
+<path d="M300 660 Q384 720 468 660" fill="none" stroke="#e2b64a" stroke-width="10" stroke-linecap="round"/>
+<g fill="none" stroke="#e2b64a" stroke-width="3" opacity=".75">
+  <path d="M200 880 Q384 830 568 880"/><path d="M196 900 Q384 850 572 900"/><path d="M192 920 Q384 870 576 920"/><path d="M188 940 Q384 890 580 940"/><path d="M184 960 Q384 910 584 960"/>
+</g>
+<g fill="#e2b64a"><ellipse cx="280" cy="902" rx="11" ry="8" transform="rotate(-20 280 902)"/><rect x="288" y="862" width="3" height="40"/><ellipse cx="470" cy="922" rx="11" ry="8" transform="rotate(-20 470 922)"/><rect x="478" y="882" width="3" height="40"/></g>
+<path d="M384 700 l14 22 l-14 22 l-14 -22 Z" fill="#b9a6ff" stroke="#e2b64a" stroke-width="4"/>
+<path d="M352 540 L352 628 Q384 646 416 628 L416 540 Z" fill="url(#skin)"/>
+<path d="M352 548 Q384 596 416 548 L416 584 Q384 612 352 584 Z" fill="#f4d4cc" opacity=".75"/>
+
+<path d="M246 360 Q246 252 384 242 Q522 252 522 360 Q522 462 470 516 Q424 566 384 570 Q344 566 298 516 Q246 462 246 360 Z" fill="url(#skin)"/>
+<path d="M300 520 Q340 560 384 566 Q428 560 468 520 Q440 590 384 596 Q328 590 300 520 Z" fill="#f4d4cc" opacity=".0"/>
+<ellipse cx="300" cy="470" rx="34" ry="18" fill="url(#blush)"/><ellipse cx="468" cy="470" rx="34" ry="18" fill="url(#blush)"/>
+<path d="M356,420 Q316,382 274,418" fill="none" stroke="#2b1a22" stroke-width="9" stroke-linecap="round"/>
+<path d="M280,414 L264,406" stroke="#2b1a22" stroke-width="6" stroke-linecap="round"/><path d="M412,420 Q452,382 494,418" fill="none" stroke="#2b1a22" stroke-width="9" stroke-linecap="round"/>
+<path d="M488,414 L504,406" stroke="#2b1a22" stroke-width="6" stroke-linecap="round"/>
+<path d="M280 318 Q306 300 340 306" fill="none" stroke="#8c7ac8" stroke-width="4" stroke-linecap="round" opacity=".8"/><path d="M488 318 Q462 300 428 306" fill="none" stroke="#8c7ac8" stroke-width="4" stroke-linecap="round" opacity=".8"/>
+<path d="M386 458 Q392 470 384 474" fill="none" stroke="#d29a8a" stroke-width="4" stroke-linecap="round"/>
+<path d="M356 506 Q384 548 412 506 Q384 516 356 506 Z" fill="#c0505e"/><path d="M366 522 Q384 540 402 522 Q384 528 366 522 Z" fill="#ff8f9c"/>
+<!-- side locks -->
+<path d="M222 380 Q196 520 220 700 Q236 800 214 900" fill="none" stroke="url(#hair)" stroke-width="40" stroke-linecap="round"/>
+<path d="M546 380 Q572 520 548 700 Q532 800 554 900" fill="none" stroke="url(#hair)" stroke-width="40" stroke-linecap="round"/>
+<!-- bangs -->
+<path d="M222 390 Q206 222 384 200 Q562 222 546 390 Q530 330 500 296 Q498 356 462 380 Q456 320 428 286 Q410 350 380 366 Q384 312 356 284 Q330 346 294 364 Q302 316 290 296 Q248 330 222 390 Z" fill="url(#hair)" stroke="#8c7ac8" stroke-width="3" stroke-linejoin="round"/>
+<path d="M296 242 Q340 226 390 228" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round" opacity=".8"/>
+<path d="M334 226 Q322 284 340 340 M410 220 Q402 284 420 340 M470 240 Q476 290 482 330" fill="none" stroke="#8c7ac8" stroke-width="2.5" opacity=".35"/>
+<!-- glowing note ornament -->
+<circle cx="520" cy="250" r="44" fill="url(#glow)"/>
+<g fill="#ffd96a" stroke="#c99a2a" stroke-width="3"><ellipse cx="510" cy="268" rx="15" ry="11" transform="rotate(-20 510 268)"/><path d="M522 264 L522 214 Q544 218 552 236 Q538 228 528 230 L528 264 Z"/></g>
+</svg>

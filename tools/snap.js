@@ -1,0 +1,105 @@
+// Visual QA: boots dist/twinsoul.html in headless Chrome and captures key screens.
+// Usage: node tools/snap.js [outDir] [width] [height]
+//   CHROME=/path/to/chrome overrides the browser (defaults: /opt/pw-browsers/chromium, then @sparticuz/chromium)
+const fs = require('fs');
+const path = require('path');
+const puppeteer = require('puppeteer-core');
+const OUT = path.resolve(process.argv[2] || 'shots');
+const W = +process.argv[3] || 390, H = +process.argv[4] || 844;
+const HTML = process.env.SNAP_URL || ('file://' + path.join(__dirname, '..', 'dist', 'twinsoul.html'));
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+
+async function browserPath() {
+  if (process.env.CHROME) return process.env.CHROME;
+  if (fs.existsSync('/opt/pw-browsers/chromium')) return '/opt/pw-browsers/chromium';
+  return require('@sparticuz/chromium').executablePath();
+}
+
+(async () => {
+  fs.mkdirSync(OUT, { recursive: true });
+  const b = await puppeteer.launch({ executablePath: await browserPath(), headless: true, args: ['--no-sandbox', '--allow-file-access-from-files', '--autoplay-policy=no-user-gesture-required'], defaultViewport: { width: W, height: H, deviceScaleFactor: 2, isMobile: true, hasTouch: true } });
+  const p = await b.newPage();
+  const errs = [];
+  p.on('pageerror', (e) => errs.push('pageerror: ' + e.message));
+  p.on('console', (m) => { if (m.type() === 'error') errs.push('console: ' + m.text()); });
+  await p.evaluateOnNewDocument(() => { window.__TEST__ = true; try { localStorage.clear(); } catch (e) {} });
+  await p.goto(HTML, { waitUntil: 'load', timeout: 120000 });
+  await p.waitForFunction(() => !document.getElementById('startBtn').disabled, { timeout: 120000 });
+  const shot = async (name) => { await p.screenshot({ path: path.join(OUT, `${W}x${H}_${name}.png`) }); console.log('shot', name); };
+  await shot('title');
+  await p.click('#startBtn');
+  await wait(2500);
+  await shot('town');
+  const steps = [
+    ['forest', (G) => { G.enterMap(0, 0); }],
+    ['abyss_b1', (G) => { G.enterDungeon(1); }],
+    ['abyss_b5_boss', (G) => { G.enterDungeon(5); }],
+    ['boss_break', (G) => { const b = G.bossRef; G.player.x = b.x + 2; G.player.y = b.y; b.state = 'chase'; G.staggerAdd(b, b.maxHp * 0.06, false); G.hitEnemy(b, 500); }],
+    ['boss_broken', (G) => { const b = G.bossRef; G.staggerAdd(b, b.maxHp * 0.2, true); }],
+    ['abyss_b23', (G) => { G.enterDungeon(23); }],
+    ['abyss_b50', (G) => { G.enterDungeon(50); }],
+    ['camp', (G) => { G.enterMap(0, null); G.player.x = G.SPAWN.x; G.player.y = G.SPAWN.y; }],
+    ['aria_menu', (G) => { G.ariaOpen(); }],
+    ['aria_play', (G) => { G.ARIA.fake = 29.6; G.ARIA.diff = 1; G.ariaStart(); G.ARIA.fake = 29.6; for (const n of G.ARIA.notes) if (n.t < 29.5) n.hit = 0; G.ARIA.combo = 42; G.ariaHit(0); }],
+    ['aria_result', (G) => { G.ARIA.fake = 99; G.ariaTick(); }],
+    ['sheet_gear', (G) => { G.ariaClose(); G.ARIA.fake = null; G.enterMap(0, 0); for (let i = 0; i < 10; i++) G.prog.inv.push(G.genItem(3 + (i % 4), i % 4)); G.openSheet(); G.setTab('gear'); }],
+    ['sheet_quest', (G) => { G.closeSheet(); G.recs().kills = 1200; G.recs().legends = 2; G.achCheck(); G.prog.title = 'k1000'; G.openSheet(); G.setTab('quest'); }],
+    ['sheet_quest_ach', (G) => { G.openSheet(); G.setTab('quest'); const pn = document.querySelector('#sheet .panel'); pn.scrollTop = pn.scrollHeight; }],
+    ['sheet_skill', (G) => { G.prog.level = 40; G.prog.skill.whirl = 10; G.prog.skill.skyfall = 2; G.gainGem('amp', true); G.gainGem('ice', true); G.sockOf('whirl')[0] = 'amp'; G.openSheet(); G.setTab('blade'); }],
+    ['sheet_skill_end', (G) => { G.openSheet(); G.setTab('blade'); const pn = document.querySelector('#sheet .panel'); pn.scrollTop = pn.scrollHeight; }],
+    ['altar', (G) => { G.enterMap(0, null); G.player.x = G.SPAWN.x; G.player.y = G.SPAWN.y; G.gainSoul(120); G.paused = false; G.altarOpen(); }],
+    ['streak', (G) => { G.altarClose(); for (let i = 0; i < 22; i++) G.streakOnKill({ exp: 10 }); }],
+    ['party', (G) => { G.closeSheet(); const P = G.pets(); P.list.length = 0; P.party = []; P.active = null; P.slots = 4; let id = 1;
+      for (const sp of ['golem', 'fairy', 'mimic', 'phoenix', 'kirin', 'frost']) { P.list.push({ id: id, sp, lvl: 20 + id * 3, exp: 0, shiny: id === 4, name: 'テスト' + id }); G.partyAdd(id, true); id++; }
+      G.enterMap(0, 0); G.prog.opt.auto = true; for (let k = 0; k < 3; k++) G.spawnPack(); }],
+    ['party_fight', (G) => { }],
+    ['pet_tab', (G) => { G.prog.opt.auto = false; G.prog.gold = 50000; G.openSheet(); G.setTab('pet'); }],
+    ['offline', (G) => { G.prog.seen = Date.now() - 200 * 60000; G.showOffline(G.offlineRewards()); }],
+    ['tip', (G) => { G.closeSheet(); document.getElementById('petOk').click(); G.paused = false; G.showTip(G.TIPS[3][2]); }],
+    ['talk', (G) => { document.getElementById('tip').classList.remove('on'); G.enterMap(0, null); G.player.x = G.SPAWN.x; G.player.y = G.SPAWN.y; G.prog.story = []; G.heroS('mina').j = false; G.qState().main = G.MAINQ.length; G.paused = false; G.heroTick(1); G.talkAdvance(); }],
+    ['talk_aria', (G) => { while (G.talkCur) G.talkAdvance(); G.playScene('aria_join'); G.talkAdvance(); G.talkAdvance(); }],
+    ['talk_karen', (G) => { while (G.talkCur) G.talkAdvance(); G.playScene('karen_join'); G.talkAdvance(); }],
+    ['talk_riko', (G) => { while (G.talkCur) G.talkAdvance(); G.playScene('riko_meet'); G.talkAdvance(); }],
+    ['talk_setsuna', (G) => { while (G.talkCur) G.talkAdvance(); G.playScene('setsuna_meet'); G.talkAdvance(); G.talkAdvance(); }],
+    ['talk_nefi', (G) => { while (G.talkCur) G.talkAdvance(); G.playScene('nefi_join'); G.talkAdvance(); }],
+    ['talk_luna', (G) => { while (G.talkCur) G.talkAdvance(); G.playScene('luna_meet'); G.talkAdvance(); }],
+    ['talk_stella', (G) => { while (G.talkCur) G.talkAdvance(); G.playScene('stella_join'); G.talkAdvance(); G.talkAdvance(); }],
+    ['talk_yuzu', (G) => { while (G.talkCur) G.talkAdvance(); G.playScene('yuzu_meet'); G.talkAdvance(); }],
+    ['talk_shion', (G) => { while (G.talkCur) G.talkAdvance(); G.playScene('shion_join'); G.talkAdvance(); G.talkAdvance(); }],
+    ['heroines_field', (G) => { while (G.talkCur) G.talkAdvance(); for (const id of Object.keys(G.HEROINES)) { G.heroS(id).j = true; G.heroS(id).out = ['luna', 'shion', 'stella'].includes(id); G.heroS(id).cos = ['yukata']; G.heroS(id).wear = 'yukata'; } G.prog.story = Object.keys(G.SCENES); G.enterDungeon(21); G.prog.opt.auto = true; }],
+    ['cutin', (G) => { G.heroS('stella').ult = 90; G.heroUlt('stella'); }],
+    ['memo', (G) => { while (G.talkCur) G.talkAdvance(); G.prog.memo = ['や', 'ゆ', 'た', 'う', 'ろ', 'ひ']; G.openSheet(); G.setTab('quest'); const pn = document.querySelector('#sheet .panel'); const c = [...document.querySelectorAll('#questLog .qc')].find((x) => x.textContent.includes('記憶')); if (c) pn.scrollTop = c.offsetTop - 80; }],
+    ['ending_final', (G) => { G.closeSheet(); G.playEnding(null); setTimeout(() => G.endSkip(), 300); }],
+    ['ending_close', (G) => { G.closeEnding && G.closeEnding(); G.prog.cleared = 1; G.refreshD && G.refreshD(); G.morph && G.morph(); G.morph && G.morph(); }],
+    ['fish_menu', (G) => { while (G.talkCur) G.talkAdvance(); G.prog.opt.auto = false; G.enterMap(0, null); G.player.x = G.SPAWN.x; G.player.y = G.SPAWN.y; G.paused = false; const S = G.fishState(); S.got = { funa: 3, koi: 1, gold: 1 }; S.best = { funa: 24, koi: 61, gold: 72 }; G.fishOpen(); }],
+    ['fish_bite', (G) => { G.fishCast(); G.FS.fish = G.FISH_BY.lord; G.fishStep(G.FS.wait + 0.01); G.FS.freeze = true; }],
+    ['fish_reel', (G) => { G.FS.freeze = false; G.fishDown(); G.FS.freeze = true; G.FS.tension = 0.7; G.FS.prog = 0.45; G.FS.fight = 9; G.FS.hold = true; }],
+    ['fish_close', (G) => { G.FS.freeze = false; G.fishClose(); }],
+    ['map_forest', (G) => { G.enterMap(0, 0); const b = []; for (let j = 0; j < G.MH; j++) for (let i = 0; i < G.MW; i++) if (G.tileAt(i, j) === G.T_BRIDGE) b.push([i, j]); const t = b[Math.floor(b.length / 2)] || [20, 20]; G.player.x = t[0] + 0.5; G.player.y = t[1] + 0.5; window.__bridges = b.length; }],
+    ['map_canyon', (G) => { G.enterMap(1, 0); const b = []; for (let j = 0; j < G.MH; j++) for (let i = 0; i < G.MW; i++) if (G.tileAt(i, j) === G.T_BRIDGE) b.push([i, j]); const t = b[Math.floor(b.length / 2)] || [20, 20]; G.player.x = t[0] + 0.5; G.player.y = t[1] + 0.5; }],
+    ['map_grave', (G) => { G.enterMap(2, 0); const r = G.propsList.find((p) => p.kind === 'ruin'); if (r) { G.player.x = r.x + 1.5; G.player.y = r.y + 2.5; } }],
+    ['forge', (G) => { G.enterMap(0, null); G.player.x = G.SPAWN.x; G.player.y = G.SPAWN.y; G.paused = false; const it = G.genItem(30, 3, 'sword'); it.plus = 6; G.prog.inv.push(it); G.prog.gold = 1e7; G.forgeOpen(it); G.FG.pos = 0; G.forgeHit(); G.FG.pos = 0.08; G.forgeHit(); G.FG.pos = -0.6; G.FG.freeze = true; }],
+    ['forge_result', (G) => { G.FG.freeze = false; G.FG.pos = 0.01; G.forgeHit(); }],
+    ['forge_close', (G) => { G.forgeClose(false); }],
+    ['date_setsuna', (G) => { while (G.talkCur) G.talkAdvance(); G.enterMap(0, null); G.player.x = G.SPAWN.x; G.player.y = G.SPAWN.y; G.paused = false; G.playScene('date_setsuna'); G.talkAdvance(); }],
+    ['date_luna', (G) => { while (G.talkCur) G.talkAdvance(); G.playScene('date_luna'); G.talkAdvance(); G.talkAdvance(); }],
+    ['date_tab', (G) => { while (G.talkCur) G.talkAdvance(); G.heroS('mina').aff = 300; G.openSheet(); G.setTab('pet'); }],
+    ['epi_name', (G) => { while (G.talkCur) G.talkAdvance(); G.enterMap(0, null); G.player.x = G.SPAWN.x; G.player.y = G.SPAWN.y; G.paused = false; G.playScene('epi_name'); for (let k = 0; k < 4; k++) G.talkAdvance(); }],
+    ['epi_shion', (G) => { while (G.talkCur) G.talkAdvance(); G.playScene('epi_shion'); G.talkAdvance(); G.talkAdvance(); }],
+    ['stella_name', (G) => { while (G.talkCur) G.talkAdvance(); G.playScene('stella_name'); G.talkAdvance(); }],
+    ['opt_diff', (G) => { while (G.talkCur) G.talkAdvance(); G.openSheet(); G.setTab('opt'); const pn = document.querySelector('#sheet .panel'); pn.scrollTop = 260; }],
+    ['bulk_legend', (G) => { G.closeSheet(); for (let i = 0; i < 40; i++) G.prog.inv.push(G.genItem(30, i % 4)); G.openSheet(); G.setTab('gear'); document.getElementById('bulkBtn').click(); document.querySelector('#bulkBar [data-pick="3"]').click(); }],
+    ['login', (G) => { while (G.talkCur) G.talkAdvance(); G.prog.opt.auto = false; const L = G.loginState(); L.last = 0; L.n = 6; G.loginChecked = false; G.loginTick(true); }],
+    ['hero_tab', (G) => { document.getElementById('petOk').click(); G.prog.opt.auto = false; G.heroS('mina').aff = 70; G.openSheet(); G.setTab('pet'); }],
+  ];
+  for (const [name, fn] of steps) {
+    const ok = await p.evaluate((src) => { const G = window.__G; if (!G) return false; try { G.closeSheet && G.closeSheet(); } catch (e) {} (0, eval)('(' + src + ')')(G); return true; }, fn.toString());
+    if (!ok) { console.log('no test hook; skipping', name); continue; }
+    await wait(name === 'cutin' ? 350 : 1500);
+    await shot(name);
+  }
+  console.log('errors', errs.length);
+  for (const e of errs.slice(0, 20)) console.log(' ', e);
+  await b.close();
+  process.exit(errs.length ? 1 : 0);
+})().catch((e) => { console.log('ERR', e.stack || e.message); process.exit(2); });

@@ -1,0 +1,22 @@
+const chromium = require('@sparticuz/chromium');
+const puppeteer = require('puppeteer-core');
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+(async () => {
+  const b = await puppeteer.launch({ executablePath: await chromium.executablePath(), args: chromium.args.concat(['--allow-file-access-from-files']), headless: true, defaultViewport: { width: 390, height: 844, deviceScaleFactor: 1, isMobile: true, hasTouch: true } });
+  const p = await b.newPage();
+  const errs = [];
+  p.on('pageerror', (e) => errs.push(e.message));
+  await p.evaluateOnNewDocument(() => { window.__TEST__ = true; try { localStorage.clear(); } catch (e) {} });
+  await p.goto('file:///home/claude/twinsoul21.html', { waitUntil: 'load', timeout: 120000 });
+  await p.waitForFunction(() => !document.getElementById('startBtn').disabled, { timeout: 120000 });
+  await p.click('#startBtn'); await sleep(300);
+  await p.evaluate(() => { const G = window.__G; G.prog.level = 40; G.wkLocal().score = 112; G.wkLocal().deep = 12; G.wkLocal().rank = 1; G.wbLocal().dmg = 1234567; });
+  await p.click('#worldBtn'); await sleep(800);
+  await p.screenshot({ path: '/home/claude/br/w_panel.png' });
+  await p.evaluate(() => window.__G.wbEnter()); await sleep(1500);
+  await p.evaluate(() => { document.getElementById('toast').classList.remove('on'); document.getElementById('banner').classList.remove('on'); });
+  await sleep(1500);
+  await p.screenshot({ path: '/home/claude/br/w_arena.png' });
+  console.log('errors', errs);
+  await b.close();
+})().catch((e) => { console.log('ERR', e.message); process.exit(1); });
