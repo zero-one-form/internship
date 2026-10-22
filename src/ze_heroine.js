@@ -434,6 +434,67 @@
       ['stella', 'yukata', '……あなたが隣にいる。ね、未来ってちゃんと変えられるでしょ？'],
       ['', '', 'ステラの線香花火は、最後まで落ちなかった。「いいことがある印だよ」と彼女は笑った。']
     ],
+    epi_name: [
+      ['', '', '森のキャンプに戻ると、焚き火のまわりに仲間たちが集まっていた。誰も、何も聞かなかった。'],
+      ['mina', 'normal', '……おかえりなさい。顔を見れば分かるわ。思い出したのね'],
+      ['mina', 'smile', '約束、覚えてる？ 名前を思い出したら、一番に教えてって'],
+      ['', '', 'あなたは、深淵の底で取り戻した名前を口にした。――ひろた、ゆうや。'],
+      ['mina', 'smile', 'ゆうや。……ふふ、いい名前。受付係は、名前を覚えるのが仕事なの。もう、絶対に忘れないわ'],
+      ['karen', 'smile', 'ゆうや！ なーんだ、普通にいい名前じゃん！ 今夜は祝いの舞だね！'],
+      ['', '', 'その夜、焚き火は遅くまで消えなかった。']
+    ],
+    epi_shion: [
+      ['shion', 'normal', '……ゆうや。話がある。……ステラのことだ'],
+      ['shion', 'sad', '……星の終わる場所で、全部、思い出した。私は、星読みの一族を守る騎士だった'],
+      ['shion', 'normal', '……小さな手を引いて、星の下を歩いた。……あれは、幼いステラだ'],
+      ['stella', 'smile', 'やっぱり！ 星がずっと言ってたの。「なくした騎士は、もう隣にいる」って'],
+      ['shion', 'smile', '……ああ。今度は、忘れない。……ゆうや、おまえのおかげだ']
+    ],
+    epi_aria: [
+      ['', '', '静かな朝。湖のほとりで、アリアが小さく歌っていた。'],
+      ['aria', 'normal', 'ゆうや。……わたし、きえなかった'],
+      ['aria', 'smile', 'うたは、おわったら、きえるとおもってた。でも、ちがった'],
+      ['aria', 'smile', 'うたは、だれかがおぼえているかぎり、つづく。……あなたが、おぼえていてくれたから'],
+      ['aria', 'normal', 'だから、つぎのうたを、いっしょにさがそう。……ね、ゆうや']
+    ],
+    mina_name: [
+      ['mina', 'smile', 'ゆうや。……ふふ、呼んでみただけ。名前で呼べるって、こんなに嬉しいのね']
+    ],
+    aria_name: [
+      ['aria', 'smile', 'ゆうや、ゆうや、ゆうや。……うたにしたら、きれい。あたらしいうたの、だいめいにする']
+    ],
+    karen_name: [
+      ['karen', 'normal', 'ゆうや、か。……なんか照れるな。今まで「アンタ」って呼んでたし'],
+      ['karen', 'smile', 'よし決めた！ 次の舞の名前は「ゆうやの舞」！ ……冗談だって、顔赤いよ？']
+    ],
+    setsuna_name: [
+      ['setsuna', 'normal', 'ゆうや様……いえ、ゆうやさん。……やはり、少しくすぐったいです'],
+      ['setsuna', 'smile', '城を取り戻したら、玉座の隣にあなたの名前を刻ませてくださいね']
+    ],
+    riko_name: [
+      ['riko', 'sad', 'ゆ、ゆうやさん……！ ……名前で呼ぶの、き、緊張します'],
+      ['riko', 'smile', 'ホネ吉も「ゆうや」って言えるように練習してます。……カタカタ、しか言えないけど']
+    ],
+    nefi_name: [
+      ['nefi', 'normal', 'ゆうや。古いことばで「ユ」は「とおい」、「ヤ」は「ひかり」なのです'],
+      ['nefi', 'smile', 'とおくから来た、ひかり。……ぴったりなのです。ふわぁ']
+    ],
+    yuzu_name: [
+      ['yuzu', 'normal', 'ゆうや。……ふーん、ゆうや、ね。カルテに書いとく'],
+      ['yuzu', 'smile', '患者名、ゆうや。症状、無茶しがち。処方、アタシがそばにいること。……なんてね']
+    ],
+    luna_name: [
+      ['luna', 'normal', 'ゆうや。……ふ、ふん、家来のくせに立派な名前なのだわ'],
+      ['luna', 'smile', '特別に、ルナ様だけは「ゆうや」と呼んであげるのだわ。ほかの子には内緒なのだわ！']
+    ],
+    shion_name: [
+      ['shion', 'normal', '……ゆうや'],
+      ['shion', 'smile', '……いい響きだ。……何度でも、呼ばせてくれ']
+    ],
+    stella_name: [
+      ['stella', 'normal', 'ゆうや。……やっと、あなたの星の名前が読めた'],
+      ['stella', 'smile', 'YOU, THY ARIA。ならべかえたら、あなたの名前。最初から、ずっとここにあったんだね']
+    ],
     aria_t1: [
       ['aria', 'normal', 'ミーナのごはん、あたたかい。……あたたかい、すき'],
       ['aria', 'smile', 'あなたの剣のおと、たのしい。ちゃん、ちゃん、って']
@@ -457,9 +518,9 @@
     L.push(ch); achCheck();
     setTimeout(() => toast('記憶のかけら「' + ch + '」を思い出した（' + L.length + '/' + MEMO_N + '）'), 600);
   }
-  const TALKS = { mina: [['mina_t1', 2], ['mina_t2', 5], ['mina_t3', 8]], aria: [['aria_t1', 2], ['aria_t2', 5], ['aria_t3', 8]], karen: [['karen_t1', 2], ['karen_t2', 5], ['karen_t3', 8]],
-    setsuna: [['setsuna_t1', 2], ['setsuna_t2', 5], ['setsuna_t3', 8]], riko: [['riko_t1', 2], ['riko_t2', 5], ['riko_t3', 8]], nefi: [['nefi_t1', 2], ['nefi_t2', 5], ['nefi_t3', 8]],
-    yuzu: [['yuzu_t1', 2], ['yuzu_t2', 5], ['yuzu_t3', 8]], luna: [['luna_t1', 2], ['luna_t2', 5], ['luna_t3', 8]], shion: [['shion_t1', 2], ['shion_t2', 5], ['shion_t3', 8]], stella: [['stella_t1', 2], ['stella_t2', 5], ['stella_t3', 8]] };
+  const TALKS = { mina: [['mina_t1', 2], ['mina_t2', 5], ['mina_t3', 8], ['mina_name', 0]], aria: [['aria_t1', 2], ['aria_t2', 5], ['aria_t3', 8], ['aria_name', 0]], karen: [['karen_t1', 2], ['karen_t2', 5], ['karen_t3', 8], ['karen_name', 0]],
+    setsuna: [['setsuna_t1', 2], ['setsuna_t2', 5], ['setsuna_t3', 8], ['setsuna_name', 0]], riko: [['riko_t1', 2], ['riko_t2', 5], ['riko_t3', 8], ['riko_name', 0]], nefi: [['nefi_t1', 2], ['nefi_t2', 5], ['nefi_t3', 8], ['nefi_name', 0]],
+    yuzu: [['yuzu_t1', 2], ['yuzu_t2', 5], ['yuzu_t3', 8], ['yuzu_name', 0]], luna: [['luna_t1', 2], ['luna_t2', 5], ['luna_t3', 8], ['luna_name', 0]], shion: [['shion_t1', 2], ['shion_t2', 5], ['shion_t3', 8], ['shion_name', 0]], stella: [['stella_t1', 2], ['stella_t2', 5], ['stella_t3', 8], ['stella_name', 0]] };
   const HERO_E = {};
   let talkQ = [], talkCur = null, talkI = 0, talkAutoT = 0, heroAuraT = 0, heroKillN = 0;
 
@@ -755,7 +816,8 @@
     if (key === 'aria_join') heroJoin('aria');
     for (const id of HERO_IDS) for (const [k] of TALKS[id]) if (k === key) { prog.gold += 500 * (1 + affLv(id)); heroS(id).seen.push(k); toast(HEROINES[id].name + 'との距離が縮まった（' + 500 * (1 + affLv(id)) + 'G）'); }
   }
-  function talkReady(id) { const S = heroS(id); return S.j ? TALKS[id].find(([k, need]) => affLv(id) >= need && !S.seen.includes(k)) : null; }
+  // '<id>_name' talks open after the epilogue in which the hero's real name is learned
+  function talkReady(id) { const S = heroS(id); return S.j ? TALKS[id].find(([k, need]) => affLv(id) >= need && !S.seen.includes(k) && (!k.endsWith('_name') || storySeen().includes('epi_name'))) : null; }
   // story beats are checked a few times a second; scenes queue up instead of interrupting each other
   function heroTick(dt) {
     heroAuraT -= dt;
@@ -765,6 +827,12 @@
     const seen = storySeen(), q = qState();
     const once = (k, cond) => { if (!seen.includes(k) && !talkQ.includes(k) && cond) playScene(k); };
     once('mina_join', q.main >= MAINQ_MINA && curMap === 0 && inCamp(player.x, player.y));
+    // epilogue: back at camp after the ending
+    if (prog.cleared > 0 && curMap === 0 && inCamp(player.x, player.y) && heroJoined('mina')) {
+      once('epi_name', true);
+      once('epi_shion', seen.includes('epi_name') && heroJoined('shion') && heroJoined('stella'));
+      once('epi_aria', seen.includes('epi_name') && heroJoined('aria'));
+    }
     if (curMap === 3 && !WB.on) {
       once('aria_voice', curFloor >= 11 && heroJoined('mina'));
       once('karen_meet', curFloor >= 13 && heroJoined('mina'));

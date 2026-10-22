@@ -702,6 +702,16 @@ const assert = (c, msg) => { if (!c) { errors.push('ASSERT FAIL: ' + msg); conso
     G.heroUlt('aria');
     assert(e.hp < 1e7 && pl.ariaSongT > 0 && !$('cutin').hidden, 'Aria\'s ultimate hits, buffs and shows a cut-in');
     e.dead = true;
+    {
+      // epilogue after the ending: the name is learned at camp, then Shion/Stella and Aria, then name talks open
+      const c0 = G.prog.cleared; G.prog.cleared = 1; G.enterMap(0, null); frames(3); G.paused = false; pl.dead = false; pl.x = G.SPAWN.x; pl.y = G.SPAWN.y;
+      for (let k = 0; k < 4; k++) { G.heroTick(1); skip(); }
+      assert(['epi_name', 'epi_shion', 'epi_aria'].every((k) => G.storySeen().includes(k)), 'after the ending the epilogue plays at camp');
+      const tk = G.heroS('mina').seen.includes('mina_name');
+      G.playScene('mina_name'); skip();
+      assert(G.heroS('mina').seen.includes('mina_name') || tk, 'each heroine has a talk that calls the hero by name');
+      G.prog.cleared = c0;
+    }
     G.heroS('mina').aff = 90; G.save(); G.prog.heroines = null; G.load();
     assert(G.heroJoined('mina') && G.affLv('mina') === 3 && G.storySeen().includes('aria_join'), 'heroine progress survives a reload');
     G.qState().main = q0; G.enterMap(0, null); frames(3); G.paused = false;

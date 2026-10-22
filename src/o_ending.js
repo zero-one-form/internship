@@ -218,4 +218,5 @@
     ov.classList.remove('on');
     setTimeout(() => { ov.hidden = true; }, 300);
     if (cb) cb(); else paused = false;
+    if (prog.cleared > 0 && !storySeen().includes('epi_name')) setTimeout(() => toast('森のキャンプで、仲間たちが待っている'), 900);
   }

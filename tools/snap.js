@@ -84,6 +84,9 @@ async function browserPath() {
     ['date_setsuna', (G) => { while (G.talkCur) G.talkAdvance(); G.enterMap(0, null); G.player.x = G.SPAWN.x; G.player.y = G.SPAWN.y; G.paused = false; G.playScene('date_setsuna'); G.talkAdvance(); }],
     ['date_luna', (G) => { while (G.talkCur) G.talkAdvance(); G.playScene('date_luna'); G.talkAdvance(); G.talkAdvance(); }],
     ['date_tab', (G) => { while (G.talkCur) G.talkAdvance(); G.heroS('mina').aff = 300; G.openSheet(); G.setTab('pet'); }],
+    ['epi_name', (G) => { while (G.talkCur) G.talkAdvance(); G.enterMap(0, null); G.player.x = G.SPAWN.x; G.player.y = G.SPAWN.y; G.paused = false; G.playScene('epi_name'); for (let k = 0; k < 4; k++) G.talkAdvance(); }],
+    ['epi_shion', (G) => { while (G.talkCur) G.talkAdvance(); G.playScene('epi_shion'); G.talkAdvance(); G.talkAdvance(); }],
+    ['stella_name', (G) => { while (G.talkCur) G.talkAdvance(); G.playScene('stella_name'); G.talkAdvance(); }],
     ['login', (G) => { while (G.talkCur) G.talkAdvance(); G.prog.opt.auto = false; const L = G.loginState(); L.last = 0; L.n = 6; G.loginChecked = false; G.loginTick(true); }],
     ['hero_tab', (G) => { document.getElementById('petOk').click(); G.prog.opt.auto = false; G.heroS('mina').aff = 70; G.openSheet(); G.setTab('pet'); }],
   ];
