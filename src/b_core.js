@@ -43,11 +43,14 @@
   const MW = 56, MH = 56;
   const CAMP = { x: 13.5, y: 13.5, r: 3.4 };
   const SPAWN = { x: CAMP.x + 1.7, y: CAMP.y + 1.5 };
-  const T_GRASS = 0, T_PATH = 1, T_WATER = 2, T_CAMP = 3, T_PIT = 4;
+  const T_GRASS = 0, T_PATH = 1, T_WATER = 2, T_CAMP = 3, T_PIT = 4, T_BRIDGE = 5; // a bridge is walkable and remembers what it spans (under[])
   const tile = new Uint8Array(MW * MH);
   const solid = new Uint8Array(MW * MH);
   const reachable = new Uint8Array(MW * MH);
   const wdepth = new Uint8Array(MW * MH);
+  const under = new Uint8Array(MW * MH), meadow = new Uint8Array(MW * MH);
+  const isWet = (i, j) => { const t = tileAt(i, j); return t === T_WATER || (t === T_BRIDGE && under[idx(i, j)] === T_WATER); };
+  const isPit = (i, j) => { const t = tileAt(i, j); return t === T_PIT || (t === T_BRIDGE && under[idx(i, j)] === T_PIT); };
   const reachList = [], props = [], waterList = [], shoreSegs = [];
   const idx = (i, j) => j * MW + i;
   const inB = (i, j) => i >= 0 && j >= 0 && i < MW && j < MH;
@@ -113,10 +116,70 @@
     const bush = !conifer && edge >= 3 && R() < 0.2;
     return { kind: bush ? 'bush' : 'tree', v: bush ? Math.floor(R() * 3) : conifer ? 3 + Math.floor(R() * 2) : Math.floor(R() * 3), x, y, s, ph };
   }
+  // signature terrain for each overworld map: a river with bridges and a flower meadow (forest),
+  // a chasm crossed by stone bridges (canyon), ruined walls among swamp pools (graveyard).
+  // Uses its own random stream so the rest of the map stays stable when features change.
+  function overworldFeatures(M) {
+    const F = seeded(M.seed * 31 + 7), far = (x, y, d) => hyp(x - CAMP.x, y - CAMP.y) > CAMP.r + d && !portals.some((p) => hyp(p.x - x, p.y - y) < d - 1);
+    const band = (kind, width) => {
+      // a meandering band from one map edge to the opposite edge, kept away from the camp and the portals
+      for (let tries = 0; tries < 40; tries++) {
+        const vert = F() < 0.5, a0 = 12 + F() * (MW - 24), amp = 3 + F() * 4, fr = 0.12 + F() * 0.1, ph = F() * TAU, pts = [];
+        for (let u = -1; u <= MW; u += 0.25) { const v = a0 + Math.sin(u * fr + ph) * amp; pts.push(vert ? [v, u] : [u, v]); }
+        if (!pts.every((q) => far(q[0], q[1], width + 4))) continue;
+        const cells = new Set();
+        for (const q of pts) for (let j = Math.floor(q[1] - width); j <= q[1] + width; j++) for (let i = Math.floor(q[0] - width); i <= q[0] + width; i++) if (inB(i, j) && hyp(i + 0.5 - q[0], j + 0.5 - q[1]) < width) cells.add(idx(i, j));
+        for (const c of cells) {
+          const t = tile[c];
+          if (t === T_PATH) { tile[c] = T_BRIDGE; under[c] = kind; }          // paths cross on bridges
+          else if (t === T_GRASS) { tile[c] = kind; solid[c] = 1; }
+        }
+        // extra crossings every ~11 tiles so no bank is cut off
+        for (let k = 8 + Math.floor(F() * 4); k < pts.length; k += 44) {
+          const q = pts[k];
+          for (let j = Math.floor(q[1] - width - 1); j <= q[1] + width + 1; j++) for (let i = Math.floor(q[0] - width - 1); i <= q[0] + width + 1; i++) {
+            if (!inB(i, j) || (vert ? Math.abs(j + 0.5 - q[1]) > 0.6 : Math.abs(i + 0.5 - q[0]) > 0.6)) continue;
+            const c = idx(i, j);
+            if (tile[c] === kind) { tile[c] = T_BRIDGE; under[c] = kind; solid[c] = 0; }
+          }
+        }
+        return true;
+      }
+      return false;
+    };
+    if (M.biome === 'forest') {
+      band(T_WATER, 1.3);
+      for (let tries = 0; tries < 30; tries++) {
+        const cx = 8 + F() * (MW - 16), cy = 8 + F() * (MH - 16), r = 4 + F() * 2;
+        if (!far(cx, cy, r + 3)) continue;
+        for (let j = Math.floor(cy - r); j <= cy + r; j++) for (let i = Math.floor(cx - r * 1.3); i <= cx + r * 1.3; i++) if (inB(i, j) && tile[idx(i, j)] === T_GRASS && hyp((i + 0.5 - cx) / 1.3, j + 0.5 - cy) < r) meadow[idx(i, j)] = 1;
+        break;
+      }
+    } else if (M.biome === 'canyon') band(T_PIT, 1.5);
+    else if (M.biome === 'grave') {
+      // two or three roofless ruins: broken stone walls with gaps, a tomb inside
+      let made = 0;
+      for (let tries = 0; tries < 60 && made < 3; tries++) {
+        const w = 5 + Math.floor(F() * 3), h = 4 + Math.floor(F() * 3), x0 = 5 + Math.floor(F() * (MW - w - 10)), y0 = 5 + Math.floor(F() * (MH - h - 10));
+        if (!far(x0 + w / 2, y0 + h / 2, Math.max(w, h) + 2)) continue;
+        let clear = true;
+        for (let j = y0 - 1; j <= y0 + h + 1 && clear; j++) for (let i = x0 - 1; i <= x0 + w + 1; i++) if (tileAt(i, j) !== T_GRASS) { clear = false; break; }
+        if (!clear) continue;
+        const gap = Math.floor(F() * (2 * (w + h)));
+        let k = 0;
+        for (let i = x0; i <= x0 + w; i++) for (const j of [y0, y0 + h]) { if (Math.abs(k++ - gap) > 1 && F() < 0.85) { solid[idx(i, j)] = 1; props.push({ kind: 'ruin', v: Math.floor(F() * 3), x: i + 0.5, y: j + 0.5, s: 0.9 + F() * 0.25, ph: 0 }); } }
+        for (let j = y0 + 1; j < y0 + h; j++) for (const i of [x0, x0 + w]) { if (Math.abs(k++ - gap) > 1 && F() < 0.85) { solid[idx(i, j)] = 1; props.push({ kind: 'ruin', v: Math.floor(F() * 3), x: i + 0.5, y: j + 0.5, s: 0.9 + F() * 0.25, ph: 0 }); } }
+        const tx = x0 + Math.floor(w / 2), ty = y0 + Math.floor(h / 2);
+        solid[idx(tx, ty)] = 1; props.push({ kind: 'tomb', v: 0, x: tx + 0.5, y: ty + 0.5, s: 1.1, ph: 0 });
+        for (let j = y0; j <= y0 + h; j++) for (let i = x0; i <= x0 + w; i++) meadow[idx(i, j)] = 2; // keep trees out
+        made++;
+      }
+    }
+  }
   function buildMap(id) {
     const M = MAPS[id];
     curMap = id;
-    tile.fill(0); solid.fill(0); reachable.fill(0); wdepth.fill(0);
+    tile.fill(0); solid.fill(0); reachable.fill(0); wdepth.fill(0); under.fill(0); meadow.fill(0);
     reachList.length = 0; props.length = 0; waterList.length = 0; shoreSegs.length = 0;
     CAMP.x = M.camp[0]; CAMP.y = M.camp[1];
     SPAWN.x = CAMP.x + 1.7; SPAWN.y = CAMP.y + 1.5;
@@ -147,6 +210,7 @@
         if (inB(i, j) && hyp(i + 0.5 - p.x, j + 0.5 - p.y) < 1.9 && tile[idx(i, j)] === T_GRASS) tile[idx(i, j)] = T_PATH;
       }
     }
+    if (!LAY) overworldFeatures(M);
     for (let k = 0; k < (LAY ? 0 : M.ponds); k++) {
       let cx = 0, cy = 0;
       for (let t = 0; t < 80; t++) {
@@ -164,7 +228,7 @@
     }
     for (let j = 0; j < MH; j++) {
       for (let i = 0; i < MW; i++) {
-        if (tile[idx(i, j)] !== T_GRASS) continue;
+        if (tile[idx(i, j)] !== T_GRASS || meadow[idx(i, j)]) continue;
         if (hyp(i + 0.5 - CAMP.x, j + 0.5 - CAMP.y) < CAMP.r + 1.6) continue;
         if (portals.some((p) => hyp(p.x - i - 0.5, p.y - j - 0.5) < 2.8)) continue;
         const edge = Math.min(i, j, MW - 1 - i, MH - 1 - j);

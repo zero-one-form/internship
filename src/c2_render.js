@@ -50,12 +50,12 @@
   }
   function waterBlobs(i, j, out) {
     out.push([i + 0.5 + (hash2(i, j, 140) - 0.5) * 0.1, j + 0.5 + (hash2(i, j, 141) - 0.5) * 0.1, 0.55 + hash2(i, j, 142) * 0.05]);
-    if (tileAt(i + 1, j) === T_WATER) out.push([i + 1, j + 0.5, 0.5]);
-    if (tileAt(i, j + 1) === T_WATER) out.push([i + 0.5, j + 1, 0.5]);
-    if (tileAt(i + 1, j) === T_WATER && tileAt(i, j + 1) === T_WATER && tileAt(i + 1, j + 1) === T_WATER) out.push([i + 1, j + 1, 0.56]);
+    if (isWet(i + 1, j)) out.push([i + 1, j + 0.5, 0.5]);
+    if (isWet(i, j + 1)) out.push([i + 0.5, j + 1, 0.5]);
+    if (isWet(i + 1, j) && isWet(i, j + 1) && isWet(i + 1, j + 1)) out.push([i + 1, j + 1, 0.56]);
     return out;
   }
-  const PROP_SHADOW = { crystal: [0.45, 0.3], spire: [0.8, 0.42], tomb: [0.4, 0.36], lamp: [0.22, 0.3], portal: [0.9, 0.28], tree: [1.05, 0.42], bush: [0.55, 0.34], rock: [0.55, 0.38], tent: [1.25, 0.38], crate: [0.5, 0.38], barrel: [0.4, 0.36], banner: [0.28, 0.3], bench: [0.7, 0.32] };
+  const PROP_SHADOW = { ruin: [0.6, 0.4], crystal: [0.45, 0.3], spire: [0.8, 0.42], tomb: [0.4, 0.36], lamp: [0.22, 0.3], portal: [0.9, 0.28], tree: [1.05, 0.42], bush: [0.55, 0.34], rock: [0.55, 0.38], tent: [1.25, 0.38], crate: [0.5, 0.38], barrel: [0.4, 0.36], banner: [0.28, 0.3], bench: [0.7, 0.32] };
   function buildChunk(ci, cj) {
     const B = chunkBounds(ci, cj), s = SG;
     const BIc = BIOMES[MAPS[curMap].biome];
@@ -115,7 +115,7 @@
       }
     }
     const pitT = [];
-    for (let j = B.j0 - 1; j < B.jE + 1; j++) for (let i = B.i0 - 1; i < B.iE + 1; i++) if (tileAt(i, j) === T_PIT) pitT.push([i, j]);
+    for (let j = B.j0 - 1; j < B.jE + 1; j++) for (let i = B.i0 - 1; i < B.iE + 1; i++) if (isPit(i, j)) pitT.push([i, j]);
     if (pitT.length) {
       g.save();
       g.beginPath(); for (const p of pitT) dia(p[0], p[1], 0.8); g.fillStyle = '#05040a'; g.fill();
@@ -123,7 +123,7 @@
       const Dp = 30 * s, top = (BIc.tuft && BIc.tuft[2]) || '#4c4868';
       for (const p of pitT) {
         const i = p[0], j = p[1];
-        for (const e of [[tileAt(i, j - 1), X(i, j), Y(i, j), X(i + 1, j), Y(i + 1, j)], [tileAt(i - 1, j), X(i, j), Y(i, j), X(i, j + 1), Y(i, j + 1)]]) {
+        for (const e of [[isPit(i, j - 1) ? T_PIT : tileAt(i, j - 1), X(i, j), Y(i, j), X(i + 1, j), Y(i + 1, j)], [isPit(i - 1, j) ? T_PIT : tileAt(i - 1, j), X(i, j), Y(i, j), X(i, j + 1), Y(i, j + 1)]]) {
           if (e[0] === T_PIT || e[0] === -1) continue;
           const gr = g.createLinearGradient(0, Math.min(e[2], e[4]), 0, Math.max(e[2], e[4]) + Dp);
           gr.addColorStop(0, top); gr.addColorStop(0.25, 'rgba(30,26,40,1)'); gr.addColorStop(1, 'rgba(5,4,10,1)');
@@ -136,10 +136,10 @@
       g.restore();
     }
     const wt = [];
-    for (let j = B.j0 - 1; j < B.jE + 1; j++) for (let i = B.i0 - 1; i < B.iE + 1; i++) if (tileAt(i, j) === T_WATER) wt.push([i, j]);
+    for (let j = B.j0 - 1; j < B.jE + 1; j++) for (let i = B.i0 - 1; i < B.iE + 1; i++) if (isWet(i, j)) wt.push([i, j]);
     if (wt.length) {
       const wb = [];
-      for (let j = B.j0 - 2; j < B.jE + 2; j++) for (let i = B.i0 - 2; i < B.iE + 2; i++) if (tileAt(i, j) === T_WATER) waterBlobs(i, j, wb);
+      for (let j = B.j0 - 2; j < B.jE + 2; j++) for (let i = B.i0 - 2; i < B.iE + 2; i++) if (isWet(i, j)) waterBlobs(i, j, wb);
       const hole = (dy) => { g.beginPath(); for (const b of wb) { const rx = b[2] * 45.25 * s, cx = X(b[0], b[1]), cy = Y(b[0], b[1]) + dy; g.moveTo(cx + rx, cy); g.ellipse(cx, cy, rx, rx / 2, 0, 0, TAU); } };
       hole(-1.5 * s); g.fillStyle = 'rgba(222,232,168,0.7)'; g.fill();
       hole(0); g.fillStyle = '#5c4632'; g.fill();
@@ -158,6 +158,22 @@
       }
       g.restore();
     }
+    for (let j = B.j0 - 1; j < B.jE + 1; j++) {
+      for (let i = B.i0 - 1; i < B.iE + 1; i++) {
+        if (tileAt(i, j) !== T_BRIDGE) continue;
+        const stone = under[idx(i, j)] === T_PIT, lift = 5 * s;
+        g.save(); g.translate(0, -lift);
+        g.beginPath(); dia(i, j, 0.6); g.fillStyle = stone ? '#6a5a4c' : '#7a5232'; g.fill();
+        g.strokeStyle = stone ? 'rgba(30,22,16,0.55)' : 'rgba(40,24,10,0.6)'; g.lineWidth = 1.2 * s;
+        for (let k = 1; k < 5; k++) { const u = k / 5; g.beginPath(); g.moveTo(X(i + u, j), Y(i + u, j)); g.lineTo(X(i + u, j + 1), Y(i + u, j + 1)); g.stroke(); }
+        g.fillStyle = 'rgba(255,240,210,0.16)'; g.beginPath(); dia(i, j, 0); g.fill();
+        g.restore();
+        // a little side face so the deck reads as raised
+        g.fillStyle = stone ? '#3e3229' : '#4a2f1a';
+        g.beginPath(); g.moveTo(X(i, j + 1), Y(i, j + 1) - lift); g.lineTo(X(i + 1, j + 1), Y(i + 1, j + 1) - lift); g.lineTo(X(i + 1, j + 1), Y(i + 1, j + 1)); g.lineTo(X(i, j + 1), Y(i, j + 1)); g.closePath(); g.fill();
+        g.beginPath(); g.moveTo(X(i + 1, j), Y(i + 1, j) - lift); g.lineTo(X(i + 1, j + 1), Y(i + 1, j + 1) - lift); g.lineTo(X(i + 1, j + 1), Y(i + 1, j + 1)); g.lineTo(X(i + 1, j), Y(i + 1, j)); g.closePath(); g.fill();
+      }
+    }
     for (const p of props) {
       if (p.x < B.i0 - 3 || p.x > B.iE + 3 || p.y < B.j0 - 3 || p.y > B.jE + 3) continue;
       const sh = PROP_SHADOW[p.kind];
@@ -174,7 +190,7 @@
         if (tile[idx(i, j)] !== T_GRASS) continue;
         const nT = Math.floor(hash2(i, j, 50) * (BIc.tuftN + 1));
         for (let n = 0; n < nT; n++) { const u = i + 0.15 + hash2(i, j, 51 + n) * 0.7, v = j + 0.15 + hash2(i, j, 61 + n) * 0.7; tuft(g, X(u, v), Y(u, v), s, hash2(i, j, 71 + n), BIc.tuft); }
-        if (hash2(i, j, 80) < BIc.flowers) {
+        if (hash2(i, j, 80) < (meadow[idx(i, j)] === 1 ? 0.85 : BIc.flowers)) {
           const nf = 1 + Math.floor(hash2(i, j, 81) * 3);
           for (let n = 0; n < nf; n++) { const u = i + 0.2 + hash2(i, j, 82 + n) * 0.6, v = j + 0.2 + hash2(i, j, 86 + n) * 0.6; flowerDecal(g, X(u, v), Y(u, v), s, hash2(i, j, 90 + n), BIc.flowerCols); }
         }
@@ -470,11 +486,24 @@
       case 'banner': drawSpr(SPR.pole, x0, y0, false, 1, 1); drawBannerCloth(x0, y0); break;
       case 'fire': drawSpr(SPR.fireBase, x0, y0, false, 1, 1); drawFlames(x0, y0); break;
       case 'tomb': drawSpr(SPR.tombs[p.v], x0, y0, false, 1, p.s); break;
+      case 'ruin': drawRuin(p, x0, y0); break;
       case 'lamp': drawSpr(SPR.lamp, x0, y0, false, 1, 1); emis.push(['warm', x0, y0 - 72 * zoom, 22 * zoom, 0.7 + 0.1 * Math.sin(time * 7 + p.ph)]); break;
       case 'portal': drawSpr(SPR.portal, x0, y0, false, 1, 1); break;
       case 'npc': drawNpc(p, x0, y0); break;
       case 'crystal': drawSpr(SPR.crystals[p.v], x0, y0, false, 1, p.s); emis.push([p.v ? 'cyan' : 'violet', x0, y0 - 22 * zoom * p.s, 34 * zoom * p.s, 0.45 + 0.12 * Math.sin(time * 2 + p.ph)]); break;
     }
+  }
+  // a block of broken wall: an isometric stone cube of varying height with a mossy top
+  function drawRuin(p, x0, y0) {
+    const z = zoom * p.s, h = (16 + p.v * 9) * z, hw = 26 * z, hh = 13 * z;
+    ctx.save(); ctx.translate(x0, y0);
+    ctx.fillStyle = '#5a5866'; ctx.beginPath(); ctx.moveTo(-hw, 0); ctx.lineTo(0, hh); ctx.lineTo(0, hh - h); ctx.lineTo(-hw, -h); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#44424e'; ctx.beginPath(); ctx.moveTo(hw, 0); ctx.lineTo(0, hh); ctx.lineTo(0, hh - h); ctx.lineTo(hw, -h); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#7d7a88'; ctx.beginPath(); ctx.moveTo(0, -hh - h); ctx.lineTo(hw, -h); ctx.lineTo(0, hh - h); ctx.lineTo(-hw, -h); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = 'rgba(96,130,80,0.75)'; ctx.beginPath(); ctx.ellipse(-4 * z, -h - 1 * z, 12 * z, 5 * z, 0, 0, TAU); ctx.fill();
+    ctx.strokeStyle = 'rgba(20,18,26,0.55)'; ctx.lineWidth = 1.2 * z;
+    for (let k = 1; k < 3; k++) { const yy = -h * k / 3; ctx.beginPath(); ctx.moveTo(-hw, yy); ctx.lineTo(0, yy + hh); ctx.lineTo(hw, yy); ctx.stroke(); }
+    ctx.restore();
   }
   function drawEnemy(e) {
     const x0 = isoX(e.x, e.y), y0 = isoY(e.x, e.y);
@@ -810,7 +839,7 @@
     mmBase = mk(MW, MH);
     const g = mmBase.getContext('2d'), img = g.createImageData(MW, MH), d = img.data;
     for (let k = 0; k < MW * MH; k++) {
-      const t = tile[k], c = t === T_PIT ? [10, 8, 16] : t === T_WATER ? C.w : solid[k] ? C.s : t === T_PATH ? C.p : t === T_CAMP ? C.c : C.g;
+      const t = tile[k], c = t === T_PIT ? [10, 8, 16] : t === T_WATER ? C.w : t === T_BRIDGE ? [150, 110, 70] : solid[k] ? C.s : t === T_PATH ? C.p : t === T_CAMP ? C.c : C.g;
       d[k * 4] = c[0]; d[k * 4 + 1] = c[1]; d[k * 4 + 2] = c[2]; d[k * 4 + 3] = 255;
     }
     g.putImageData(img, 0, 0);

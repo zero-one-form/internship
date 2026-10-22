@@ -75,6 +75,9 @@ async function browserPath() {
     ['fish_bite', (G) => { G.fishCast(); G.FS.fish = G.FISH_BY.lord; G.fishStep(G.FS.wait + 0.01); G.FS.freeze = true; }],
     ['fish_reel', (G) => { G.FS.freeze = false; G.fishDown(); G.FS.freeze = true; G.FS.tension = 0.7; G.FS.prog = 0.45; G.FS.fight = 9; G.FS.hold = true; }],
     ['fish_close', (G) => { G.FS.freeze = false; G.fishClose(); }],
+    ['map_forest', (G) => { G.enterMap(0, 0); const b = []; for (let j = 0; j < G.MH; j++) for (let i = 0; i < G.MW; i++) if (G.tileAt(i, j) === G.T_BRIDGE) b.push([i, j]); const t = b[Math.floor(b.length / 2)] || [20, 20]; G.player.x = t[0] + 0.5; G.player.y = t[1] + 0.5; window.__bridges = b.length; }],
+    ['map_canyon', (G) => { G.enterMap(1, 0); const b = []; for (let j = 0; j < G.MH; j++) for (let i = 0; i < G.MW; i++) if (G.tileAt(i, j) === G.T_BRIDGE) b.push([i, j]); const t = b[Math.floor(b.length / 2)] || [20, 20]; G.player.x = t[0] + 0.5; G.player.y = t[1] + 0.5; }],
+    ['map_grave', (G) => { G.enterMap(2, 0); const r = G.propsList.find((p) => p.kind === 'ruin'); if (r) { G.player.x = r.x + 1.5; G.player.y = r.y + 2.5; } }],
     ['login', (G) => { while (G.talkCur) G.talkAdvance(); G.prog.opt.auto = false; const L = G.loginState(); L.last = 0; L.n = 6; G.loginChecked = false; G.loginTick(true); }],
     ['hero_tab', (G) => { document.getElementById('petOk').click(); G.prog.opt.auto = false; G.heroS('mina').aff = 70; G.openSheet(); G.setTab('pet'); }],
   ];
