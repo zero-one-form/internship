@@ -31,7 +31,15 @@
     ['br10', '崩しの名手', 'ボスを10回ブレイクする', () => recs().breaks >= 10],
     ['ariaS', 'アリアの歌い手', 'アリアの演奏でランクSを取る', () => ariaState().best.some((v) => v >= 95)],
     ['pet', 'ともだち', 'ペットを孵す', () => pets().list.length > 0],
-    ['daily10', '働き者', '今日の依頼を10回すべて達成する', () => (prog.dailyAll || 0) >= 10]
+    ['daily10', '働き者', '今日の依頼を10回すべて達成する', () => (prog.dailyAll || 0) >= 10],
+    ['fish5', '釣り好き', '魚を5種類釣る', () => FISH.filter((f) => f.id !== 'boot' && fishState().got[f.id]).length >= 5],
+    ['fishAll', '池の主', '釣りの図鑑をすべて埋める', () => FISH.every((f) => fishState().got[f.id])],
+    ['lord', '深淵の釣り人', '深淵のヌシを釣り上げる', () => !!fishState().got.lord],
+    ['forge', '名工', '鍛冶の打ち込みで3回ともPERFECTを出す', () => (recs().forgeP || 0) >= 1],
+    ['heroes', '十人十色', 'ヒロイン10人全員を仲間にする', () => HERO_IDS.every((id) => heroJoined(id))],
+    ['bond', '絆', 'ヒロインの好感度をLv10にする', () => HERO_IDS.some((id) => affLv(id) >= AFF_MAX)],
+    ['yukata', '夏祭り', '浴衣を3着そろえる', () => HERO_IDS.filter((id) => (heroS(id).cos || []).includes('yukata')).length >= 3],
+    ['memo', 'その名は', '記憶のかけらを6つ集める', () => memoList().length >= MEMO_N]
   ];
   const ACH_IDS = ACH.map((a) => a[0]);
   let dailyTickT = 0;

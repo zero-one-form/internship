@@ -88,6 +88,7 @@
     const who = HERO_IDS.filter((id) => heroJoined(id));
     const fan = who.length ? HEROINES[who[Math.floor(Math.random() * who.length)]].name + '「' + (f.id === 'boot' ? 'それ、魚じゃないよね……？' : f.id === 'lord' ? 'う、うそでしょ!? ヌシを釣ったの!?' : 'わあ、すごい！') + '」' : '';
     FS.last = { id: f.id, size, gold };
+    achCheck();
     sfx(f.id === 'lord' || f.id === 'gold' ? 'legend' : 'quest');
     save();
     fishMenu(f.name + '（' + size + 'cm）を釣り上げた！ ' + gold.toLocaleString() + 'G' + (first ? '　図鑑に登録' + (f.id !== 'boot' ? '（魂の欠片+3）' : '') : record ? '　自己ベスト！' : '') + (fan ? '　' + fan : ''));

@@ -527,7 +527,7 @@
           train: { atk: num(pp.train && pp.train.atk, 0, 0, 999), spd: num(pp.train && pp.train.spd, 0, 0, 50), exp: num(pp.train && pp.train.exp, 0, 0, 50) } }; }
       prog.seen = num(s.seen, 0, 0, 1e15);
       { const cc = s.cls && typeof s.cls === 'object' ? s.cls : {}; prog.cls = { blade: ['saint', 'guard'].includes(cc.blade) ? cc.blade : null, arcane: ['star', 'soul'].includes(cc.arcane) ? cc.arcane : null }; }
-      { const rr = s.rec && typeof s.rec === 'object' ? s.rec : {}; prog.rec = {}; for (const k of ['kills', 'elites', 'bosses', 'legends', 'combo', 'chests', 'goblins', 'deaths', 'dodges', 'reacts', 'breaks', 'aria', 'floors', 'streak']) prog.rec[k] = num(rr[k], 0, 0, 1e9); prog.rec.play = typeof rr.play === 'number' && isFinite(rr.play) ? Math.max(0, rr.play) : 0; }
+      { const rr = s.rec && typeof s.rec === 'object' ? s.rec : {}; prog.rec = {}; for (const k of ['kills', 'elites', 'bosses', 'legends', 'combo', 'chests', 'goblins', 'deaths', 'dodges', 'reacts', 'breaks', 'aria', 'floors', 'streak', 'forgeP']) prog.rec[k] = num(rr[k], 0, 0, 1e9); prog.rec.play = typeof rr.play === 'number' && isFinite(rr.play) ? Math.max(0, rr.play) : 0; }
       prog.cleared = typeof s.cleared === 'number' && isFinite(s.cleared) ? clamp(Math.floor(s.cleared), 0, 9999) : 0;
       if (typeof prog.deep === 'number') prog.deep = Math.min(50, prog.deep);
       const oo = s.opt && typeof s.opt === 'object' ? s.opt : {};

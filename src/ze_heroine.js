@@ -76,7 +76,7 @@
     const S = heroS(id), C = COSTUMES[c];
     if (!S.j || !C || (S.cos || []).includes(c)) return false;
     if (prog.gold < C.price) { toast('ゴールドが足りない（' + C.price.toLocaleString() + 'G）'); return false; }
-    prog.gold -= C.price; S.cos = (S.cos || []).concat(c); S.wear = c;
+    prog.gold -= C.price; S.cos = (S.cos || []).concat(c); S.wear = c; achCheck();
     toast(HEROINES[id].name + 'の「' + C.name + '」を手に入れた！'); sfx('legend'); save();
     return true;
   }
@@ -87,7 +87,7 @@
     if (!S.j || affLv(id) >= AFF_MAX) return false;
     if (prog.gold < c) { toast('ゴールドが足りない（' + c.toLocaleString() + 'G）'); return false; }
     const lv0 = affLv(id);
-    prog.gold -= c; S.aff += GIFT_AFF;
+    prog.gold -= c; S.aff += GIFT_AFF; achCheck();
     toast(HEROINES[id].name + '「' + GIFTS[id][1] + '」' + (affLv(id) > lv0 ? '　好感度 Lv' + affLv(id) + '！' : ''));
     sfx('quest'); save();
     return true;
@@ -393,7 +393,7 @@
   function memoGain(key) {
     const ch = MEMO[key], L = memoList();
     if (!ch || L.includes(ch)) return;
-    L.push(ch);
+    L.push(ch); achCheck();
     setTimeout(() => toast('記憶のかけら「' + ch + '」を思い出した（' + L.length + '/' + MEMO_N + '）'), 600);
   }
   const TALKS = { mina: [['mina_t1', 2], ['mina_t2', 5], ['mina_t3', 8]], aria: [['aria_t1', 2], ['aria_t2', 5], ['aria_t3', 8]], karen: [['karen_t1', 2], ['karen_t2', 5], ['karen_t3', 8]],
@@ -416,7 +416,7 @@
     const others = HERO_IDS.filter((x) => x !== id && heroS(x).j && heroS(x).out !== false), joined = (x) => storySeen().indexOf(x + '_join');
     let msg = '';
     if (others.length >= HERO_MAX_OUT) { const b = others.filter((x) => x !== 'mina').sort((p, q) => joined(p) - joined(q))[0]; heroS(b).out = false; msg = HEROINES[b].name + 'は休憩へ'; }
-    toast(HEROINES[id].name + 'が仲間に！' + (msg ? '　' + msg + '（同行は3人まで）' : '')); sfx('level');
+    toast(HEROINES[id].name + 'が仲間に！' + (msg ? '　' + msg + '（同行は3人まで）' : '')); sfx('level'); achCheck();
   }
   function affLv(id) { return Math.min(AFF_MAX, Math.floor(heroS(id).aff / AFF_STEP)); }
   function heroPow(id) { return 1 + 0.06 * affLv(id); }

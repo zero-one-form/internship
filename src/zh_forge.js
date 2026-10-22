@@ -38,6 +38,7 @@
   function forgeBonus(hits) { return hits.reduce((a, q) => a + (q === 2 ? 0.1 : q === 1 ? 0.05 : 0), 0); }
   function forgeResolve() {
     const it = FG.it, hits = FG.hits, all = hits.every((q) => q === 2), bonus = forgeBonus(hits);
+    if (all) { recs().forgeP = (recs().forgeP || 0) + 1; achCheck(); }
     const before = it.plus, ok = enhance(it, { bonus, sure: all, great: all && Math.random() < 0.35 });
     const words = hits.map((q) => (q === 2 ? 'PERFECT' : q ? 'GOOD' : 'MISS')).join(' / ');
     $('forgeRes').textContent = words + '　成功率 +' + Math.round(bonus * 100) + '%' + (all ? '（会心の打ち込み！）' : '') + '　→　' +

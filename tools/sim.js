@@ -1,6 +1,7 @@
 // Balance bot: boots the game headlessly (jsdom, no drawing), turns on AUTO and fast-forwards game time
 // with a simple player policy. Prints a progression table and writes JSON for comparison.
 // Usage: node tools/sim.js [hours=2] [out.json] [seed]
+//   SIM_GIFTS=1 (with SIM_HEROES): spend spare gold on heroine gifts
 //   SIM_HEROES=1: start with Mina in the party so the other heroines join on their floors (the bot never visits camp for the main quests)
 const fs = require('fs');
 const path = require('path');
@@ -75,6 +76,8 @@ setTimeout(async () => {
     if (process.env.SIM_HEROES) { // the frame loop that drives heroines does not run headless
       while (G.talkCur) G.talkAdvance();
       if (!G.paused) { G.heroTick(DT); G.heroUpdate(DT); }
+      // SIM_GIFTS=1: spend spare gold on gifts for the heroines in the party (the main gold sink)
+      if (process.env.SIM_GIFTS && Math.floor(t / DT) % 200 === 0) for (const id of G.heroOut()) if (G.affLv(id) < 10 && G.prog.gold > G.giftCost(id) * 3) G.giveGift(id);
     }
     G.simStep(DT); t += DT;
     if (G.curMap === 3 && G.floor !== lastFloor) { if (lastFloor) floorTimes.push({ f: lastFloor, t: Math.round(t - floorT) }); lastFloor = G.floor; floorT = t; }

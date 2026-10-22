@@ -734,6 +734,8 @@ const assert = (c, msg) => { if (!c) { errors.push('ASSERT FAIL: ' + msg); conso
     for (let k = 0; k < 3; k++) { G.FG.pos = 0; G.forgeHit(); }
     G.forgeResolve();
     assert(it.plus >= p1 + 1 && /会心/.test($('forgeRes').textContent), 'three PERFECT strikes guarantee the enhancement');
+    assert(G.prog.ach.includes('forge'), 'three PERFECTs earn the master smith title');
+    G.save(); G.load(); assert(G.recs().forgeP >= 1, 'the PERFECT forging count survives a reload');
     G.FG.pos = 0; for (let i = 0; i < 40; i++) G.forgeStep(0.05);
     G.forgeClose(false);
     assert(!G.FG.on && !G.paused, 'leaving the forge resumes the game');
@@ -764,6 +766,7 @@ const assert = (c, msg) => { if (!c) { errors.push('ASSERT FAIL: ' + msg); conso
       caught = S.got.koi > 0;
     }
     assert(caught && G.prog.gold > g0 && S.best.koi > 0, 'careful reeling lands the fish, pays gold and fills the record book');
+    S.got.lord = 1; G.achCheck(); assert(G.prog.ach.includes('lord'), 'landing the abyss lord earns a title');
     G.save(); G.prog.fish = null; G.load();
     assert(G.fishState().got.koi > 0, 'the fish record survives a reload');
     G.fishClose();
