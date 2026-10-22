@@ -254,13 +254,14 @@ button{font-family:inherit;cursor:pointer;-webkit-tap-highlight-color:transparen
 .el{position:absolute;color:#ffe9b0;text-shadow:0 0 16px rgba(255,200,90,.8),0 0 44px rgba(255,160,50,.35);will-change:transform,opacity;backface-visibility:hidden;}
 .ename{position:absolute;left:0;right:0;top:calc(40% - .1em);text-align:center;font-family:"Shippori Mincho","Noto Serif CJK JP","Hiragino Mincho ProN",serif;font-weight:600;font-size:clamp(34px,11vw,84px);line-height:1.1;letter-spacing:.14em;color:#eaf6ff;text-shadow:0 0 18px rgba(150,210,255,.85),0 0 60px rgba(110,160,255,.4);opacity:0;filter:blur(8px);transition:opacity 1.4s ease,filter 1.8s ease;}
 .ename.on{opacity:1;filter:blur(0);}
-.emys{position:absolute;left:6%;right:6%;top:calc(40% + clamp(70px,18vw,140px));text-align:center;font-family:"Shippori Mincho","Noto Serif CJK JP",serif;font-weight:600;font-size:clamp(13px,3.6vw,19px);letter-spacing:.2em;line-height:1.8;color:#c9cfe6;opacity:0;transition:opacity 2s ease;}
+.emys{position:absolute;left:6%;right:6%;top:calc(40% + clamp(86px,23vw,160px));text-align:center;font-family:"Shippori Mincho","Noto Serif CJK JP",serif;font-weight:600;font-size:clamp(13px,3.6vw,19px);letter-spacing:.2em;line-height:1.8;color:#c9cfe6;opacity:0;transition:opacity 2s ease;}
 .emys.on{opacity:1;}
 .efin{position:absolute;left:0;right:0;bottom:calc(18% + env(safe-area-inset-bottom,0px));text-align:center;font-family:"Cinzel","Times New Roman",serif;font-weight:600;font-size:clamp(14px,3.6vw,20px);letter-spacing:.5em;color:#d9b25a;opacity:0;transition:opacity 2.2s ease;}
 .efin.on{opacity:.9;}
 .eskip{position:absolute;top:calc(env(safe-area-inset-top,0px) + 12px);right:12px;min-height:40px;padding:0 16px;border:1px solid rgba(217,178,90,.5);border-radius:20px;background:rgba(10,10,20,.5);color:#d9cfae;font-size:12px;font-weight:800;}
 .eskip[hidden],.ebtn[hidden]{display:none;}
 .ebtn{position:absolute;left:50%;bottom:calc(7% + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:min(70%,280px);min-height:50px;border:1px solid #d9b25a;border-radius:25px;background:rgba(217,178,90,.12);color:#f4ead2;font-family:"Shippori Mincho","Noto Serif CJK JP",serif;font-size:16px;font-weight:600;letter-spacing:.3em;}
+@media (max-height:500px){.ename{margin:0;top:14%;font-size:clamp(28px,12vh,52px);}.emys{margin:0;top:calc(14% + clamp(60px,19vh,80px));font-size:12px;line-height:1.6;}.efin{bottom:calc(24% + env(safe-area-inset-bottom,0px));font-size:13px;}.ebtn{bottom:calc(5% + env(safe-area-inset-bottom,0px));min-height:42px;}}
 @media (prefers-reduced-motion:reduce){.ending,.eline,.ename,.emys,.efin{transition-duration:.01s}}
 .combo b{display:block;font-size:40px;font-weight:800;font-style:italic;line-height:1;letter-spacing:.02em;background:linear-gradient(180deg,#ffffff,#ffd36e 60%,#ff8a1a);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 2px 2px rgba(0,0,0,.6));}
 .combo.t1 b{background-image:linear-gradient(180deg,#fff,#7fe0ff 60%,#2a7cff);}
@@ -636,7 +637,7 @@ button{font-family:inherit;cursor:pointer;-webkit-tap-highlight-color:transparen
     <p id="endLine" class="eline"></p>
     <div id="endTitle" aria-label="YOU, THY ARIA"></div>
     <p id="endName" class="ename">ひろたゆうや</p>
-    <p id="endMys" class="emys">――この旅を紡いでいたのは、<br>いったい誰だったのか。</p>
+    <p id="endMys" class="emys">――レンズの向こうで、若葉色の服の彼が<br>山のふもとを走っている。<br>この旅を紡いでいたのは、きっと。</p>
     <p id="endFin" class="efin">THE END ?</p>
     <button id="endSkip" class="eskip" type="button">スキップ</button>
     <button id="endBtn" class="ebtn" type="button" hidden>旅を続ける</button>

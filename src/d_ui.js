@@ -390,7 +390,7 @@
         findPath, spawnPack, blockedAt, inCamp, gainExp, hurtPlayer, expNeed, chunkCache, castSkill, learn, SKD, fields, meteors,
         get dash() { return dash; },
         ARIA, ariaOpen, ariaStart, ariaHit, ariaTick, ariaClose, ariaChart, ariaState, ariaDiveStart,
-        HEROINES, SCENES, heroS, heroOut, heroJoined, affLv, playScene, talkAdvance, get talkCur() { return talkCur; }, heroTick, heroUpdate, heroUlt, heroAtkMul, storySeen, heroEnt, heroGuard, drawBust, giveGift, giftCost, loginTick, loginState, get loginChecked() { return loginChecked; }, set loginChecked(v) { loginChecked = v; }, LOGIN_DAYS,
+        HEROINES, SCENES, heroS, heroOut, heroJoined, affLv, playScene, talkAdvance, get talkCur() { return talkCur; }, heroTick, heroUpdate, heroUlt, heroAtkMul, storySeen, heroEnt, heroGuard, drawBust, giveGift, giftCost, loginTick, loginState, get loginChecked() { return loginChecked; }, set loginChecked(v) { loginChecked = v; }, LOGIN_DAYS, memoList, MEMO,
         TIPS, tipTick, tipsSeen, showTip,
         partyList, partyAdd, partyRemove, partySlots, entOf, PET_SP, trainS, TRAIN, offlineRewards, showOffline, autoOn, autoToggle, autoBattle, expGapMul, autoRetreat, get autoWall() { return autoWall; }, set autoWall(v) { autoWall = v; }, petPower, partyGoldMul,
         soul, perkLv, PERKS, gainSoul, rebirth, altarOpen, altarClose, altarRender, streakOnKill, streakEnd, get streakN() { return streakN; }, potMax, GEMS, gainGem, gemFree, sockets, sockOf, makeCtx, castWithGems, applySlots, setSlot, SLOTS, keyOn, growthUpdate, skillCdMul, cdOf, skillMpMul,

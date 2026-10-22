@@ -662,6 +662,8 @@ const assert = (c, msg) => { if (!c) { errors.push('ASSERT FAIL: ' + msg); conso
     assert(G.heroJoined('karen') && ['karen_meet', 'karen_join'].every((k) => G.storySeen().includes(k)), 'Karen is met and joins in the burning mine (B13-B14)');
     assert(['setsuna', 'riko', 'nefi'].every((id) => G.heroJoined(id) && G.storySeen().includes(id + '_meet') && G.storySeen().includes(id + '_join')), 'Setsuna (B17-18), Riko (B22-23) and Nefi (B27-28) are met and join');
     assert(['yuzu', 'luna', 'shion', 'stella'].every((id) => G.heroJoined(id)), 'Yuzu (B32-33), Luna (B37-38), Shion (B42-43) and Stella (B47-48) join');
+    assert(G.memoList().join('') === 'やゆたうろ', 'memory fragments of the hero\'s name are gathered along the story, scrambled');
+    { const m0 = G.prog.memo.slice(); G.prog.memo = null; G.save(); G.load(); assert(G.memoList().length === 5, 'fragments are rebuilt from the story for older saves'); G.prog.memo = m0; }
     assert(G.heroOut().join() === 'mina,shion,stella', 'at most three heroines travel together; a newcomer joins and the longest-serving one (not Mina) rests');
     const party = (ids) => { for (const id of Object.keys(G.HEROINES)) G.heroS(id).out = ids.includes(id); };
     party(['aria', 'karen', 'riko']);

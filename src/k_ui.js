@@ -275,6 +275,7 @@
     for (const b of q.act) box.append(qCard('掲示板の依頼', bountyText(b) + '（' + (bountyDone(b) ? '達成！' : bountyProg(b)) + '）', '報酬：' + rewardText(b.rew)));
     if (!q.act.length) box.append(elP('ith', '掲示板の依頼は受けていない。始まりの森のミーナから受けられる'));
     box.append(elP('ith', '報告は始まりの森のミーナへ。設定の「帰還」ですぐ町へ戻れる'));
+    { const L = memoList(); if (L.length) box.append(qCard('記憶のかけら（' + L.length + '/' + MEMO_N + '）', L.join('・'), L.length >= MEMO_N ? '六つそろった。……並べ替えれば、読めるかもしれない' : '物語を進めると、失った名前を少しずつ思い出す')); }
     box.append(recordsCard());
     achCards(box);
   }

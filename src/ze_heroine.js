@@ -88,6 +88,7 @@
       ['', '', 'トマが「えっ、ボクが!?」と声を上げた。ガルドは黙って、ミーナの杖に油を差した。'],
       ['mina', 'sad', 'あなたの歌が、底へ呼ばれている気がするの。ひとりで行かせたくない'],
       ['mina', 'smile', '回復は任せて。前に出るのはあなたの役目よ'],
+      ['', '', '――「や君、また走ってるの？」 遠くで、誰かが笑った気がした。知らないはずの声なのに、なつかしい。'],
       ['', '', 'ミーナが仲間になった。']
     ],
     aria_voice: [
@@ -101,7 +102,8 @@
       ['aria', 'smile', 'あなたの歌。ずっと、きこえてた'],
       ['mina', 'sad', 'あなた……人じゃない、のね'],
       ['aria', 'sad', 'わからない。なまえも、ない。……でも、うたは、ある'],
-      ['', '', '少女は光の粒になって消えた。「したで、まってる」という声だけを残して。']
+      ['', '', '少女は光の粒になって消えた。「したで、まってる」という声だけを残して。'],
+      ['', '', '光がまぶしくて、思わず目もとに手をやった。……そこに、透明な板が二枚あった気がする。世界はいつも、レンズの向こうにあった。']
     ],
     aria_join: [
       ['aria', 'smile', 'また、あえた'],
@@ -113,19 +115,22 @@
     story_b30: [
       ['aria', 'sad', 'ここ、しってる。むかし、だれかが、ここで、うたってた'],
       ['mina', 'normal', '墓所の石板……「歌は、底へ還る」。あれはきっと、この子のことね'],
-      ['aria', 'normal', 'わたし、だれかの、うたのつづき。……だれの？']
+      ['aria', 'normal', 'わたし、だれかの、うたのつづき。……だれの？'],
+      ['', '', '石板の隅に、子どもの落書きのような絵があった。なだらかな、ふたつの山。――若葉色の服の胸に、同じ絵があった気がする。']
     ],
     story_b40: [
       ['mina', 'sad', '打ち明けるわ。私の家は代々、森の門を見張る「歌守り」だったの'],
       ['mina', 'normal', 'ふたつの魂を持つ旅人が現れたら、底まで送り届けること。それが言い伝えよ'],
       ['mina', 'smile', 'でも今は、言い伝えだから一緒にいるんじゃない。……わかるでしょう？'],
-      ['aria', 'smile', 'ミーナ、うそ、へた']
+      ['aria', 'smile', 'ミーナ、うそ、へた'],
+      ['', '', '山のふもとの公園を、息を切らして走っていた。ゴールの先で、誰かが手を振っていた。――あれは、いつの記憶だろう。']
     ],
     story_b50: [
       ['aria', 'normal', 'さいごの、いっせつ。あそこに、ある'],
       ['aria', 'sad', 'うたがおわったら、わたし、きえる、かも'],
       ['mina', 'sad', '……'],
-      ['aria', 'smile', 'でも、いい。あなたの歌が、おわりをもてるなら']
+      ['aria', 'smile', 'でも、いい。あなたの歌が、おわりをもてるなら'],
+      ['aria', 'normal', '……ねえ。わたしのうたの、だいめい、おぼえてる？ ならべかえて。そこに、あなたが、いる']
     ],
     mina_t1: [
       ['mina', 'normal', 'トマの目利き箱、実はね……中身を選んでるのはトマ本人なの。内緒よ'],
@@ -339,6 +344,7 @@
       ['stella', 'sad', 'それがどういう意味か、ステラにもまだ読めないんだ。……ちょっと、こわい'],
       ['stella', 'smile', 'だから、一緒に確かめに行く！ 最後の星まで、ちゃんと見届けるね'],
       ['shion', 'smile', '……ステラは、私が守る。……なぜか、そう決まっている気がする'],
+      ['stella', 'normal', 'それとね、あなたの名前、星の並びに隠れてるの。文字が六つ。……でも、順番がばらばら'],
       ['', '', 'ステラが仲間になった。']
     ],
     stella_t1: [
@@ -367,6 +373,16 @@
       ['aria', 'normal', 'だから、あなたがわすれても、わたしが、うたってあげる']
     ]
   };
+  // memory fragments: the hero's real name, one letter per story beat, in scrambled order (the ending reveals it)
+  const MEMO = { mina_join: 'や', aria_meet: 'ゆ', story_b30: 'た', story_b40: 'う', stella_join: 'ろ', story_b50: 'ひ' };
+  const MEMO_N = Object.keys(MEMO).length;
+  function memoList() { if (!Array.isArray(prog.memo)) prog.memo = []; return prog.memo; }
+  function memoGain(key) {
+    const ch = MEMO[key], L = memoList();
+    if (!ch || L.includes(ch)) return;
+    L.push(ch);
+    setTimeout(() => toast('記憶のかけら「' + ch + '」を思い出した（' + L.length + '/' + MEMO_N + '）'), 600);
+  }
   const TALKS = { mina: [['mina_t1', 2], ['mina_t2', 5], ['mina_t3', 8]], aria: [['aria_t1', 2], ['aria_t2', 5], ['aria_t3', 8]], karen: [['karen_t1', 2], ['karen_t2', 5], ['karen_t3', 8]],
     setsuna: [['setsuna_t1', 2], ['setsuna_t2', 5], ['setsuna_t3', 8]], riko: [['riko_t1', 2], ['riko_t2', 5], ['riko_t3', 8]], nefi: [['nefi_t1', 2], ['nefi_t2', 5], ['nefi_t3', 8]],
     yuzu: [['yuzu_t1', 2], ['yuzu_t2', 5], ['yuzu_t3', 8]], luna: [['luna_t1', 2], ['luna_t2', 5], ['luna_t3', 8]], shion: [['shion_t1', 2], ['shion_t2', 5], ['shion_t3', 8]], stella: [['stella_t1', 2], ['stella_t2', 5], ['stella_t3', 8]] };
@@ -655,6 +671,7 @@
   }
   function talkDone(key) {
     if (!storySeen().includes(key)) storySeen().push(key);
+    memoGain(key);
     if (key === 'mina_join') { heroJoin('mina'); toast('ミーナが仲間になった！（「仲間」タブで会話できる）'); }
     for (const id of ['setsuna', 'riko', 'nefi', 'yuzu', 'luna', 'shion', 'stella']) if (key === id + '_join') heroJoin(id);
     if (key === 'karen_join') heroJoin('karen');

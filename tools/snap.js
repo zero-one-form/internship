@@ -68,6 +68,9 @@ async function browserPath() {
     ['talk_shion', (G) => { while (G.talkCur) G.talkAdvance(); G.playScene('shion_join'); G.talkAdvance(); G.talkAdvance(); }],
     ['heroines_field', (G) => { while (G.talkCur) G.talkAdvance(); for (const id of Object.keys(G.HEROINES)) { G.heroS(id).j = true; G.heroS(id).out = ['luna', 'shion', 'stella'].includes(id); } G.prog.story = Object.keys(G.SCENES); G.enterDungeon(21); G.prog.opt.auto = true; }],
     ['cutin', (G) => { G.heroS('karen').ult = 60; G.heroUlt('karen'); }],
+    ['memo', (G) => { while (G.talkCur) G.talkAdvance(); G.prog.memo = ['や', 'ゆ', 'た', 'う', 'ろ', 'ひ']; G.openSheet(); G.setTab('quest'); const pn = document.querySelector('#sheet .panel'); const c = [...document.querySelectorAll('#questLog .qc')].find((x) => x.textContent.includes('記憶')); if (c) pn.scrollTop = c.offsetTop - 80; }],
+    ['ending_final', (G) => { G.closeSheet(); G.playEnding(null); setTimeout(() => G.endSkip(), 300); }],
+    ['ending_close', (G) => { G.closeEnding && G.closeEnding(); }],
     ['login', (G) => { while (G.talkCur) G.talkAdvance(); G.prog.opt.auto = false; const L = G.loginState(); L.last = 0; L.n = 6; G.loginChecked = false; G.loginTick(true); }],
     ['hero_tab', (G) => { document.getElementById('petOk').click(); G.prog.opt.auto = false; G.heroS('mina').aff = 70; G.openSheet(); G.setTab('pet'); }],
   ];
