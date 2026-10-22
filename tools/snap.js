@@ -71,6 +71,10 @@ async function browserPath() {
     ['memo', (G) => { while (G.talkCur) G.talkAdvance(); G.prog.memo = ['や', 'ゆ', 'た', 'う', 'ろ', 'ひ']; G.openSheet(); G.setTab('quest'); const pn = document.querySelector('#sheet .panel'); const c = [...document.querySelectorAll('#questLog .qc')].find((x) => x.textContent.includes('記憶')); if (c) pn.scrollTop = c.offsetTop - 80; }],
     ['ending_final', (G) => { G.closeSheet(); G.playEnding(null); setTimeout(() => G.endSkip(), 300); }],
     ['ending_close', (G) => { G.closeEnding && G.closeEnding(); G.prog.cleared = 1; G.refreshD && G.refreshD(); G.morph && G.morph(); G.morph && G.morph(); }],
+    ['fish_menu', (G) => { while (G.talkCur) G.talkAdvance(); G.prog.opt.auto = false; G.enterMap(0, null); G.player.x = G.SPAWN.x; G.player.y = G.SPAWN.y; G.paused = false; const S = G.fishState(); S.got = { funa: 3, koi: 1, gold: 1 }; S.best = { funa: 24, koi: 61, gold: 72 }; G.fishOpen(); }],
+    ['fish_bite', (G) => { G.fishCast(); G.FS.fish = G.FISH_BY.lord; G.fishStep(G.FS.wait + 0.01); G.FS.freeze = true; }],
+    ['fish_reel', (G) => { G.FS.freeze = false; G.fishDown(); G.FS.freeze = true; G.FS.tension = 0.7; G.FS.prog = 0.45; G.FS.fight = 9; G.FS.hold = true; }],
+    ['fish_close', (G) => { G.FS.freeze = false; G.fishClose(); }],
     ['login', (G) => { while (G.talkCur) G.talkAdvance(); G.prog.opt.auto = false; const L = G.loginState(); L.last = 0; L.n = 6; G.loginChecked = false; G.loginTick(true); }],
     ['hero_tab', (G) => { document.getElementById('petOk').click(); G.prog.opt.auto = false; G.heroS('mina').aff = 70; G.openSheet(); G.setTab('pet'); }],
   ];

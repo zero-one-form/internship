@@ -222,6 +222,9 @@ button{font-family:inherit;cursor:pointer;-webkit-tap-highlight-color:transparen
 .ariaofs span{flex:1;}
 .ariaofs b{min-width:4.5em;text-align:center;}
 .ariares p{margin:0 0 6px;font-size:13.5px;font-weight:800;}
+.fish{background:radial-gradient(circle at 32% 25%,rgba(255,255,255,.3),rgba(255,255,255,0) 60%),linear-gradient(135deg,#4ec3d6,#1d5a8a) !important;color:#fff !important;}
+#fishCv{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;}
+.fishdex{font-size:12px;line-height:1.6;opacity:.85;margin:0 0 12px;overflow-wrap:anywhere;}
 .aria{background:radial-gradient(circle at 32% 25%,rgba(255,255,255,.3),rgba(255,255,255,0) 60%),linear-gradient(135deg,#f6b93b,#8e6bff) !important;color:#fff !important;}
 .opov.on{opacity:1;}
 .opov[hidden],.opsplash[hidden],.opskip[hidden]{display:none;}
@@ -506,6 +509,7 @@ button{font-family:inherit;cursor:pointer;-webkit-tap-highlight-color:transparen
   </div>
   <div class="campbtns">
     <button id="altarBtn" class="act shop altar" type="button" hidden aria-label="魂の祭壇（永続の特典と転生）"><span class="lbl">魂の</span><b>祭壇</b></button>
+    <button id="fishBtn" class="act shop fish" type="button" hidden aria-label="池で釣り（ミニゲーム）"><span class="lbl">池で</span><b>釣り</b></button>
     <button id="ariaBtn" class="act shop aria" type="button" hidden aria-label="アリアの演奏（リズムゲーム）"><span class="lbl">♪演奏</span><b>アリア</b></button>
     <button id="shopBtn" class="act shop" type="button" hidden aria-label="回復薬を買う 20G"><span class="lbl">回復薬</span><b>20G</b><span id="shopGold" hidden></span></button>
   </div>
@@ -626,6 +630,17 @@ button{font-family:inherit;cursor:pointer;-webkit-tap-highlight-color:transparen
       <div class="ariaofs"><span>タイミング調整</span><button id="ariaOfsDn" class="close" type="button" aria-label="判定を早める">－</button><b id="ariaOfsVal">+0ms</b><button id="ariaOfsUp" class="close" type="button" aria-label="判定を遅らせる">＋</button></div>
       <button id="ariaGo" class="primary" type="button">はじめる</button>
       <button id="ariaQuit" class="ghost" type="button">キャンプへ戻る</button>
+    </div>
+  </div>
+  <div id="fishOv" class="ariaov" hidden>
+    <canvas id="fishCv" aria-label="釣り"></canvas>
+    <div id="fishPanel" class="panel ariapanel" role="dialog" aria-modal="true" aria-labelledby="fishTitle">
+      <h2 id="fishTitle">池で釣り</h2>
+      <p id="fishLead" class="lead"></p>
+      <div id="fishRes" class="ariares" hidden></div>
+      <p id="fishDex" class="fishdex"></p>
+      <button id="fishGo" class="primary" type="button">糸を垂らす</button>
+      <button id="fishQuit" class="ghost" type="button">キャンプへ戻る</button>
     </div>
   </div>
   <div id="opOv" class="opov" hidden><canvas id="opCv" aria-label="オープニング"></canvas><button id="opSkip" class="opskip" type="button">SKIP ▸▸</button></div>

@@ -3,7 +3,7 @@
   const dom = {};
   const lastV = {};
   function cacheDom() {
-    const ids = ['altarBtn', 'ariaBtn', 'goldHud', 'xpLine', 'lvText', 'formName', 'hpFill', 'hpText', 'mpFill', 'mpText', 'xpFill', 'morphBtn', 'morphLabel', 'potionBtn', 'potionCount', 'shopBtn', 'shopGold', 'ptBadge', 'bagDot', 'bossBar', 'bossName', 'bossFill', 'bossStg'];
+    const ids = ['altarBtn', 'ariaBtn', 'fishBtn', 'goldHud', 'xpLine', 'lvText', 'formName', 'hpFill', 'hpText', 'mpFill', 'mpText', 'xpFill', 'morphBtn', 'morphLabel', 'potionBtn', 'potionCount', 'shopBtn', 'shopGold', 'ptBadge', 'bagDot', 'bossBar', 'bossName', 'bossFill', 'bossStg'];
     for (const id of ids) dom[id] = $(id);
   }
   function setT(id, v) { if (lastV[id] !== v) { lastV[id] = v; dom[id].textContent = v; } }
@@ -37,6 +37,7 @@
     setH('shopBtn', !(inCamp(player.x, player.y) && !player.dead));
     setH('altarBtn', !(curMap !== 3 && inCamp(player.x, player.y) && !player.dead));
     setH('ariaBtn', !(curMap !== 3 && inCamp(player.x, player.y) && !player.dead));
+    setH('fishBtn', !(curMap !== 3 && inCamp(player.x, player.y) && !player.dead));
     setT('shopGold', '所持 ' + prog.gold + 'G');
     const pts = prog.sp + prog.kp;
     setH('ptBadge', pts <= 0);
@@ -350,6 +351,7 @@
     if (curMap === 3) { startFloor(); restoreDive(); }
     netInit();
     ariaBind();
+    fishBind();
     applySlots();
     if (!TEST) pendingOffline = offlineRewards(); else prog.seen = Date.now();
     $('autoBtn').addEventListener('click', autoToggle);
@@ -393,7 +395,7 @@
         findPath, spawnPack, blockedAt, inCamp, gainExp, hurtPlayer, expNeed, chunkCache, castSkill, learn, SKD, fields, meteors,
         get dash() { return dash; },
         ARIA, ariaOpen, ariaStart, ariaHit, ariaTick, ariaClose, ariaChart, ariaState, ariaDiveStart,
-        HEROINES, SCENES, heroS, heroOut, heroJoined, affLv, playScene, talkAdvance, get talkCur() { return talkCur; }, heroTick, heroUpdate, heroUlt, heroAtkMul, storySeen, heroEnt, heroGuard, drawBust, giveGift, giftCost, loginTick, loginState, get loginChecked() { return loginChecked; }, set loginChecked(v) { loginChecked = v; }, LOGIN_DAYS, memoList, MEMO, buyCostume, setWear, heroWear, COSTUMES,
+        HEROINES, SCENES, heroS, heroOut, heroJoined, affLv, playScene, talkAdvance, get talkCur() { return talkCur; }, heroTick, heroUpdate, heroUlt, heroAtkMul, storySeen, heroEnt, heroGuard, drawBust, giveGift, giftCost, loginTick, loginState, get loginChecked() { return loginChecked; }, set loginChecked(v) { loginChecked = v; }, LOGIN_DAYS, memoList, MEMO, FS, FISH, FISH_BY, fishOpen, fishClose, fishCast, fishDown, fishUp, fishStep, fishState, buyCostume, setWear, heroWear, COSTUMES,
         TIPS, tipTick, tipsSeen, showTip,
         partyList, partyAdd, partyRemove, partySlots, entOf, PET_SP, trainS, TRAIN, offlineRewards, showOffline, autoOn, autoToggle, autoBattle, expGapMul, autoRetreat, get autoWall() { return autoWall; }, set autoWall(v) { autoWall = v; }, petPower, partyGoldMul,
         soul, perkLv, PERKS, gainSoul, rebirth, altarOpen, altarClose, altarRender, streakOnKill, streakEnd, get streakN() { return streakN; }, potMax, GEMS, gainGem, gemFree, sockets, sockOf, makeCtx, castWithGems, applySlots, setSlot, SLOTS, keyOn, growthUpdate, skillCdMul, cdOf, skillMpMul,

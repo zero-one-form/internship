@@ -716,6 +716,36 @@ const assert = (c, msg) => { if (!c) { errors.push('ASSERT FAIL: ' + msg); conso
     assert(G.mainDone(), 'reaching B21 completes it');
     Object.assign(q, q0); G.prog.deep = d0;
   }
+  // fishing minigame
+  {
+    G.enterMap(0, null); frames(3); G.paused = false;
+    const pl = G.player; pl.dead = false; pl.x = G.SPAWN.x; pl.y = G.SPAWN.y;
+    G.fishOpen();
+    assert(G.FS.on && G.paused && !$('fishOv').hidden, 'the fishing pond opens from camp');
+    const F = G.FS, S = G.fishState(), g0 = G.prog.gold;
+    G.fishCast(); G.fishDown();
+    assert(F.phase === 'menu' && $('fishRes').textContent.includes('早すぎ'), 'tapping before the bite scares the fish');
+    G.fishCast(); F.fish = G.FISH_BY.koi; G.fishStep(F.wait + 0.01);
+    assert(F.phase === 'bite', 'the float sinks after the wait');
+    G.fishStep(1);
+    assert(F.phase === 'menu' && $('fishRes').textContent.includes('遅れ'), 'a late tap loses the fish');
+    G.fishCast(); F.fish = G.FISH_BY.koi; G.fishStep(F.wait + 0.01); G.fishDown();
+    assert(F.phase === 'reel', 'a tap on the bite hooks it');
+    for (let i = 0; i < 200 && F.phase === 'reel'; i++) G.fishStep(0.05);
+    assert(F.phase === 'menu' && $('fishRes').textContent.includes('糸が切れた'), 'holding forever snaps the line');
+    // a patient angler: hold while calm, let go when the line gets tight or the fish runs
+    let caught = false;
+    for (let tries = 0; tries < 6 && !caught; tries++) {
+      G.fishCast(); F.fish = G.FISH_BY.koi; G.fishStep(F.wait + 0.01); G.fishDown();
+      for (let i = 0; i < 2000 && F.phase === 'reel'; i++) { if (F.tension > 0.6 || F.fight > 0) G.fishUp(); else if (F.tension < 0.2) G.fishDown(); G.fishStep(0.05); }
+      caught = S.got.koi > 0;
+    }
+    assert(caught && G.prog.gold > g0 && S.best.koi > 0, 'careful reeling lands the fish, pays gold and fills the record book');
+    G.save(); G.prog.fish = null; G.load();
+    assert(G.fishState().got.koi > 0, 'the fish record survives a reload');
+    G.fishClose();
+    assert(!G.FS.on && !G.paused, 'leaving the pond resumes the game');
+  }
   // gifts (gold sink) and the login bonus
   {
     G.enterMap(0, null); frames(3); G.paused = false;

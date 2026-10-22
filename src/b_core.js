@@ -369,7 +369,7 @@
     undead: { hp: 78, dmg: 9, sp: 1.15, exp: 19, aggro: 3.6, atk: 1.45, r: 0.38, armor: 2, vars: 2 }
   };
   function defaultProg() {
-    return { level: 1, exp: 0, stats: { str: 5, agi: 5, vit: 5, int: 5, luk: 5 }, sp: 0, kp: 0, skill: { whirl: 1, chain: 1, sprint: 1 }, potions: 5, gold: 0, form: 'blade', intro: false, map: 0, deep: 0, floor: 1, q: { main: 0, mp: 0, ma: false, mn: false, act: [], board: [] }, opt: { autoPot: true, autoTarget: true, autoSell: false, stick: true, shake: true, op: true, bgm: 0.6, se: 0.8 }, cleared: 0, inv: [], eq: { sword: null, staff: null, head: null, body: null, acc: null }, starter: false, rank: 0, rankMax: 0, rankDeep: [], bless: [], phx: false, cls: { blade: null, arcane: null }, pets: null, rec: null, aria: null, soul: null, seen: 0, heroines: null, story: null, login: null, memo: null, gems: null, sock: null, slots: null };
+    return { level: 1, exp: 0, stats: { str: 5, agi: 5, vit: 5, int: 5, luk: 5 }, sp: 0, kp: 0, skill: { whirl: 1, chain: 1, sprint: 1 }, potions: 5, gold: 0, form: 'blade', intro: false, map: 0, deep: 0, floor: 1, q: { main: 0, mp: 0, ma: false, mn: false, act: [], board: [] }, opt: { autoPot: true, autoTarget: true, autoSell: false, stick: true, shake: true, op: true, bgm: 0.6, se: 0.8 }, cleared: 0, inv: [], eq: { sword: null, staff: null, head: null, body: null, acc: null }, starter: false, rank: 0, rankMax: 0, rankDeep: [], bless: [], phx: false, cls: { blade: null, arcane: null }, pets: null, rec: null, aria: null, soul: null, seen: 0, heroines: null, story: null, login: null, memo: null, fish: null, gems: null, sock: null, slots: null };
   }
   const prog = defaultProg();
   const player = {
@@ -492,6 +492,9 @@
           prog.story = Array.isArray(s.story) ? s.story.filter((k) => typeof k === 'string' && SCENES[k]) : []; }
         prog.memo = Array.isArray(s.memo) ? s.memo.filter((c, i, A) => typeof c === 'string' && Object.values(MEMO).includes(c) && A.indexOf(c) === i) : [];
         for (const k in MEMO) if (prog.story.includes(k) && !prog.memo.includes(MEMO[k])) prog.memo.push(MEMO[k]); // saves from before the fragments existed
+        { const F = s.fish && typeof s.fish === 'object' ? s.fish : {}, got = {}, best = {};
+          for (const f of FISH) { if (F.got && F.got[f.id]) got[f.id] = num(F.got[f.id], 0, 0, 1e6); if (F.best && F.best[f.id]) best[f.id] = num(F.best[f.id], 0, 0, 1000); }
+          prog.fish = { got, best }; }
         prog.login = s.login && typeof s.login === 'object' ? { last: num(s.login.last, 0, 0, 1e7), n: num(s.login.n, 0, 0, 1e5) } : { last: 0, n: 0 };
         prog.tips = Array.isArray(s.tips) ? s.tips.filter((id) => TIPS.some((t) => t[0] === id)) : []; }
       { const so = s.soul && typeof s.soul === 'object' ? s.soul : {}, pk = so.perks && typeof so.perks === 'object' ? so.perks : {}, perks = {};
