@@ -78,6 +78,9 @@ async function browserPath() {
     ['map_forest', (G) => { G.enterMap(0, 0); const b = []; for (let j = 0; j < G.MH; j++) for (let i = 0; i < G.MW; i++) if (G.tileAt(i, j) === G.T_BRIDGE) b.push([i, j]); const t = b[Math.floor(b.length / 2)] || [20, 20]; G.player.x = t[0] + 0.5; G.player.y = t[1] + 0.5; window.__bridges = b.length; }],
     ['map_canyon', (G) => { G.enterMap(1, 0); const b = []; for (let j = 0; j < G.MH; j++) for (let i = 0; i < G.MW; i++) if (G.tileAt(i, j) === G.T_BRIDGE) b.push([i, j]); const t = b[Math.floor(b.length / 2)] || [20, 20]; G.player.x = t[0] + 0.5; G.player.y = t[1] + 0.5; }],
     ['map_grave', (G) => { G.enterMap(2, 0); const r = G.propsList.find((p) => p.kind === 'ruin'); if (r) { G.player.x = r.x + 1.5; G.player.y = r.y + 2.5; } }],
+    ['forge', (G) => { G.enterMap(0, null); G.player.x = G.SPAWN.x; G.player.y = G.SPAWN.y; G.paused = false; const it = G.genItem(30, 3, 'sword'); it.plus = 6; G.prog.inv.push(it); G.prog.gold = 1e7; G.forgeOpen(it); G.FG.pos = 0; G.forgeHit(); G.FG.pos = 0.08; G.forgeHit(); G.FG.pos = -0.6; G.FG.freeze = true; }],
+    ['forge_result', (G) => { G.FG.freeze = false; G.FG.pos = 0.01; G.forgeHit(); }],
+    ['forge_close', (G) => { G.forgeClose(false); }],
     ['login', (G) => { while (G.talkCur) G.talkAdvance(); G.prog.opt.auto = false; const L = G.loginState(); L.last = 0; L.n = 6; G.loginChecked = false; G.loginTick(true); }],
     ['hero_tab', (G) => { document.getElementById('petOk').click(); G.prog.opt.auto = false; G.heroS('mina').aff = 70; G.openSheet(); G.setTab('pet'); }],
   ];

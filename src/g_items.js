@@ -186,19 +186,25 @@
     log('ノーマル装備' + n + '個を' + g + 'Gで売った');
     save(); renderGear();
   }
-  function enhance(it) {
-    if (!inCamp(player.x, player.y) || it.plus >= 10) return;
+  // o: { bonus: extra success rate, sure: always succeeds, great: +2 } from the forging minigame
+  function enhance(it, o) {
+    o = o || {};
+    if (!inCamp(player.x, player.y) || it.plus >= 10) return false;
     const cost = enhanceCost(it);
-    if (prog.gold < cost) { toast('所持金が足りない'); return; }
+    if (prog.gold < cost) { toast('所持金が足りない'); return false; }
     prog.gold -= cost;
-    if (Math.random() < enhanceRate(it)) {
-      it.plus++;
+    if (o.sure || Math.random() < Math.min(1, enhanceRate(it) + (o.bonus || 0))) {
+      it.plus = Math.min(10, it.plus + (o.great ? 2 : 1));
       toast('強化成功！ +' + it.plus);
       questEvent('plus');
       sfx('anvil');
       if (prog.eq[it.type] === it) refreshGear();
-    } else { toast('強化失敗…（装備はそのまま）'); sfx('fail'); }
+      save(); renderGear();
+      return true;
+    }
+    toast('強化失敗…（装備はそのまま）'); sfx('fail');
     save(); renderGear();
+    return false;
   }
 
   /* ---------- loot rendering ---------- */
@@ -306,6 +312,7 @@
     const eb = elBtn(it.plus >= 10 ? '強化は最大' : '強化 +' + (it.plus + 1) + '（' + cost + 'G／成功率' + Math.round(enhanceRate(it) * 100) + '%）', 'ghost small', () => enhance(it));
     eb.disabled = it.plus >= 10 || !camp || prog.gold < cost;
     acts.append(eb);
+    if (it.plus < 10) { const fb = elBtn('打ち込みで強化（成功率UP）', 'ghost small', () => { closeSheet(); forgeOpen(it); }); fb.disabled = eb.disabled; acts.append(fb); }
     if (selItem.where === 'inv') acts.append(elBtn('売る（' + sellPrice(it) + 'G）', 'ghost small', () => sell(it)));
     box.append(acts);
     if (!camp) box.append(elP('ith', '強化はキャンプの焚き火のそばでできます。失敗しても装備は壊れません'));

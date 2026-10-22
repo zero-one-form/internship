@@ -223,6 +223,7 @@ button{font-family:inherit;cursor:pointer;-webkit-tap-highlight-color:transparen
 .ariaofs b{min-width:4.5em;text-align:center;}
 .ariares p{margin:0 0 6px;font-size:13.5px;font-weight:800;}
 .fish{background:radial-gradient(circle at 32% 25%,rgba(255,255,255,.3),rgba(255,255,255,0) 60%),linear-gradient(135deg,#4ec3d6,#1d5a8a) !important;color:#fff !important;}
+#forgeCv{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;}
 #fishCv{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;}
 .fishdex{font-size:12px;line-height:1.6;opacity:.85;margin:0 0 12px;overflow-wrap:anywhere;}
 .aria{background:radial-gradient(circle at 32% 25%,rgba(255,255,255,.3),rgba(255,255,255,0) 60%),linear-gradient(135deg,#f6b93b,#8e6bff) !important;color:#fff !important;}
@@ -630,6 +631,15 @@ button{font-family:inherit;cursor:pointer;-webkit-tap-highlight-color:transparen
       <div class="ariaofs"><span>タイミング調整</span><button id="ariaOfsDn" class="close" type="button" aria-label="判定を早める">－</button><b id="ariaOfsVal">+0ms</b><button id="ariaOfsUp" class="close" type="button" aria-label="判定を遅らせる">＋</button></div>
       <button id="ariaGo" class="primary" type="button">はじめる</button>
       <button id="ariaQuit" class="ghost" type="button">キャンプへ戻る</button>
+    </div>
+  </div>
+  <div id="forgeOv" class="ariaov" hidden>
+    <canvas id="forgeCv" aria-label="鍛冶の打ち込み"></canvas>
+    <div id="forgePanel" class="panel ariapanel" role="dialog" aria-modal="true" aria-labelledby="forgeTitle" hidden>
+      <h2 id="forgeTitle">ガルドの鍛冶場</h2>
+      <div id="forgeRes" class="ariares"></div>
+      <button id="forgeAgain" class="primary" type="button">もう一度</button>
+      <button id="forgeBack" class="ghost" type="button">装備画面へ戻る</button>
     </div>
   </div>
   <div id="fishOv" class="ariaov" hidden>

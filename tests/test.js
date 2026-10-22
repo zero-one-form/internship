@@ -716,6 +716,29 @@ const assert = (c, msg) => { if (!c) { errors.push('ASSERT FAIL: ' + msg); conso
     assert(G.mainDone(), 'reaching B21 completes it');
     Object.assign(q, q0); G.prog.deep = d0;
   }
+  // forging minigame (enhance with timing strikes)
+  {
+    G.enterMap(0, null); frames(3); G.paused = false;
+    const pl = G.player; pl.dead = false; pl.x = G.SPAWN.x; pl.y = G.SPAWN.y;
+    const it = G.genItem(20, 2, 'sword'); it.plus = 4; G.prog.inv.push(it); G.prog.gold = 1e7;
+    G.forgeOpen(it);
+    assert(G.FG.on && G.paused && !$('forgeOv').hidden, 'the forge opens for an item at camp');
+    G.FG.pos = 0.9; G.forgeHit(); G.FG.pos = G.forgeZone(it).good * 0.8; G.forgeHit(); G.FG.pos = 0; G.forgeHit();
+    assert(G.FG.hits.join() === '0,1,2' && Math.abs(G.forgeBonus(G.FG.hits) - 0.15) < 1e-9, 'MISS / GOOD / PERFECT strikes add 0% / 5% / 10%');
+    G.FG.pos = 0; G.forgeHit(); assert(G.FG.hits.length === 3, 'only three strikes per forging');
+    const p0 = it.plus, g0 = G.prog.gold;
+    G.forgeResolve();
+    assert(G.prog.gold < g0 && !$('forgePanel').hidden && /強化/.test($('forgeRes').textContent), 'the forging result is shown and paid for');
+    // three perfect strikes always succeed
+    const p1 = it.plus; G.forgeClose(false); G.forgeOpen(it);
+    for (let k = 0; k < 3; k++) { G.FG.pos = 0; G.forgeHit(); }
+    G.forgeResolve();
+    assert(it.plus >= p1 + 1 && /会心/.test($('forgeRes').textContent), 'three PERFECT strikes guarantee the enhancement');
+    G.FG.pos = 0; for (let i = 0; i < 40; i++) G.forgeStep(0.05);
+    G.forgeClose(false);
+    assert(!G.FG.on && !G.paused, 'leaving the forge resumes the game');
+    G.prog.inv.splice(G.prog.inv.indexOf(it), 1);
+  }
   // fishing minigame
   {
     G.enterMap(0, null); frames(3); G.paused = false;

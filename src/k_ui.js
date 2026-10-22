@@ -203,6 +203,7 @@
     const eb = elBtn(it.plus >= 10 ? '強化は最大' : '強化 +' + (it.plus + 1) + '（' + cost + 'G・' + Math.round(enhanceRate(it) * 100) + '%）', 'ghost small', () => enhance(it));
     eb.disabled = it.plus >= 10 || !camp || prog.gold < cost;
     acts.append(eb);
+    if (it.plus < 10) { const fb = elBtn('打ち込みで強化（成功率UP）', 'ghost small', () => { closeSheet(); forgeOpen(it); }); fb.disabled = eb.disabled; acts.append(fb); }
     if (inInv) { const sb = elBtn('売る（' + sellPrice(it) + 'G）', 'ghost small', () => sell(it)); sb.disabled = !!it.lock; acts.append(sb); }
     box.append(acts);
     if (!camp) box.append(elP('ith', '強化はキャンプの焚き火のそばでできる（失敗しても壊れない）'));
