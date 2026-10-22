@@ -68,6 +68,19 @@
     stella: ['古い星図', 'わあ！ この星座、はじめて見た！ ありがとう！']
   };
   const GIFT_AFF = 15;
+  // costumes: a second gold sink. Worn outfits show on cards, cut-ins, the HUD button and in the field;
+  // story talks keep the usual outfit because they need every expression.
+  const COSTUMES = { yukata: { name: '夏祭りの浴衣', price: 3000000 } };
+  function heroWear(id) { const S = heroS(id); return S.wear && (S.cos || []).includes(S.wear) ? S.wear : ''; }
+  function buyCostume(id, c) {
+    const S = heroS(id), C = COSTUMES[c];
+    if (!S.j || !C || (S.cos || []).includes(c)) return false;
+    if (prog.gold < C.price) { toast('ゴールドが足りない（' + C.price.toLocaleString() + 'G）'); return false; }
+    prog.gold -= C.price; S.cos = (S.cos || []).concat(c); S.wear = c;
+    toast(HEROINES[id].name + 'の「' + C.name + '」を手に入れた！'); sfx('legend'); save();
+    return true;
+  }
+  function setWear(id, c) { heroS(id).wear = c; const b = $('heroBtn'); if (b) b.dataset.id = ''; save(); }
   function giftCost(id) { return 10000 * Math.pow(affLv(id) + 1, 2); }
   function giveGift(id) {
     const S = heroS(id), c = giftCost(id);
@@ -461,8 +474,9 @@
     else { g.fillStyle = '#ffe28a'; g.beginPath(); g.arc(7 * s, -40 * s + bob, 1.8 * s, 0, TAU); g.fill(); g.fillRect(8.4 * s, -46 * s + bob, 0.9 * s, 6 * s); }
     g.restore();
   }
-  function drawBust(g, id, w, h, expr) {
-    const im = heroArt(id + '_bust_' + (expr || 'normal')) || heroArt(id + '_bust_normal');
+  function drawBust(g, id, w, h, expr, dressed) {
+    const wear = dressed && heroWear(id);
+    const im = (wear && heroArt(id + '_' + wear)) || heroArt(id + '_bust_' + (expr || 'normal')) || heroArt(id + '_bust_normal');
     g.clearRect(0, 0, w, h);
     if (im) { const k = Math.min(w / im.naturalWidth, h / im.naturalHeight); g.drawImage(im, (w - im.naturalWidth * k) / 2, h - im.naturalHeight * k, im.naturalWidth * k, im.naturalHeight * k); }
     else drawHeroinePH(g, id, w / 2, h * 0.98, h / 50, 0.3, false, expr);
@@ -557,7 +571,7 @@
     if (x0 < -60 || x0 > W + 60 || y0 < -80 || y0 > H + 60) return;
     const fl = E.hid === 'aria' ? (10 + Math.sin(E.anim * 2.4) * 3) * zoom : 0;
     ctx.fillStyle = 'rgba(0,0,0,0.3)'; ctx.beginPath(); ctx.ellipse(x0, y0, 11 * zoom, 4.5 * zoom, 0, 0, TAU); ctx.fill();
-    const im = heroArt(E.hid + '_chibi');
+    const wear = heroWear(E.hid), im = (wear && heroArt(E.hid + '_' + wear + '_chibi')) || heroArt(E.hid + '_chibi');
     if (im) {
       const hgt = 70 * zoom, wd = hgt * im.naturalWidth / im.naturalHeight;
       ctx.save(); ctx.translate(x0, y0 - fl); if (E.faceLeft) ctx.scale(-1, 1); ctx.drawImage(im, -wd / 2, -hgt, wd, hgt); ctx.restore();
@@ -636,7 +650,7 @@
     $('cutinName').textContent = H.ult;
     $('cutinWho').textContent = H.name;
     el.style.setProperty('--cc', H.col);
-    const cv = $('cutinCv'); drawBust(cv.getContext('2d'), id, cv.width, cv.height, 'smile');
+    const cv = $('cutinCv'); drawBust(cv.getContext('2d'), id, cv.width, cv.height, 'smile', true);
     el.hidden = false; el.classList.remove('on'); void el.offsetWidth; el.classList.add('on');
     addSlowMo(0.7);
     setTimeout(() => { el.hidden = true; el.classList.remove('on'); }, 1200);
@@ -730,10 +744,16 @@
         cv.style.filter = 'brightness(0)'; cv.style.opacity = '0.35';
         info.append(elP('qg', '？？？'), elP('qr', '物語を進めると出会える'));
       } else {
-        drawBust(cv.getContext('2d'), id, cv.width, cv.height, 'smile');
+        drawBust(cv.getContext('2d'), id, cv.width, cv.height, 'smile', true);
         info.append(elP('qg', H.name + '　' + H.title), elP('qh', '好感度 Lv' + affLv(id) + (affLv(id) < AFF_MAX ? '（次まで ' + (AFF_STEP - S.aff % AFF_STEP) + '）' : '（最大）') + '　奥義 ' + Math.floor(S.ult / ULT_NEED * 100) + '%'), elP('qr', H.d), elP('qr', '奥義「' + H.ult + '」：' + H.ultD));
         const acts = document.createElement('div'); acts.className = 'ita';
         if (affLv(id) < AFF_MAX) acts.append(elBtn('贈り物：' + GIFTS[id][0] + '（' + giftCost(id).toLocaleString() + 'G）', 'ghost small', () => { if (giveGift(id)) renderPets(); }));
+        for (const c in COSTUMES) {
+          if (!window.__HEROINE_ART || !window.__HEROINE_ART[id + '_' + c]) continue;
+          const own = (S.cos || []).includes(c), on = heroWear(id) === c;
+          acts.append(own ? elBtn(on ? 'いつもの服に戻す' : COSTUMES[c].name + 'を着る', 'ghost small', () => { setWear(id, on ? '' : c); renderPets(); })
+            : elBtn(COSTUMES[c].name + '（' + COSTUMES[c].price.toLocaleString() + 'G）', 'ghost small', () => { if (buyCostume(id, c)) renderPets(); }));
+        }
         const tk = talkReady(id);
         if (tk) acts.append(elBtn('話す（新しい話）', 'primary small', () => { closeSheet(); playScene(tk[0]); }));
         const isOut = heroOut().includes(id);
@@ -752,7 +772,7 @@
     if (!id) { if (!b.hidden) b.hidden = true; return; }
     if (b.hidden) b.hidden = false;
     const pct = heroS(id).ult / ULT_NEED;
-    if (b.dataset.id !== id) { b.dataset.id = id; const cv = $('heroBtnCv'); drawBust(cv.getContext('2d'), id, cv.width, cv.height, 'normal'); b.setAttribute('aria-label', HEROINES[id].name + 'の奥義「' + HEROINES[id].ult + '」'); }
+    if (b.dataset.id !== id) { b.dataset.id = id; const cv = $('heroBtnCv'); drawBust(cv.getContext('2d'), id, cv.width, cv.height, 'normal', true); b.setAttribute('aria-label', HEROINES[id].name + 'の奥義「' + HEROINES[id].ult + '」'); }
     b.style.setProperty('--ult', String(pct));
     b.classList.toggle('ready', pct >= 1);
   }

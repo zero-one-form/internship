@@ -37,6 +37,6 @@
     $('petDlg').hidden = false;
     const c = $('petCv'), g = c.getContext('2d');
     g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, c.width, c.height);
-    if (who) drawBust(g, who, c.width, c.height, 'smile');
+    if (who) drawBust(g, who, c.width, c.height, 'smile', true);
     sfx('quest');
   }

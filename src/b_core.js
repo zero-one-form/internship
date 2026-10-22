@@ -488,7 +488,7 @@
         prog.ach = Array.isArray(s.ach) ? s.ach.filter((id) => ACH_IDS.includes(id)) : [];
         prog.title = ACH_IDS.includes(s.title) ? s.title : '';
         { const hh = s.heroines && typeof s.heroines === 'object' ? s.heroines : {}; prog.heroines = {};
-          for (const id of HERO_IDS) { const h = hh[id] && typeof hh[id] === 'object' ? hh[id] : {}; prog.heroines[id] = { j: !!h.j, aff: num(h.aff, 0, 0, 1e6), seen: Array.isArray(h.seen) ? h.seen.filter((k) => typeof k === 'string' && SCENES[k]) : [], out: h.out !== false, ult: num(h.ult, 0, 0, ULT_NEED) }; }
+          for (const id of HERO_IDS) { const h = hh[id] && typeof hh[id] === 'object' ? hh[id] : {}; prog.heroines[id] = { j: !!h.j, aff: num(h.aff, 0, 0, 1e6), seen: Array.isArray(h.seen) ? h.seen.filter((k) => typeof k === 'string' && SCENES[k]) : [], out: h.out !== false, ult: num(h.ult, 0, 0, ULT_NEED), cos: Array.isArray(h.cos) ? h.cos.filter((c, i, A) => COSTUMES[c] && A.indexOf(c) === i) : [], wear: typeof h.wear === 'string' && COSTUMES[h.wear] ? h.wear : '' }; }
           prog.story = Array.isArray(s.story) ? s.story.filter((k) => typeof k === 'string' && SCENES[k]) : []; }
         prog.memo = Array.isArray(s.memo) ? s.memo.filter((c, i, A) => typeof c === 'string' && Object.values(MEMO).includes(c) && A.indexOf(c) === i) : [];
         for (const k in MEMO) if (prog.story.includes(k) && !prog.memo.includes(MEMO[k])) prog.memo.push(MEMO[k]); // saves from before the fragments existed

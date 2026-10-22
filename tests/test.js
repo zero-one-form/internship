@@ -724,6 +724,14 @@ const assert = (c, msg) => { if (!c) { errors.push('ASSERT FAIL: ' + msg); conso
     assert(G.giveGift('mina') && G.prog.gold === g0 - c0 && S.aff === 15, 'a gift costs gold and raises affection by half a level');
     G.giveGift('mina');
     assert(G.affLv('mina') === 1 && G.giftCost('mina') === 4 * c0, 'gifts get pricier as affection grows');
+    G.prog.gold = 2e6;
+    assert(!G.buyCostume('mina', 'yukata') && G.heroWear('mina') === '', 'a costume needs enough gold');
+    G.prog.gold = 4e6;
+    assert(G.buyCostume('mina', 'yukata') && G.prog.gold === 1e6 && G.heroWear('mina') === 'yukata', 'buying a costume puts it on');
+    G.setWear('mina', ''); assert(G.heroWear('mina') === '', 'the usual outfit can be worn again');
+    G.setWear('mina', 'yukata'); G.save(); G.prog.heroines = null; G.load();
+    assert(G.heroWear('mina') === 'yukata', 'owned and worn costumes survive a reload');
+    G.heroS('aria').wear = 'yukata'; assert(G.heroWear('aria') === '', 'an unowned costume cannot be worn');
     G.prog.gold = 0; const a0 = S.aff;
     assert(!G.giveGift('mina') && S.aff === a0, 'no gift without enough gold');
     const L = G.loginState(); L.last = 0; L.n = 0; G.loginChecked = false; G.prog.potions = 0;
