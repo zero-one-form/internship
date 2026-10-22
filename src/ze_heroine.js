@@ -670,7 +670,7 @@
     if (talkCur || paused || player.dead || !$('intro').hidden || OP.on || transit) return;
     const seen = storySeen(), q = qState();
     const once = (k, cond) => { if (!seen.includes(k) && !talkQ.includes(k) && cond) playScene(k); };
-    once('mina_join', q.main >= MAINQ.length && curMap === 0 && inCamp(player.x, player.y));
+    once('mina_join', q.main >= MAINQ_MINA && curMap === 0 && inCamp(player.x, player.y));
     if (curMap === 3 && !WB.on) {
       once('aria_voice', curFloor >= 11 && heroJoined('mina'));
       once('karen_meet', curFloor >= 13 && heroJoined('mina'));

@@ -32,7 +32,7 @@
     paused = true;
     $('petTitle').textContent = 'ログインボーナス ' + n + '日目';
     $('petLine').textContent = '今日の贈り物：' + (R[2] ? R[0] + ' ' + R[2]() : R[0]);
-    $('petDesc').textContent = LOGIN_DAYS.map((x, k) => (k === i ? '▶' : k < i ? '✓' : '・') + (k + 1) + '日目 ' + x[0]).join('　') + (who ? '　' + HEROINES[who].name + '「また明日も、来てね」' : '');
+    $('petDesc').textContent = LOGIN_DAYS.map((x, k) => (k === i ? '▶' : k < i ? '✓' : '・') + (k + 1)).join(' ') + '（7日目はレジェンド装備）' + (who ? '　' + HEROINES[who].name + '「また明日も、来てね」' : '');
     $('petOk').textContent = '受け取る';
     $('petDlg').hidden = false;
     const c = $('petCv'), g = c.getContext('2d');

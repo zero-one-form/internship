@@ -704,6 +704,16 @@ const assert = (c, msg) => { if (!c) { errors.push('ASSERT FAIL: ' + msg); conso
     assert(G.heroJoined('mina') && G.affLv('mina') === 3 && G.storySeen().includes('aria_join'), 'heroine progress survives a reload');
     G.qState().main = q0; G.enterMap(0, null); frames(3); G.paused = false;
   }
+  // main story requests continue every ten floors after Mina joins
+  {
+    const q = G.qState(), q0 = { main: q.main, ma: q.ma, mn: q.mn }, d0 = G.prog.deep;
+    assert(G.MAINQ.length === 14 && G.MAINQ.slice(10).map((m) => m.goal.n).join() === '21,31,41,50', 'four more main requests lead to B20, B30, B40 and B50');
+    q.main = 10; q.ma = true; q.mn = false; G.prog.deep = 20;
+    assert(!G.mainDone(), 'the B20 request is not done before reaching B21');
+    G.prog.deep = 21;
+    assert(G.mainDone(), 'reaching B21 completes it');
+    Object.assign(q, q0); G.prog.deep = d0;
+  }
   // gifts (gold sink) and the login bonus
   {
     G.enterMap(0, null); frames(3); G.paused = false;

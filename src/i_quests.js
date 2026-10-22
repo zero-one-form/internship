@@ -11,8 +11,14 @@
     { title: '深淵の入口', story: '森の北の門は「深淵の回廊」へ通じているわ。B3Fまで潜って、無事に戻ってきて。', goal: { t: 'floor', n: 3 }, rew: { item: 2, exp: 600 } },
     { title: '最初の番人', story: 'B5Fには番人がいると聞いたわ。あなたなら越えられるはず。', goal: { t: 'floor', n: 6 }, rew: { item: 3, gold: 1000, exp: 1200 } },
     { title: '鍛えし刃', story: '鍛冶屋のガルドが、腕のいい冒険者を探しているの。装備を+5まで鍛えてみて。', goal: { t: 'plus', n: 5 }, rew: { gold: 1500, exp: 1500 } },
-    { title: '深淵の底へ', story: 'これが私からの最後の依頼。B10Fの番人を越えて、その先を見てきて。', goal: { t: 'floor', n: 11 }, rew: { item: 3, gold: 3000, exp: 4000 } }
+    { title: '深淵の底へ', story: 'これが私からの最後の依頼。B10Fの番人を越えて、その先を見てきて。', goal: { t: 'floor', n: 11 }, rew: { item: 3, gold: 3000, exp: 4000 } },
+    // after Mina joins the party, Toma runs the desk (GDD §6-2: one story beat every ten floors)
+    { title: '歌の聞こえる場所', story: '受付代理のトマです！ ミーナさんから伝言です。「B20Fの先で、歌が待っている」……だそうです。行ってみてください！', goal: { t: 'floor', n: 21 }, rew: { item: 3, gold: 30000, exp: 20000 } },
+    { title: '墓所の石板', story: 'B30Fに古い石板があるって、古文書に書いてありました！ 読めたら……ボクにも教えてくださいね？', goal: { t: 'floor', n: 31 }, rew: { item: 3, gold: 80000, exp: 50000 } },
+    { title: '歌守りの言い伝え', story: 'ミーナさんの家の言い伝えに「四十の門」っていうのがあるんです。B40Fの先、きっと何かあります！', goal: { t: 'floor', n: 41 }, rew: { item: 3, gold: 150000, exp: 80000 } },
+    { title: '最後の一節', story: 'これがボクからの……いいえ、ギルドからの最後の依頼です。B50F、深淵の底へ。みんなで、帰ってきてください！', goal: { t: 'floor', n: 50 }, rew: { item: 3, gold: 300000, exp: 120000 } }
   ];
+  const MAINQ_MINA = 10; // Mina joins once the first ten (her own) requests are done
   const NPCS = [
     { role: 'quest', name: 'ギルド受付 ミーナ', key: 'npc_mina', base: 'hero_arcane', tint: '#9fe6d8', dx: 2.6, dy: 0.4 },
     { role: 'shop', name: '行商ゴブリン トマ', key: 'goblin', base: 'goblin', dx: 0.6, dy: 2.7 },
@@ -76,10 +82,11 @@
     if (r.exp) gainExp(r.exp);
     save();
   }
+  function deskName() { return heroJoined('mina') ? '受付' : 'ミーナ'; }
   function checkNotify() {
     const q = qState();
-    if (q.ma && mainDone() && !q.mn) { q.mn = true; toast('依頼達成！ミーナに報告しよう'); sfx('quest'); }
-    for (const b of q.act) if (bountyDone(b) && !b.nt) { b.nt = true; toast('掲示板の依頼を達成！ミーナに報告しよう'); }
+    if (q.ma && mainDone() && !q.mn) { q.mn = true; toast('依頼達成！' + deskName() + 'に報告しよう'); sfx('quest'); }
+    for (const b of q.act) if (bountyDone(b) && !b.nt) { b.nt = true; toast('掲示板の依頼を達成！' + deskName() + 'に報告しよう'); }
   }
   function questKill(e) {
     const q = qState(), M = MAINQ[q.main];
