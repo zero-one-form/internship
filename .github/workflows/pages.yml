@@ -1,10 +1,9 @@
 name: Deploy to GitHub Pages
 
-# Publishes dist/site (the PWA build) to https://zero-one-form.github.io/internship/
-# One-time setup: Settings > Pages > Build and deployment > Source: "GitHub Actions".
+# Publishes dist/site (the PWA build) to GitHub Pages. Manual only (Actions > Run workflow):
+# the game is shared privately via Cloudflare Pages instead (docs/DEPLOY.md), and the GitHub Pages
+# URL would show the account name. One-time setup if used: Settings > Pages > Source: "GitHub Actions".
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 permissions:
