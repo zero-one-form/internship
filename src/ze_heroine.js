@@ -96,7 +96,7 @@
   // scenes: [speaker, expression, text]; speaker '' = narration, '?' = an unseen voice
   const SCENES = {
     mina_join: [
-      ['mina', 'normal', 'おかえりなさい。B10Fの番人、本当に越えたのね'],
+      ['mina', 'normal', 'B10Fの番人、本当に越えたのね。……噂を聞いて、居ても立ってもいられなかったの'],
       ['mina', 'smile', '……決めたわ。受付はトマに任せる。私も一緒に行く'],
       ['', '', 'トマが「えっ、ボクが!?」と声を上げた。ガルドは黙って、ミーナの杖に油を差した。'],
       ['mina', 'sad', 'あなたの歌が、底へ呼ばれている気がするの。ひとりで行かせたくない'],
@@ -532,13 +532,17 @@
   function storySeen() { if (!Array.isArray(prog.story)) prog.story = []; return prog.story; }
   function heroJoined(id) { return heroS(id).j; }
   function heroOut() { return HERO_IDS.filter((id) => heroS(id).j && heroS(id).out !== false).slice(0, HERO_MAX_OUT); }
+  // each heroine's meeting and joining scenes, and the floor she joins on
+  const HERO_ARC = [['aria', ['aria_voice', 'aria_meet', 'aria_join'], 20], ['karen', ['karen_meet', 'karen_join'], 14], ['setsuna', ['setsuna_meet', 'setsuna_join'], 18], ['riko', ['riko_meet', 'riko_join'], 23],
+    ['nefi', ['nefi_meet', 'nefi_join'], 28], ['yuzu', ['yuzu_meet', 'yuzu_join'], 33], ['luna', ['luna_meet', 'luna_join'], 38], ['shion', ['shion_meet', 'shion_join'], 43], ['stella', ['stella_meet', 'stella_join'], 48]];
+  function heroArc(id) { if (id === 'mina') return ['mina_join']; const a = HERO_ARC.find((x) => x[0] === id); return a ? a[1].filter((k) => k !== 'aria_voice') : []; }
   // a new heroine always comes along; if the party is full, the longest-serving one (never Mina) takes a rest
-  function heroJoin(id) {
+  function heroJoin(id, quiet) {
     const S = heroS(id); S.j = true; S.out = true;
     const others = HERO_IDS.filter((x) => x !== id && heroS(x).j && heroS(x).out !== false), joined = (x) => storySeen().indexOf(x + '_join');
     let msg = '';
     if (others.length >= HERO_MAX_OUT) { const b = others.filter((x) => x !== 'mina').sort((p, q) => joined(p) - joined(q))[0]; heroS(b).out = false; msg = HEROINES[b].name + 'は休憩へ'; }
-    toast(HEROINES[id].name + 'が仲間に！' + (msg ? '　' + msg + '（同行は3人まで）' : '')); sfx('level'); achCheck();
+    toast(HEROINES[id].name + (quiet ? 'が追いついて仲間に！（出会いの話は「仲間」タブで）' : 'が仲間に！') + (msg ? '　' + msg + '（同行は3人まで）' : '')); sfx('level'); achCheck();
   }
   function affLv(id) { return Math.min(AFF_MAX, Math.floor(heroS(id).aff / AFF_STEP)); }
   function heroPow(id) { return 1 + 0.06 * affLv(id); }
@@ -826,7 +830,18 @@
     if (talkCur || paused || player.dead || !$('intro').hidden || OP.on || transit) return;
     const seen = storySeen(), q = qState();
     const once = (k, cond) => { if (!seen.includes(k) && !talkQ.includes(k) && cond) playScene(k); };
-    once('mina_join', q.main >= MAINQ_MINA && curMap === 0 && inCamp(player.x, player.y));
+    // Mina joins after her requests, or anyway once the hero is past B10 (players who only dive never visit her desk)
+    const calm = !WB.on && !enemies.some((e) => !e.dead && (e.boss || hyp(e.x - player.x, e.y - player.y) < 8));
+    once('mina_join', (q.main >= MAINQ_MINA && curMap === 0 && inCamp(player.x, player.y)) || ((prog.deep || 0) >= 11 && calm));
+    // catch-up: heroines whose floors were passed long ago join quietly; their meeting can be replayed from the companion tab
+    if (heroJoined('mina') && !talkQ.length) {
+      for (const [id, keys, f] of HERO_ARC) {
+        if (heroJoined(id) || (prog.deep || 0) < f + 3) continue;
+        for (const k of keys) { if (!seen.includes(k)) seen.push(k); memoGain(k); }
+        heroJoin(id, true);
+        break;
+      }
+    }
     // epilogue: back at camp after the ending
     if (prog.cleared > 0 && curMap === 0 && inCamp(player.x, player.y) && heroJoined('mina')) {
       once('epi_name', true);
@@ -885,6 +900,7 @@
             : elBtn(COSTUMES[c].name + '（' + COSTUMES[c].price.toLocaleString() + 'G）', 'ghost small', () => { if (buyCostume(id, c)) renderPets(); }));
         }
         if (affLv(id) >= AFF_MAX && SCENES['date_' + id]) acts.append(elBtn(storySeen().includes('date_' + id) ? '夏祭りの思い出をもう一度' : '夏祭りに誘う（特別な会話）', 'primary small', () => { closeSheet(); playScene('date_' + id); }));
+        acts.append(elBtn('出会いの話を見る', 'ghost small', () => { closeSheet(); for (const k of heroArc(id)) playScene(k); }));
         const tk = talkReady(id);
         if (tk) acts.append(elBtn('話す（新しい話）', 'primary small', () => { closeSheet(); playScene(tk[0]); }));
         const isOut = heroOut().includes(id);

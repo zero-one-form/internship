@@ -41,6 +41,7 @@ const assert = (c, msg) => { if (!c) { errors.push('ASSERT FAIL: ' + msg); conso
   assert(G, 'test hook exists');
   assert(!$('intro').hidden && G.paused, 'intro shown and paused at first launch');
   $('startBtn').click();
+  G.storySeen().push('mina_join'); // keep heroine story scenes out of the combat tests (the heroine section below resets this)
   assert($('intro').hidden && !G.paused, 'start button closes intro and unpauses');
   frames(30);
   assert(G.enemies.length >= 30, 'enemies spawned: ' + G.enemies.length);
@@ -802,6 +803,21 @@ const assert = (c, msg) => { if (!c) { errors.push('ASSERT FAIL: ' + msg); conso
     assert(G.fishState().got.koi > 0, 'the fish record survives a reload');
     G.fishClose();
     assert(!G.FS.on && !G.paused, 'leaving the pond resumes the game');
+  }
+  // heroines for players who never visit Mina's desk: she joins past B10, skipped heroines catch up
+  {
+    const skip = () => { let n = 0; while (G.talkCur && n++ < 60) G.talkAdvance(); };
+    const h0 = JSON.stringify(G.prog.heroines), s0 = G.storySeen().slice(), d0 = G.prog.deep, q0 = G.qState().main;
+    G.prog.heroines = null; G.prog.story = []; G.qState().main = 0; G.prog.deep = 35;
+    G.enterMap(0, null); frames(3); G.paused = false; const pl = G.player; pl.dead = false; pl.x = G.SPAWN.x; pl.y = G.SPAWN.y;
+    G.heroTick(1);
+    assert(G.talkCur === 'mina_join', 'Mina joins once the hero is past B10 even without her requests');
+    skip();
+    for (let k = 0; k < 12; k++) { G.heroTick(1); skip(); }
+    const joined = Object.keys(G.HEROINES).filter((id) => G.heroJoined(id));
+    assert(['aria', 'karen', 'setsuna', 'riko', 'nefi'].every((id) => G.heroJoined(id)) && !G.heroJoined('yuzu'), 'heroines from floors already passed catch up; later ones still wait for their floor (' + joined.join() + ')');
+    assert(G.memoList().includes('ゆ'), 'catch-up also hands over the memory fragment of a skipped scene');
+    G.prog.heroines = JSON.parse(h0); G.prog.story = s0; G.prog.deep = d0; G.qState().main = q0;
   }
   // gifts (gold sink) and the login bonus
   {
