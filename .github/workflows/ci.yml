@@ -18,13 +18,14 @@ jobs:
         with:
           python-version: '3.12'
       - run: npm ci
-      - name: Build single-file HTML
+      - run: pip install pillow
+      - name: Build single-file HTML and the Pages site
         run: python3 build.py
       - name: Syntax check
         run: node --check dist/game_only.js
       - name: No duplicate function names across modules
         run: node tools/lint_dupes.js
-      - name: Size budget (16MB)
+      - name: Size budget (16MB, single-file artifact only; the Pages site has no limit)
         run: |
           size=$(stat -c%s dist/twinsoul.html)
           echo "dist/twinsoul.html = $size bytes"
@@ -34,4 +35,6 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: twinsoul-html
-          path: dist/twinsoul.html
+          path: |
+            dist/twinsoul.html
+            dist/site

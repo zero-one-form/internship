@@ -108,6 +108,13 @@ docs/             設計書・ロードマップ・QA計画
 - 書き込めるのは共有設定で「投稿者(Contributor)」以上の人。公開リンクで来た組織外の人は閲覧のみ、未サインインはオフライン動作。
 - db にはトランザクションも加算命令もないため、共有HPは「各自の累計ダメージを自分のドキュメントに書く → 全員分を読んで合計」で計算している。
 
+## 6-2. GitHub Pages 版（スマホのホーム画面に置けるPWA）
+- `python3 build.py` が `dist/site/` も作る。中身は1ファイル版と同じゲームで、画像・データは別ファイル（容量の上限なし）。`manifest.webmanifest`・アイコン・`sw.js`（オフライン用の事前キャッシュ。デプロイのたびに版が変わる）つき。
+- `.github/workflows/pages.yml` が **main への push** で `https://zero-one-form.github.io/internship/` に公開する。初回だけ GitHub の Settings → Pages → Source を「GitHub Actions」にする。
+- オンライン機能（共闘ボス・ランキング）は claude.ai の仕組みで動いているため、Pages 版では自動でオフライン表示になる（ほかはすべて遊べる）。使うなら Firebase などへの置き換えが必要。
+- ローカル確認：`cd dist/site && python3 -m http.server 8765` → `SNAP_URL=http://localhost:8765/ node tools/snap.js shots`
+- リポジトリと Pages は**誰でも見られる**。実在の人物の名前・似顔絵（`yuya_*`）と主題歌は、公開前に本人・権利者の了承を取ること。
+
 ## 7. テスト
 - `tests/test.js` は jsdom 上でゲームを起動し、`window.__TEST__ = true` で有効になる `window.__G`（d_ui.js）経由で約200項目を検査する。最後の行が `ERRORS: 0` なら合格。実行時間は約2分。
 - `window.__TEST__` のときは、起動時のオープニングと上位職の自動選択画面を出さない。

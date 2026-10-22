@@ -6,7 +6,7 @@ const path = require('path');
 const puppeteer = require('puppeteer-core');
 const OUT = path.resolve(process.argv[2] || 'shots');
 const W = +process.argv[3] || 390, H = +process.argv[4] || 844;
-const HTML = 'file://' + path.join(__dirname, '..', 'dist', 'twinsoul.html');
+const HTML = process.env.SNAP_URL || ('file://' + path.join(__dirname, '..', 'dist', 'twinsoul.html'));
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
 async function browserPath() {
