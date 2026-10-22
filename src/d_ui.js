@@ -68,6 +68,9 @@
     p.clearRect(0, 0, w, h);
     p.fillStyle = rad(p, w * 0.45, h * 0.3, w * 0.8, player.form === 'blade' ? [[0, '#4b5a96'], [1, '#141834']] : [[0, '#4a3a9a'], [1, '#120e34']]);
     p.fillRect(0, 0, w, h);
+    // after the ending, the helmet comes off: the portrait shows who the traveller really was
+    const me = prog.cleared > 0 && heroArt('yuya_bust_normal');
+    if (me) { const iw = me.naturalWidth, s0 = iw * 0.62; p.drawImage(me, (iw - s0) / 2, me.naturalHeight * 0.02, s0, s0, 0, 0, w, h); return; }
     const fr = E.anims.stance.fr[6][0];
     const sz = Math.min(44, fr[2], fr[3]);
     const sx = clamp(fr[0] + fr[4] - sz / 2, fr[0], fr[0] + fr[2] - sz), sy = clamp(fr[1] + fr[5] - 112, fr[1], fr[1] + fr[3] - sz);

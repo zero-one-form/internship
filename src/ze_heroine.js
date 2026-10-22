@@ -429,6 +429,7 @@
   function heroArtPreload() { for (const k in (window.__HEROINE_ART || {})) heroArt(k); }
   function heroArtLoaded() {
     if (talkCur) talkShow();
+    drawPortrait();
     const b = $('heroBtn'); if (b) b.dataset.id = '';
   }
   // placeholder: a simple chibi drawn in code with each heroine's palette

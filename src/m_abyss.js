@@ -136,7 +136,7 @@
     return false;
   }
   function finalVictory(e) {
-    prog.cleared = (prog.cleared || 0) + 1;
+    prog.cleared = (prog.cleared || 0) + 1; drawPortrait();
     const nxRank = rankUnlock();
     for (let k = 0; k < 3; k++) {
       const it = genItem(e.lvl + 4, 3);

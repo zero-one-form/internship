@@ -97,6 +97,7 @@
     for (const a of END.anims) { try { a.cancel(); } catch (e) { /* ignore */ } }
     for (const p of END.parts) p.fadeOn = true;
     $('endName').classList.add('on');
+    $('endHero').classList.add('on');
     $('endMys').classList.add('on');
     $('endFin').classList.add('on');
     $('endBtn').hidden = false;
@@ -106,7 +107,8 @@
     END = { done, skip: false, timers: [], anims: [], closed: false, parts: [], rate: window.__endRate || 1 };
     const ov = $('ending');
     $('endTitle').textContent = '';
-    for (const id of ['endName', 'endMys', 'endFin']) $(id).classList.remove('on');
+    for (const id of ['endName', 'endMys', 'endFin', 'endHero']) $(id).classList.remove('on');
+    { const src = window.__HEROINE_ART && window.__HEROINE_ART.yuya_bust_normal, im = $('endHero'); if (src && !im.getAttribute('src')) im.src = src; }
     $('endBtn').hidden = true; $('endSkip').hidden = false;
     ov.hidden = false; paused = true;
     AU.force = 'ending';
@@ -194,6 +196,7 @@
     await endWait(2900);
     if (!END || END.skip) return;
     ne.classList.add('on');
+    $('endHero').classList.add('on'); // the face behind the name: the traveller himself
     for (const p of END.parts) p.fadeOn = true;
     await endWait(2600);
     if (!END || END.skip) return;
