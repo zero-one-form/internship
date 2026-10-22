@@ -788,6 +788,10 @@ const assert = (c, msg) => { if (!c) { errors.push('ASSERT FAIL: ' + msg); conso
     G.setWear('mina', 'yukata'); G.save(); G.prog.heroines = null; G.load();
     assert(G.heroWear('mina') === 'yukata', 'owned and worn costumes survive a reload');
     G.heroS('aria').wear = 'yukata'; assert(G.heroWear('aria') === '', 'an unowned costume cannot be worn');
+    S.aff = 300; G.playScene('date_mina'); let dn = 0; while (G.talkCur && dn++ < 20) G.talkAdvance();
+    assert(G.storySeen().includes('date_mina') && G.prog.ach.includes('date'), 'a max-affection heroine can be taken to the summer festival (and it earns a title)');
+    assert(Object.keys(G.HEROINES).every((id) => G.SCENES['date_' + id]), 'every heroine has a festival date');
+    S.aff = 30;
     G.prog.gold = 0; const a0 = S.aff;
     assert(!G.giveGift('mina') && S.aff === a0, 'no gift without enough gold');
     const L = G.loginState(); L.last = 0; L.n = 0; G.loginChecked = false; G.prog.potions = 0;

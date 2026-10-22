@@ -373,6 +373,67 @@
       ['stella', 'normal', 'あなたの星、ずっと探してたんだ。空のどこにもなくて'],
       ['stella', 'smile', 'わかった。あなたの星は、ここにあったんだね。……みんなの真ん中に']
     ],
+    date_mina: [
+      ['', '', '森のキャンプに、季節外れの提灯が並んだ。トマが「夏祭りです！」と言い張っている。'],
+      ['mina', 'yukata', 'ふふ、似合う？ ……あなたに見せたくて、ガルドに頼んで仕立ててもらったの'],
+      ['mina', 'yukata', '受付をしていた頃は、お祭りの日も窓口に座ってた。みんなの「いってきます」を見送る役'],
+      ['mina', 'yukata', 'でも今日は、私が「いってきます」を言う番。……一緒に、屋台を回ってくれる？'],
+      ['', '', 'ふたりで食べたりんご飴は、ちょっとだけ甘すぎた。ミーナは「ちょうどいいわ」と笑った。']
+    ],
+    date_aria: [
+      ['aria', 'yukata', 'これ、ゆかた？ ……ひらひら、すき'],
+      ['aria', 'yukata', 'おまつりのおと、いっぱい。たいこ、わらいごえ、ふえ。……ぜんぶ、うたみたい'],
+      ['', '', 'アリアは提灯の下で小さく歌い出した。屋台の人たちが手を止めて、聞き入っている。'],
+      ['aria', 'yukata', 'あなたといると、あたらしいうたが、うまれる。……きょうのうた、あなたにあげる']
+    ],
+    date_karen: [
+      ['karen', 'yukata', 'じゃーん！ どう？ 浴衣で踊るのは初めてなんだけど、袖が邪魔で邪魔で！'],
+      ['karen', 'yukata', 'でもさ、一座のみんなとも、こうやってお祭りを回ったんだ。……ちょっと、思い出しちゃった'],
+      ['karen', 'yukata', 'よし、湿っぽいのはナシ！ 櫓の上で一曲踊るから、一番前で見てて！'],
+      ['', '', '火の粉のような提灯の光の中、カレンの舞は誰よりも楽しそうだった。']
+    ],
+    date_setsuna: [
+      ['setsuna', 'yukata', 'お、お待たせいたしました。浴衣というものは、帯を結ぶのが難しいのですね……'],
+      ['setsuna', 'yukata', 'かき氷……！ 氷を、わざわざ削って、甘い蜜をかけて食べるのですか。なんて贅沢な'],
+      ['setsuna', 'yukata', '百年眠っていた間に、世界はこんなに楽しいものを覚えていたのですね'],
+      ['setsuna', 'yukata', '……来年も、再来年も。あなたと一緒に、この季節を迎えたいです']
+    ],
+    date_riko: [
+      ['riko', 'yukata', 'ひ、人がいっぱい……！ で、でも、ホネ吉がお面をつけてたら、誰も怖がらないんです'],
+      ['riko', 'yukata', '見てください、金魚すくい！ ……あ、ホネ吉が全部すくっちゃった'],
+      ['', '', 'リコの周りに、子どもたちが集まってきた。「その骸骨、かっこいい！」'],
+      ['riko', 'yukata', 'えへへ……リコ、お祭りでこんなに笑ったの、初めてです。連れてきてくれて、ありがとう']
+    ],
+    date_nefi: [
+      ['nefi', 'yukata', 'ふわぁ……夜なのに、太陽みたいに明るいのです'],
+      ['nefi', 'yukata', '神殿のお祭りでは、砂の上に灯りを並べて、みんなで朝まで歌ったのです'],
+      ['nefi', 'yukata', 'ネフィ、今日はお昼寝しないで起きているのです。……あなたの隣で、最後まで'],
+      ['', '', '……と言いながら、ネフィは花火が始まる前に、あなたの肩で眠ってしまった。']
+    ],
+    date_yuzu: [
+      ['yuzu', 'yukata', 'べ、別に浴衣着たくて着たわけじゃないから。ミーナが無理やり着せてきたの'],
+      ['yuzu', 'yukata', 'ほら、ラムネ。冷やしておいたやつ。……アンタの分も買っといたから'],
+      ['yuzu', 'yukata', '姉さんとも、こうやってお祭りに来たかったな。……なんて、今さらだけど'],
+      ['yuzu', 'yukata', 'だからさ、来年もちゃんと生きて、また来なよ。……ツケ、払い終わるまで逃がさないって言ったでしょ']
+    ],
+    date_luna: [
+      ['luna', 'yukata', 'ふふん、紅い浴衣のルナ様、美しすぎて言葉も出ないのだわ？'],
+      ['luna', 'yukata', 'お祭りの夜は月が見えにくいのが難点なのだわ。……でも、提灯の灯りも悪くないのだわ'],
+      ['luna', 'yukata', 'お、おまえ、はぐれないように、ルナ様の袖をつかんでいてもいいのだわ。家来なのだから！'],
+      ['', '', 'ルナは袖をつかまれたまま、ずっと上機嫌だった。コウモリのクロが、やれやれと鳴いた。']
+    ],
+    date_shion: [
+      ['shion', 'yukata', '……浴衣は、鎧より落ち着かない'],
+      ['shion', 'yukata', '……ステラに、この面を選んでもらった。……狐は、守り神らしい'],
+      ['shion', 'yukata', '……昔も、誰かと祭りに来た気がする。……小さな手を、引いていた'],
+      ['shion', 'yukata', '……今日は、おまえの手を引こう。……人が多い。はぐれるな']
+    ],
+    date_stella: [
+      ['stella', 'yukata', 'わあ、空がにぎやか！ 花火って、地上の流れ星みたいだね'],
+      ['stella', 'yukata', '星読みで見えた未来、ひとつだけ外れたの。「この夏はひとりで星を見る」って出てたのに'],
+      ['stella', 'yukata', '……あなたが隣にいる。ね、未来ってちゃんと変えられるでしょ？'],
+      ['', '', 'ステラの線香花火は、最後まで落ちなかった。「いいことがある印だよ」と彼女は笑った。']
+    ],
     aria_t1: [
       ['aria', 'normal', 'ミーナのごはん、あたたかい。……あたたかい、すき'],
       ['aria', 'smile', 'あなたの剣のおと、たのしい。ちゃん、ちゃん、って']
@@ -475,7 +536,7 @@
     g.restore();
   }
   function drawBust(g, id, w, h, expr, dressed) {
-    const wear = dressed && heroWear(id);
+    const wear = expr === 'yukata' ? 'yukata' : dressed && heroWear(id); // date scenes always show the yukata
     const im = (wear && heroArt(id + '_' + wear)) || heroArt(id + '_bust_' + (expr || 'normal')) || heroArt(id + '_bust_normal');
     g.clearRect(0, 0, w, h);
     if (im) { const k = Math.min(w / im.naturalWidth, h / im.naturalHeight); g.drawImage(im, (w - im.naturalWidth * k) / 2, h - im.naturalHeight * k, im.naturalWidth * k, im.naturalHeight * k); }
@@ -687,6 +748,7 @@
   function talkDone(key) {
     if (!storySeen().includes(key)) storySeen().push(key);
     memoGain(key);
+    if (key.startsWith('date_')) { toast(HEROINES[key.slice(5)].name + 'との夏祭りの思い出ができた'); sfx('level'); achCheck(); }
     if (key === 'mina_join') { heroJoin('mina'); toast('ミーナが仲間になった！（「仲間」タブで会話できる）'); }
     for (const id of ['setsuna', 'riko', 'nefi', 'yuzu', 'luna', 'shion', 'stella']) if (key === id + '_join') heroJoin(id);
     if (key === 'karen_join') heroJoin('karen');
@@ -754,6 +816,7 @@
           acts.append(own ? elBtn(on ? 'いつもの服に戻す' : COSTUMES[c].name + 'を着る', 'ghost small', () => { setWear(id, on ? '' : c); renderPets(); })
             : elBtn(COSTUMES[c].name + '（' + COSTUMES[c].price.toLocaleString() + 'G）', 'ghost small', () => { if (buyCostume(id, c)) renderPets(); }));
         }
+        if (affLv(id) >= AFF_MAX && SCENES['date_' + id]) acts.append(elBtn(storySeen().includes('date_' + id) ? '夏祭りの思い出をもう一度' : '夏祭りに誘う（特別な会話）', 'primary small', () => { closeSheet(); playScene('date_' + id); }));
         const tk = talkReady(id);
         if (tk) acts.append(elBtn('話す（新しい話）', 'primary small', () => { closeSheet(); playScene(tk[0]); }));
         const isOut = heroOut().includes(id);

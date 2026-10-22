@@ -39,7 +39,8 @@
     ['heroes', '十人十色', 'ヒロイン10人全員を仲間にする', () => HERO_IDS.every((id) => heroJoined(id))],
     ['bond', '絆', 'ヒロインの好感度をLv10にする', () => HERO_IDS.some((id) => affLv(id) >= AFF_MAX)],
     ['yukata', '夏祭り', '浴衣を3着そろえる', () => HERO_IDS.filter((id) => (heroS(id).cos || []).includes('yukata')).length >= 3],
-    ['memo', 'その名は', '記憶のかけらを6つ集める', () => memoList().length >= MEMO_N]
+    ['memo', 'その名は', '記憶のかけらを6つ集める', () => memoList().length >= MEMO_N],
+    ['date', '夏祭りの約束', 'ヒロインと夏祭りを過ごす', () => HERO_IDS.some((id) => storySeen().includes('date_' + id))]
   ];
   const ACH_IDS = ACH.map((a) => a[0]);
   let dailyTickT = 0;
