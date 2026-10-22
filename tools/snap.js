@@ -62,7 +62,11 @@ async function browserPath() {
     ['talk_riko', (G) => { while (G.talkCur) G.talkAdvance(); G.playScene('riko_meet'); G.talkAdvance(); }],
     ['talk_setsuna', (G) => { while (G.talkCur) G.talkAdvance(); G.playScene('setsuna_meet'); G.talkAdvance(); G.talkAdvance(); }],
     ['talk_nefi', (G) => { while (G.talkCur) G.talkAdvance(); G.playScene('nefi_join'); G.talkAdvance(); }],
-    ['heroines_field', (G) => { while (G.talkCur) G.talkAdvance(); for (const id of Object.keys(G.HEROINES)) G.heroS(id).j = true; G.prog.story = Object.keys(G.SCENES); G.enterDungeon(21); G.prog.opt.auto = true; }],
+    ['talk_luna', (G) => { while (G.talkCur) G.talkAdvance(); G.playScene('luna_meet'); G.talkAdvance(); }],
+    ['talk_stella', (G) => { while (G.talkCur) G.talkAdvance(); G.playScene('stella_join'); G.talkAdvance(); G.talkAdvance(); }],
+    ['talk_yuzu', (G) => { while (G.talkCur) G.talkAdvance(); G.playScene('yuzu_meet'); G.talkAdvance(); }],
+    ['talk_shion', (G) => { while (G.talkCur) G.talkAdvance(); G.playScene('shion_join'); G.talkAdvance(); G.talkAdvance(); }],
+    ['heroines_field', (G) => { while (G.talkCur) G.talkAdvance(); for (const id of Object.keys(G.HEROINES)) { G.heroS(id).j = true; G.heroS(id).out = ['luna', 'shion', 'stella'].includes(id); } G.prog.story = Object.keys(G.SCENES); G.enterDungeon(21); G.prog.opt.auto = true; }],
     ['cutin', (G) => { G.heroS('karen').ult = 60; G.heroUlt('karen'); }],
     ['hero_tab', (G) => { G.prog.opt.auto = false; G.heroS('mina').aff = 70; G.openSheet(); G.setTab('pet'); }],
   ];

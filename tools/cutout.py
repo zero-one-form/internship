@@ -67,7 +67,7 @@ def cutout(src, name, keep_white=False):
     box = cut.getbbox()
     if box:
         cut = cut.crop(box)
-    limit = 420 if 'chibi' in name else 900
+    limit = 300 if 'chibi' in name else 640
     k = min(1.0, limit / max(cut.size))
     if k < 1:
         cut = cut.resize((round(cut.width * k), round(cut.height * k)), Image.LANCZOS)

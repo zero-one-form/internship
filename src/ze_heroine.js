@@ -31,10 +31,30 @@
       name: 'ネフィ', title: '砂の神殿の巫女', col: '#2fb8a8', hair: ['#f2d08a', '#c89a4a'], cloth: ['#f4f0e0', '#3ab8a8'], eye: '#2a9a8a',
       ult: '砂陽の祈り', ultD: 'まわりの敵に大ダメージ。10秒間 主人公はどんな攻撃でもHPが1残る',
       d: '太陽の杖から光の玉を放つ。奥義「砂陽の祈り」でピンチを耐えしのぐ'
+    },
+    yuzu: {
+      name: 'ユズ', title: '毒霧の薬師', col: '#7ccf6a', hair: ['#a8e6c0', '#5aa880'], cloth: ['#3a6a3a', '#f4ead0'], eye: '#c8d84a',
+      ult: '特製の万能薬', ultD: 'HPを40%回復し回復薬を2個補充。まわりの敵の攻撃を8秒間35%弱める',
+      d: '薬びんを投げて敵をまとめて打ち、攻撃を弱める。奥義「特製の万能薬」'
+    },
+    luna: {
+      name: 'ルナ', title: '紅月の姫君', col: '#d8344a', hair: ['#2a1a22', '#c8283a'], cloth: ['#1e1418', '#b8202e'], eye: '#e0283a',
+      ult: '紅月の宴', ultD: 'まわりの敵に大ダメージ。当てた敵1体ごとにHPを5%吸い取る（最大50%）',
+      d: '血の矢で敵を射ち、少しずつ主人公のHPを癒やす。奥義「紅月の宴」'
+    },
+    shion: {
+      name: 'シオン', title: '虚無の騎士', col: '#8a6ad8', hair: ['#d0c8e8', '#9a8ac8'], cloth: ['#2a3050', '#7a4ab8'], eye: '#4a3a9a',
+      ult: '虚空の盾', ultD: 'まわりの敵に大ダメージを与え、2.5秒間 動けなくする',
+      d: '前に立って斬り込み、同行しているだけで主人公の受けるダメージを10%減らす。奥義「虚空の盾」'
+    },
+    stella: {
+      name: 'ステラ', title: '星を読む少女', col: '#f2c94c', hair: ['#2a3a7a', '#1a2450'], cloth: ['#f4f2ff', '#1e2a5a'], eye: '#f2c94c',
+      ult: '流星群', ultD: 'まわりの敵に流れ星が10回降りそそぐ',
+      d: '敵の頭上に小さな星を落とし、まわりごと打つ。奥義「流星群」'
     }
   };
   const HERO_IDS = Object.keys(HEROINES);
-  const AFF_STEP = 30, AFF_MAX = 10, ULT_NEED = 60;
+  const AFF_STEP = 30, AFF_MAX = 10, ULT_NEED = 90, HERO_MAX_OUT = 3, HERO_DMG = 0.6, HERO_ULT = 0.7; // tuned with tools/sim.js (SIM_HEROES=1) // at most three heroines travel together
   // scenes: [speaker, expression, text]; speaker '' = narration, '?' = an unseen voice
   const SCENES = {
     mina_join: [
@@ -202,6 +222,113 @@
       ['nefi', 'normal', '古いことばで「セネブ」は「あなたが元気でありますように」という意味なのです'],
       ['nefi', 'smile', 'セネブ。……毎朝、あなたに言うことにしたのです']
     ],
+    yuzu_meet: [
+      ['', '', '毒の霧が、ある一角だけ晴れていた。湯気の立つ鍋をかき混ぜる少女がいる。'],
+      ['yuzu', 'normal', 'あー、そこ踏まないで。霧よけの薬、まいてあるから。……で、アンタたち誰？ 遭難者？'],
+      ['yuzu', 'smile', 'アタシはユズ、薬師。この霧の毒、薬の材料として優秀なんだよね。だから住んでる'],
+      ['mina', 'sad', '住んで……!? 体は大丈夫なの？'],
+      ['yuzu', 'normal', '平気平気。自分で作った解毒薬、毎朝飲んでるし。……アンタたちの顔色の方が心配だわ']
+    ],
+    yuzu_join: [
+      ['yuzu', 'normal', 'はいはい、わかった。そんなボロボロで下に行くって言うなら、ついてってあげる'],
+      ['yuzu', 'sad', '……昔、薬が間に合わなくて、助けられなかった人がいるんだ。もう、ああいうのはごめんなの'],
+      ['yuzu', 'smile', 'だから感謝しなさいよ？ 薬代はツケにしといてあげる'],
+      ['riko', 'smile', 'ゆ、ユズさんの薬、ホネ吉もぴかぴかになりました……！'],
+      ['', '', 'ユズが仲間になった。']
+    ],
+    yuzu_t1: [
+      ['yuzu', 'normal', 'トマに頼まれて「若返りの薬」作ったら、トマが子どもになりかけた。……今のは聞かなかったことに'],
+      ['yuzu', 'smile', 'ガルドのおっさんの腰痛の薬は自信作。毎晩取りに来るんだよね、あの人']
+    ],
+    yuzu_t2: [
+      ['yuzu', 'sad', '助けられなかったの、アタシの姉さん。病気でさ。アタシが薬師になったの、それから'],
+      ['yuzu', 'normal', '……アンタが無茶して帰ってくると、ちょっと腹が立つ。なんでかわかる？'],
+      ['yuzu', 'smile', 'わかんないならいい。はい、薬。飲んで']
+    ],
+    yuzu_t3: [
+      ['yuzu', 'normal', '全部終わったら、森のキャンプに薬屋を開こうと思って'],
+      ['yuzu', 'smile', '常連第一号はアンタね。……ツケ、まだ残ってるから逃がさないよ']
+    ],
+    luna_meet: [
+      ['', '', '血の色の回廊の奥、壊れた玉座の上で、少女が足をぶらぶらさせていた。'],
+      ['luna', 'normal', '無礼者！ このルナ様の回廊に、断りもなく足を踏み入れるなんて！'],
+      ['luna', 'sad', '……って、久しぶりのお客なのだわ。べ、別に寂しかったわけじゃないのだわ！'],
+      ['karen', 'smile', 'わかりやすっ'],
+      ['luna', 'smile', 'こ、この子はコウモリのクロ。わらわの……じゃなくて、ルナ様の一の家来なのだわ']
+    ],
+    luna_join: [
+      ['luna', 'normal', 'ふん。おまえたち、なかなかやるのだわ。特別に、ルナ様の家来にしてあげてもいいのだわ'],
+      ['luna', 'sad', '……ほんとはね、この回廊にずっとひとりで、誰も来なくて。紅い月を見上げてばかりいたのだわ'],
+      ['luna', 'smile', 'だから……つ、連れていきなさい！ 置いていったら、泣いちゃうのだわ！'],
+      ['setsuna', 'smile', 'ひとりの玉座の寂しさは、わたくしもよく知っています。ご一緒しましょう'],
+      ['', '', 'ルナが仲間になった。']
+    ],
+    luna_t1: [
+      ['luna', 'normal', 'ミーナのトマトスープ、悪くないのだわ。血みたいに赤くて、とってもおいしいのだわ'],
+      ['luna', 'smile', 'クロはアリアの歌が好きみたい。ルナ様の家来なのに、浮気なのだわ']
+    ],
+    luna_t2: [
+      ['luna', 'sad', '吸血鬼は、人に怖がられるもの。……ずっと、そう教えられてきたのだわ'],
+      ['luna', 'normal', 'でも、おまえはルナ様のこと、一度も怖がらなかったのだわ'],
+      ['luna', 'smile', '……ほめてあげる。頭、なでてあげてもいいのだわ']
+    ],
+    luna_t3: [
+      ['luna', 'normal', '紅い月の夜には、吸血鬼は一番大事な人の名前を呼ぶのだわ'],
+      ['luna', 'smile', 'おまえ、名前がないのでしょう？ ……だったら、思い出すまでルナ様が「家来」って呼んであげるのだわ']
+    ],
+    shion_meet: [
+      ['', '', '何もない淵に、ひとりの騎士が立っていた。剣を地に突き、誰かを待つように。'],
+      ['shion', 'normal', '……シオン。騎士だ。……それ以外は、思い出せない'],
+      ['aria', 'normal', 'あなたも、きおく、ないの？'],
+      ['shion', 'normal', '……ああ。だが、この先に行かせてはならないものがあることだけは、覚えている'],
+      ['shion', 'smile', '……おまえたちの剣は、まっすぐだ。少し、見届けさせてくれ']
+    ],
+    shion_join: [
+      ['shion', 'normal', '……決めた。おまえたちの盾になる'],
+      ['shion', 'sad', '守るべき誰かがいた気がする。顔も、名前も、思い出せないが'],
+      ['shion', 'smile', '……だから今は、目の前の仲間を守る。それで、いい'],
+      ['luna', 'smile', 'む、無口な家来が増えたのだわ。よろしくなのだわ！'],
+      ['', '', 'シオンが仲間になった。']
+    ],
+    shion_t1: [
+      ['shion', 'normal', '……ガルドに、剣の手入れを教わった。……うまい、と言われた'],
+      ['shion', 'smile', '……うれしかった。……これは、皆には言うな']
+    ],
+    shion_t2: [
+      ['shion', 'sad', '……夢を見た。小さな手を引いて、星の下を歩く夢だ'],
+      ['shion', 'normal', '……あの手が誰のものか、この淵の先で、わかる気がする']
+    ],
+    shion_t3: [
+      ['shion', 'normal', '……記憶が戻っても、戻らなくても'],
+      ['shion', 'smile', '……私は、おまえの騎士だ。……それだけは、忘れない']
+    ],
+    stella_meet: [
+      ['', '', '星が終わる場所。崩れた天文台で、少女が空のない天井を見上げていた。'],
+      ['stella', 'normal', 'あ、来た来た！ 星がね、今日あなたたちが来るって言ってたの。ステラだよ'],
+      ['shion', 'sad', '……ステラ。……その名前を、私は知っている気がする'],
+      ['stella', 'smile', 'ふふ、ほんと？ 星読みは、会う人みんなと、どこかでつながってるんだよ'],
+      ['aria', 'sad', 'このばしょ、さいごのうたの、すぐそば']
+    ],
+    stella_join: [
+      ['stella', 'normal', 'あのね、星がずっと同じことを言ってるの。「歌の終わりに、二つの魂が出会う」って'],
+      ['stella', 'sad', 'それがどういう意味か、ステラにもまだ読めないんだ。……ちょっと、こわい'],
+      ['stella', 'smile', 'だから、一緒に確かめに行く！ 最後の星まで、ちゃんと見届けるね'],
+      ['shion', 'smile', '……ステラは、私が守る。……なぜか、そう決まっている気がする'],
+      ['', '', 'ステラが仲間になった。']
+    ],
+    stella_t1: [
+      ['stella', 'normal', 'トマの今日の運勢、「大当たりの箱を開ける」だって。……トマ、すっごい顔で箱を並べてたよ'],
+      ['stella', 'smile', 'あなたの運勢？ ふふ、ナイショ。いいことだよ']
+    ],
+    stella_t2: [
+      ['stella', 'sad', '星読みって、ときどき、見たくない未来も見えちゃうの'],
+      ['stella', 'normal', 'でもね、星の光って何百年も前の光なんだよ。だから未来は、まだ変えられるの'],
+      ['stella', 'smile', '……あなたと一緒なら、きっと変えられる']
+    ],
+    stella_t3: [
+      ['stella', 'normal', 'あなたの星、ずっと探してたんだ。空のどこにもなくて'],
+      ['stella', 'smile', 'わかった。あなたの星は、ここにあったんだね。……みんなの真ん中に']
+    ],
     aria_t1: [
       ['aria', 'normal', 'ミーナのごはん、あたたかい。……あたたかい、すき'],
       ['aria', 'smile', 'あなたの剣のおと、たのしい。ちゃん、ちゃん、って']
@@ -216,7 +343,8 @@
     ]
   };
   const TALKS = { mina: [['mina_t1', 2], ['mina_t2', 5], ['mina_t3', 8]], aria: [['aria_t1', 2], ['aria_t2', 5], ['aria_t3', 8]], karen: [['karen_t1', 2], ['karen_t2', 5], ['karen_t3', 8]],
-    setsuna: [['setsuna_t1', 2], ['setsuna_t2', 5], ['setsuna_t3', 8]], riko: [['riko_t1', 2], ['riko_t2', 5], ['riko_t3', 8]], nefi: [['nefi_t1', 2], ['nefi_t2', 5], ['nefi_t3', 8]] };
+    setsuna: [['setsuna_t1', 2], ['setsuna_t2', 5], ['setsuna_t3', 8]], riko: [['riko_t1', 2], ['riko_t2', 5], ['riko_t3', 8]], nefi: [['nefi_t1', 2], ['nefi_t2', 5], ['nefi_t3', 8]],
+    yuzu: [['yuzu_t1', 2], ['yuzu_t2', 5], ['yuzu_t3', 8]], luna: [['luna_t1', 2], ['luna_t2', 5], ['luna_t3', 8]], shion: [['shion_t1', 2], ['shion_t2', 5], ['shion_t3', 8]], stella: [['stella_t1', 2], ['stella_t2', 5], ['stella_t3', 8]] };
   const HERO_E = {};
   let talkQ = [], talkCur = null, talkI = 0, talkAutoT = 0, heroAuraT = 0, heroKillN = 0;
 
@@ -227,13 +355,22 @@
   }
   function storySeen() { if (!Array.isArray(prog.story)) prog.story = []; return prog.story; }
   function heroJoined(id) { return heroS(id).j; }
-  function heroOut() { return HERO_IDS.filter((id) => heroS(id).j && heroS(id).out !== false); }
+  function heroOut() { return HERO_IDS.filter((id) => heroS(id).j && heroS(id).out !== false).slice(0, HERO_MAX_OUT); }
+  // a new heroine always comes along; if the party is full, the longest-serving one (never Mina) takes a rest
+  function heroJoin(id) {
+    const S = heroS(id); S.j = true; S.out = true;
+    const others = HERO_IDS.filter((x) => x !== id && heroS(x).j && heroS(x).out !== false), joined = (x) => storySeen().indexOf(x + '_join');
+    let msg = '';
+    if (others.length >= HERO_MAX_OUT) { const b = others.filter((x) => x !== 'mina').sort((p, q) => joined(p) - joined(q))[0]; heroS(b).out = false; msg = HEROINES[b].name + 'は休憩へ'; }
+    toast(HEROINES[id].name + 'が仲間に！' + (msg ? '　' + msg + '（同行は3人まで）' : '')); sfx('level');
+  }
   function affLv(id) { return Math.min(AFF_MAX, Math.floor(heroS(id).aff / AFF_STEP)); }
   function heroPow(id) { return 1 + 0.06 * affLv(id); }
   function heroAtkMul() { return (heroOut().includes('aria') ? 1.12 + 0.01 * affLv('aria') : 1) * (player.ariaSongT > 0 ? 1.3 : 1); }
   function heroGuard(dmg) {
     if (player.minaShieldT > 0) dmg = Math.round(dmg * 0.6);
     if (player.setsunaT > 0) dmg = Math.round(dmg * 0.7);
+    if (heroOut().includes('shion')) dmg = Math.round(dmg * 0.9);
     if (player.nefiT > 0 && dmg >= player.hp) dmg = Math.max(0, Math.ceil(player.hp) - 1); // the prayer leaves 1 HP
     return dmg;
   }
@@ -305,9 +442,9 @@
     E.anim += dt;
     if (E.map !== curMap || hyp(E.x - player.x, E.y - player.y) > 14) { E.map = curMap; E.x = player.x - 0.8 + idx * 1.6; E.y = player.y + 0.8; }
     const fight = !player.dead && !inCamp(player.x, player.y) ? nearest(player.x, player.y, 7, null) : null;
-    const back = [[-1.3, 1.1], [1.1, 1.3], [0.2, 1.9], [-1.9, 0.1], [1.9, -0.1], [-0.6, 2.5]][idx % 6];
+    const back = [[-1.3, 1.1], [1.1, 1.3], [0.2, 1.9], [-1.9, 0.1], [1.9, -0.1], [-0.6, 2.5], [1.4, 2.4], [-2.2, 1.6], [2.4, 0.9], [-1.0, -1.2]][idx % 10];
     // the dancer fights in front, inside the pack; the others stay behind the hero
-    const front = id === 'karen' && fight && hyp(fight.x - player.x, fight.y - player.y) < 5;
+    const front = (id === 'karen' || id === 'shion') && fight && hyp(fight.x - player.x, fight.y - player.y) < 5;
     const tx = front ? fight.x + (player.x - fight.x) * 0.25 : player.x + back[0] * (fight ? 1.6 : 1);
     const ty = front ? fight.y + (player.y - fight.y) * 0.25 : player.y + back[1] * (fight ? 1.6 : 1);
     const dx = tx - E.x, dy = ty - E.y, d = hyp(dx, dy), sp = Math.max(3.6, D.speed * 1.2);
@@ -315,12 +452,12 @@
     if (E.moving) { const st = Math.min(d, sp * dt); E.x += dx / d * st; E.y += dy / d * st; if (Math.abs(dx - dy) > 0.02) E.faceLeft = (dx - dy) < 0; }
     if (player.dead) return;
     E.atkT -= dt; E.sk -= dt;
-    const pw = heroPow(id) * petDmgMul();
+    const pw = heroPow(id) * petDmgMul() * HERO_DMG;
     if (id === 'mina') {
       if (player.hp < D.maxHp * 0.35 && E.sk <= 0) { E.sk = 25; player.minaShieldT = 4; addVfx({ k: 'ring', x: player.x, y: player.y, R: 1.6, c: '140,230,160', w: 6, life: 0.5 }); addText(E.x, E.y, '結界！', 'heal', 70); }
       if (E.atkT > 0) return;
       E.atkT = 1.6;
-      if (player.hp < D.maxHp * 0.85) { const amt = Math.round(D.maxHp * 0.03 * heroPow(id)); player.hp = Math.min(D.maxHp, player.hp + amt); burst(player.x, player.y, 20, 'heal', 6, 'mint', 1.2); return; }
+      if (player.hp < D.maxHp * 0.85) { const amt = Math.round(D.maxHp * 0.02 * heroPow(id)); player.hp = Math.min(D.maxHp, player.hp + amt); burst(player.x, player.y, 20, 'heal', 6, 'mint', 1.2); return; }
       if (fight) { faceE(E, fight); shots.push({ x: E.x, y: E.y, h: 36, tgt: fight, dmg: D.atk * 0.7 * pw, sp: 11, trail: [], col: 'mint' }); }
     } else if (id === 'setsuna' || id === 'nefi') {
       if (E.atkT > 0 || !fight) return;
@@ -337,6 +474,25 @@
           n++; const c0 = cur; cur = enemies.filter((e) => !e.dead && !hit.has(e) && hyp(e.x - c0.x, e.y - c0.y) < 3.5).sort((a, b) => hyp(a.x - c0.x, a.y - c0.y) - hyp(b.x - c0.x, b.y - c0.y))[0];
         }
       });
+    } else if (id === 'yuzu' || id === 'stella') {
+      if (E.atkT > 0 || !fight) return;
+      E.atkT = id === 'yuzu' ? 1.9 : 2.1; faceE(E, fight);
+      // a thrown flask / a falling star: splash damage around the target
+      const R = id === 'yuzu' ? 1.6 : 1.4;
+      for (const e of enemies) if (!e.dead && hyp(e.x - fight.x, e.y - fight.y) < R) { hitEnemy(e, D.atk * (id === 'yuzu' ? 0.7 : 0.9) * pw); if (id === 'yuzu') { e.weakT = Math.max(e.weakT || 0, 4); e.weakAmt = Math.max(e.weakAmt || 0, 0.2); } }
+      addVfx({ k: 'ring', x: fight.x, y: fight.y, R, c: id === 'yuzu' ? '140,230,110' : '255,220,120', w: 5, life: 0.4 });
+    } else if (id === 'luna') {
+      if (E.atkT > 0 || !fight) return;
+      E.atkT = 1.6; faceE(E, fight);
+      shots.push({ x: E.x, y: E.y, h: 36, tgt: fight, dmg: D.atk * 0.85 * pw, sp: 13, trail: [], col: 'red', ctx: { dmg: 1, crit: 0, leech: 0, el: null } });
+      if (player.hp < D.maxHp) player.hp = Math.min(D.maxHp, player.hp + D.maxHp * 0.01);
+    } else if (id === 'shion') {
+      if (E.atkT > 0 || !fight) return;
+      const t = enemies.filter((e) => !e.dead && hyp(e.x - E.x, e.y - E.y) < 2.2)[0];
+      if (!t) return;
+      E.atkT = 1.4; faceE(E, t);
+      hitEnemy(t, D.atk * 1.0 * pw); if (!t.dead && !t.boss) t.stunT = Math.max(t.stunT || 0, 0.3);
+      addVfx({ k: 'ring', x: t.x, y: t.y, R: 1, c: '170,140,255', w: 5, life: 0.3 });
     } else if (id === 'karen') {
       if (E.atkT > 0 || !fight) return;
       E.atkT = player.karenDanceT > 0 ? 0.9 : 1.8;
@@ -364,7 +520,7 @@
       const hgt = 70 * zoom, wd = hgt * im.naturalWidth / im.naturalHeight;
       ctx.save(); ctx.translate(x0, y0 - fl); if (E.faceLeft) ctx.scale(-1, 1); ctx.drawImage(im, -wd / 2, -hgt, wd, hgt); ctx.restore();
     } else drawHeroinePH(ctx, E.hid, x0, y0 - fl, 1.25 * zoom, E.anim, E.faceLeft, 'normal');
-    emis.push([{ aria: 'violet', karen: 'warm', setsuna: 'cyan', riko: 'violet', nefi: 'gold' }[E.hid] || 'mint', x0, y0 - fl - 30 * zoom, 26 * zoom, 0.25]);
+    emis.push([{ aria: 'violet', karen: 'warm', setsuna: 'cyan', riko: 'violet', nefi: 'gold', yuzu: 'lime', luna: 'red', shion: 'violet', stella: 'gold' }[E.hid] || 'mint', x0, y0 - fl - 30 * zoom, 26 * zoom, 0.25]);
   }
   function heroOnKill(e) {
     const out = heroOut();
@@ -385,28 +541,47 @@
       player.hp = Math.min(D.maxHp, player.hp + D.maxHp * 0.6); player.minaShieldT = 6;
       addVfx({ k: 'pillar', x: player.x, y: player.y, c: '140,230,160', life: 1 }); burst(player.x, player.y, 20, 'heal', 30, 'mint', 2);
     } else if (id === 'setsuna') {
-      withEl('ice', () => { for (const e of enemies) if (!e.dead && hyp(e.x - player.x, e.y - player.y) < 6) hitEnemy(e, D.atk * 4.5 * heroPow(id)); });
+      withEl('ice', () => { for (const e of enemies) if (!e.dead && hyp(e.x - player.x, e.y - player.y) < 6) hitEnemy(e, D.atk * 4.5 * heroPow(id) * HERO_ULT); });
       player.setsunaT = 8;
       addVfx({ k: 'ring', x: player.x, y: player.y, R: 6, c: '150,200,255', w: 14, life: 0.8 }); addVfx({ k: 'sflash', c: '200,230,255', a: 0.3, life: 0.5 });
       addShake(8); zoomPunch(0.05);
     } else if (id === 'riko') {
-      withEl('volt', () => { for (const e of enemies) if (!e.dead && hyp(e.x - player.x, e.y - player.y) < 7) hitEnemy(e, D.atk * 4 * heroPow(id)); });
+      withEl('volt', () => { for (const e of enemies) if (!e.dead && hyp(e.x - player.x, e.y - player.y) < 7) hitEnemy(e, D.atk * 4 * heroPow(id) * HERO_ULT); });
       player.hp = Math.min(D.maxHp, player.hp + D.maxHp * 0.25);
       addVfx({ k: 'ring', x: player.x, y: player.y, R: 7, c: '180,150,255', w: 12, life: 0.8 }); burst(player.x, player.y, 20, 'heal', 24, 'violet', 2);
       addShake(8); zoomPunch(0.05);
+    } else if (id === 'yuzu') {
+      player.hp = Math.min(D.maxHp, player.hp + D.maxHp * 0.4);
+      prog.potions = Math.min(potMax(), prog.potions + 2);
+      for (const e of enemies) if (!e.dead && hyp(e.x - player.x, e.y - player.y) < 6) { e.weakT = 8; e.weakAmt = 0.35; }
+      addVfx({ k: 'ring', x: player.x, y: player.y, R: 6, c: '140,230,110', w: 12, life: 0.8 }); burst(player.x, player.y, 20, 'heal', 24, 'lime', 2);
+    } else if (id === 'luna') {
+      let n = 0;
+      for (const e of enemies) if (!e.dead && hyp(e.x - player.x, e.y - player.y) < 6) { hitEnemy(e, D.atk * 5 * heroPow(id) * HERO_ULT); n++; }
+      player.hp = Math.min(D.maxHp, player.hp + D.maxHp * Math.min(0.5, 0.05 * n));
+      addVfx({ k: 'ring', x: player.x, y: player.y, R: 6, c: '230,40,70', w: 14, life: 0.8 }); addVfx({ k: 'sflash', c: '255,80,100', a: 0.3, life: 0.5 });
+      addShake(10); zoomPunch(0.06);
+    } else if (id === 'shion') {
+      for (const e of enemies) if (!e.dead && hyp(e.x - player.x, e.y - player.y) < 5) { hitEnemy(e, D.atk * 4 * heroPow(id) * HERO_ULT); if (!e.dead) e.stunT = Math.max(e.stunT || 0, e.boss ? 1 : 2.5); }
+      addVfx({ k: 'ring', x: player.x, y: player.y, R: 5, c: '170,130,255', w: 14, life: 0.8 }); addVfx({ k: 'sflash', c: '190,160,255', a: 0.3, life: 0.5 });
+      addShake(12); zoomPunch(0.06);
+    } else if (id === 'stella') {
+      const near = enemies.filter((e) => !e.dead && hyp(e.x - player.x, e.y - player.y) < 8);
+      for (let i = 0; i < 10 && near.length; i++) { const e = near[Math.floor(Math.random() * near.length)]; if (!e.dead) { hitEnemy(e, D.atk * 2.5 * heroPow(id) * HERO_ULT); addVfx({ k: 'ring', x: e.x, y: e.y, R: 1.2, c: '255,220,120', w: 6, life: 0.5 }); } }
+      addVfx({ k: 'sflash', c: '255,240,180', a: 0.35, life: 0.6 }); addShake(10); zoomPunch(0.06);
     } else if (id === 'nefi') {
-      for (const e of enemies) if (!e.dead && hyp(e.x - player.x, e.y - player.y) < 6) hitEnemy(e, D.atk * 3.5 * heroPow(id));
+      for (const e of enemies) if (!e.dead && hyp(e.x - player.x, e.y - player.y) < 6) hitEnemy(e, D.atk * 3.5 * heroPow(id) * HERO_ULT);
       player.nefiT = 10;
       addVfx({ k: 'pillar', x: player.x, y: player.y, c: '255,220,120', life: 1.2 }); addVfx({ k: 'sflash', c: '255,230,160', a: 0.3, life: 0.5 });
       addShake(6); zoomPunch(0.05);
     } else if (id === 'karen') {
-      withEl('fire', () => { for (const e of enemies) if (!e.dead && hyp(e.x - player.x, e.y - player.y) < 6) hitEnemy(e, D.atk * 5.5 * heroPow(id)); });
+      withEl('fire', () => { for (const e of enemies) if (!e.dead && hyp(e.x - player.x, e.y - player.y) < 6) hitEnemy(e, D.atk * 5.5 * heroPow(id) * HERO_ULT); });
       player.karenDanceT = 8;
       addVfx({ k: 'ring', x: player.x, y: player.y, R: 6, c: '255,130,50', w: 14, life: 0.8 }); addVfx({ k: 'sflash', c: '255,170,90', a: 0.3, life: 0.5 });
       burst(player.x, player.y, 20, 'ember', 30, 'warm', 2);
       addShake(10); zoomPunch(0.06);
     } else {
-      withEl('volt', () => { for (const e of enemies) if (!e.dead && hyp(e.x - player.x, e.y - player.y) < 7) hitEnemy(e, D.atk * 6 * heroPow(id)); });
+      withEl('volt', () => { for (const e of enemies) if (!e.dead && hyp(e.x - player.x, e.y - player.y) < 7) hitEnemy(e, D.atk * 6 * heroPow(id) * HERO_ULT); });
       player.ariaSongT = 8;
       addVfx({ k: 'ring', x: player.x, y: player.y, R: 7, c: '200,180,255', w: 12, life: 0.8 }); addVfx({ k: 'sflash', c: '220,200,255', a: 0.3, life: 0.5 });
       addShake(10); zoomPunch(0.06);
@@ -455,10 +630,10 @@
   }
   function talkDone(key) {
     if (!storySeen().includes(key)) storySeen().push(key);
-    if (key === 'mina_join') { const S = heroS('mina'); S.j = true; S.out = true; toast('ミーナが仲間になった！（「仲間」タブで会話できる）'); sfx('level'); }
-    for (const id of ['setsuna', 'riko', 'nefi']) if (key === id + '_join') { const S = heroS(id); S.j = true; S.out = true; toast(HEROINES[id].name + 'が仲間になった！'); sfx('level'); }
-    if (key === 'karen_join') { const S = heroS('karen'); S.j = true; S.out = true; toast('カレンが仲間になった！'); sfx('level'); }
-    if (key === 'aria_join') { const S = heroS('aria'); S.j = true; S.out = true; toast('アリアが仲間になった！'); sfx('level'); }
+    if (key === 'mina_join') { heroJoin('mina'); toast('ミーナが仲間になった！（「仲間」タブで会話できる）'); }
+    for (const id of ['setsuna', 'riko', 'nefi', 'yuzu', 'luna', 'shion', 'stella']) if (key === id + '_join') heroJoin(id);
+    if (key === 'karen_join') heroJoin('karen');
+    if (key === 'aria_join') heroJoin('aria');
     for (const id of HERO_IDS) for (const [k] of TALKS[id]) if (k === key) { prog.gold += 500 * (1 + affLv(id)); heroS(id).seen.push(k); toast(HEROINES[id].name + 'との距離が縮まった（' + 500 * (1 + affLv(id)) + 'G）'); }
   }
   function talkReady(id) { const S = heroS(id); return S.j ? TALKS[id].find(([k, need]) => affLv(id) >= need && !S.seen.includes(k)) : null; }
@@ -481,6 +656,10 @@
       once('riko_join', curFloor >= 23 && seen.includes('riko_meet') && (curFloor > 23 || stairsOpen));
       once('nefi_meet', curFloor >= 27 && heroJoined('mina'));
       once('nefi_join', curFloor >= 28 && seen.includes('nefi_meet') && (curFloor > 28 || stairsOpen));
+      for (const [id, f] of [['yuzu', 32], ['luna', 37], ['shion', 42], ['stella', 47]]) {
+        once(id + '_meet', curFloor >= f && heroJoined('mina'));
+        once(id + '_join', curFloor >= f + 1 && seen.includes(id + '_meet') && (curFloor > f + 1 || stairsOpen));
+      }
       once('aria_meet', curFloor >= 15 && seen.includes('aria_voice') && (curFloor > 15 || stairsOpen));
       once('aria_join', curFloor >= 20 && seen.includes('aria_meet') && (curFloor > 20 || stairsOpen));
       once('story_b30', curFloor >= 30 && heroJoined('aria') && (curFloor > 30 || stairsOpen));
@@ -497,10 +676,10 @@
   /* ---------- companion tab section ---------- */
   function heroCards(box) {
     const head = document.createElement('div'); head.className = 'qc';
-    head.append(elP('qh', 'ヒロイン'), elP('qr', '一緒に戦うほど好感度が上がり、会話が増える。奥義ゲージがたまると右の顔のボタンで発動（AUTO中は自動）。'));
+    head.append(elP('qh', 'ヒロイン（同行 ' + heroOut().length + '/' + HERO_MAX_OUT + '人）'), elP('qr', '一緒に戦うほど好感度が上がり、会話が増える。奥義ゲージがたまると右の顔のボタンで発動（AUTO中は自動）。同行は3人まで。'));
     box.append(head);
     for (const id of HERO_IDS) {
-      const H = HEROINES[id], S = heroS(id), c = document.createElement('div'); c.className = 'qc hcard' + (S.j && S.out !== false ? ' on' : '');
+      const H = HEROINES[id], S = heroS(id), c = document.createElement('div'); c.className = 'qc hcard' + (heroOut().includes(id) ? ' on' : '');
       const cv = document.createElement('canvas'); cv.width = 160; cv.height = 200; cv.className = 'pcv hcv';
       const info = document.createElement('div');
       if (!S.j) {
@@ -513,7 +692,11 @@
         const acts = document.createElement('div'); acts.className = 'ita';
         const tk = talkReady(id);
         if (tk) acts.append(elBtn('話す（新しい話）', 'primary small', () => { closeSheet(); playScene(tk[0]); }));
-        acts.append(elBtn(S.out !== false ? '休ませる' : '連れて行く', 'ghost small', () => { S.out = S.out === false; save(); renderPets(); }));
+        const isOut = heroOut().includes(id);
+        acts.append(elBtn(isOut ? '休ませる' : '連れて行く', 'ghost small', () => {
+          if (!isOut && heroOut().length >= HERO_MAX_OUT) { toast('同行は3人まで。先に誰かを休ませてね'); return; }
+          S.out = !isOut; save(); renderPets();
+        }));
         info.append(acts);
       }
       c.append(cv, info);

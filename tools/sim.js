@@ -1,6 +1,7 @@
 // Balance bot: boots the game headlessly (jsdom, no drawing), turns on AUTO and fast-forwards game time
 // with a simple player policy. Prints a progression table and writes JSON for comparison.
 // Usage: node tools/sim.js [hours=2] [out.json] [seed]
+//   SIM_HEROES=1: start with Mina in the party so the other heroines join on their floors (the bot never visits camp for the main quests)
 const fs = require('fs');
 const path = require('path');
 const { JSDOM, VirtualConsole } = require('jsdom');
@@ -35,6 +36,7 @@ setTimeout(async () => {
   $('startBtn').click();
   G.paused = false;
   G.prog.opt.auto = true;
+  if (process.env.SIM_HEROES) { G.heroS('mina').j = true; G.storySeen().push('mina_join'); }
   const DT = 0.05, rows = [];
   let bestDeep = 0, deathsAtBest = 0, farmUntil = 0, nextShop = 600, doShop = false;
   let t = 0, nextRow = 0, deaths0 = 0, phase = 'forest', floorT = 0, lastFloor = 0;
@@ -70,6 +72,10 @@ setTimeout(async () => {
     if (!$('sheet').hidden) G.closeSheet();
     if (G.paused && $('blessDlg').hidden && $('clsDlg').hidden && !G.player.dead) G.paused = false;
     if (G.transit) { await new Promise((r) => setTimeout(r, 360)); continue; }
+    if (process.env.SIM_HEROES) { // the frame loop that drives heroines does not run headless
+      while (G.talkCur) G.talkAdvance();
+      if (!G.paused) { G.heroTick(DT); G.heroUpdate(DT); }
+    }
     G.simStep(DT); t += DT;
     if (G.curMap === 3 && G.floor !== lastFloor) { if (lastFloor) floorTimes.push({ f: lastFloor, t: Math.round(t - floorT) }); lastFloor = G.floor; floorT = t; }
     if (Math.floor(t * 20) % 100 === 0) policy();
@@ -77,12 +83,12 @@ setTimeout(async () => {
       nextRow += 300;
       const r = G.recs();
       if (process.env.DBG) console.log("DBG", JSON.stringify({ t: Math.round(t), dead: G.player.dead, paused: G.paused, deadOv: !$("dead").hidden, intro: !$("intro").hidden, map: G.curMap, tgt: !!G.player.target, path: G.player.path.length, auto: G.autoOn(), pos: [G.player.x.toFixed(1), G.player.y.toFixed(1)], hp: Math.round(G.player.hp), fl: G.floor, tb: G.player.target && !!G.player.target.boss, td: G.player.target ? +Math.hypot(G.player.target.x - G.player.x, G.player.target.y - G.player.y).toFixed(1) : -1, tobj: G.player.target && G.player.target.obj, stairs: G.stairsOpen, alive: G.enemies.filter((e) => !e.dead).length }));
-      rows.push({ min: Math.round(t / 60), lvl: G.prog.level, deep: G.prog.deep, floor: G.curMap === 3 ? G.floor : 0, gold: G.prog.gold, kills: r.kills || 0, deaths: r.deaths || 0, pots: G.prog.potions, soul: G.soul().pts, legends: r.legends || 0, clr: G.prog.cleared || 0, atk: Math.round(G.D.atk), hp: G.D.maxHp });
+      rows.push({ min: Math.round(t / 60), lvl: G.prog.level, deep: G.prog.deep, floor: G.curMap === 3 ? G.floor : 0, gold: G.prog.gold, kills: r.kills || 0, deaths: r.deaths || 0, pots: G.prog.potions, soul: G.soul().pts, legends: r.legends || 0, clr: G.prog.cleared || 0, her: G.heroOut().length, atk: Math.round(G.D.atk), hp: G.D.maxHp });
     }
   }
   const pad = (s, n) => String(s).padStart(n);
-  console.log(' min  lvl deep  fl     gold  kills dth pot soul leg clr   atk    hp');
-  for (const r of rows) console.log([pad(r.min, 4), pad(r.lvl, 4), pad(r.deep, 4), pad(r.floor, 3), pad(r.gold, 8), pad(r.kills, 6), pad(r.deaths, 3), pad(r.pots, 3), pad(r.soul, 4), pad(r.legends, 3), pad(r.clr, 3), pad(r.atk, 5), pad(r.hp, 5)].join(' '));
+  console.log(' min  lvl deep  fl     gold  kills dth pot soul leg clr her   atk    hp');
+  for (const r of rows) console.log([pad(r.min, 4), pad(r.lvl, 4), pad(r.deep, 4), pad(r.floor, 3), pad(r.gold, 8), pad(r.kills, 6), pad(r.deaths, 3), pad(r.pots, 3), pad(r.soul, 4), pad(r.legends, 3), pad(r.clr, 3), pad(r.her, 3), pad(r.atk, 5), pad(r.hp, 5)].join(' '));
   const ft = floorTimes.slice(-40);
   console.log('floor clear times (s):', ft.map((x) => 'B' + x.f + ':' + x.t).join(' '));
   console.log('sim', HOURS + 'h in', ((Date.now() - started) / 1000).toFixed(0) + 's; errors', errors.length);

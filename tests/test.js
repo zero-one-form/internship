@@ -657,31 +657,46 @@ const assert = (c, msg) => { if (!c) { errors.push('ASSERT FAIL: ' + msg); conso
     assert(G.talkCur === 'mina_join' && G.paused && !$('talkDlg').hidden, 'finishing the main quests starts Mina\'s joining scene');
     skip();
     assert(G.heroJoined('mina') && !G.paused && $('talkDlg').hidden, 'Mina joins the party after the scene');
-    for (const f of [11, 14, 16, 17, 19, 21, 22, 24, 27, 29]) { G.enterDungeon(f); frames(3); G.paused = false; G.heroTick(1); skip(); }
+    for (const f of [11, 14, 16, 17, 19, 21, 22, 24, 27, 29, 32, 34, 37, 39, 42, 44, 47, 49]) { G.enterDungeon(f); frames(3); G.paused = false; G.heroTick(1); skip(); }
     assert(G.heroJoined('aria') && ['aria_voice', 'aria_meet', 'aria_join'].every((k) => G.storySeen().includes(k)), 'Aria\'s arc plays out from B11 to B20 and she joins');
     assert(G.heroJoined('karen') && ['karen_meet', 'karen_join'].every((k) => G.storySeen().includes(k)), 'Karen is met and joins in the burning mine (B13-B14)');
     assert(['setsuna', 'riko', 'nefi'].every((id) => G.heroJoined(id) && G.storySeen().includes(id + '_meet') && G.storySeen().includes(id + '_join')), 'Setsuna (B17-18), Riko (B22-23) and Nefi (B27-28) are met and join');
-    assert(G.heroOut().length === 6 && G.heroAtkMul() > 1, 'all six heroines travel along; Aria\'s song raises attack');
+    assert(['yuzu', 'luna', 'shion', 'stella'].every((id) => G.heroJoined(id)), 'Yuzu (B32-33), Luna (B37-38), Shion (B42-43) and Stella (B47-48) join');
+    assert(G.heroOut().join() === 'mina,shion,stella', 'at most three heroines travel together; a newcomer joins and the longest-serving one (not Mina) rests');
+    const party = (ids) => { for (const id of Object.keys(G.HEROINES)) G.heroS(id).out = ids.includes(id); };
+    party(['aria', 'karen', 'riko']);
+    assert(G.heroAtkMul() > 1, 'Aria\'s song raises attack');
     {
       const k = G.heroEnt('karen'), t = G.makeTestElite(); t.maxHp = t.hp = 1e7; t.x = pl.x + 3; t.y = pl.y; k.x = t.x - 1; k.y = t.y; k.atkT = 0; k.map = G.curMap;
       G.heroUpdate(0.05);
       assert(t.hp < 1e7, 'Karen dances into the pack and burns enemies next to her');
-      G.heroS('karen').ult = 60; const hp1 = t.hp; G.heroUlt('karen');
+      G.heroS('karen').ult = 90; const hp1 = t.hp; G.heroUlt('karen');
       assert(t.hp < hp1 && pl.karenDanceT > 0, 'Karen\'s ultimate burns everything nearby and speeds up her dance');
       const t2 = G.makeTestElite(); t2.maxHp = t2.hp = 1e7; t2.x = t.x + 1.5; t2.y = t.y; const r = G.heroEnt('riko'); r.atkT = 0; r.map = G.curMap;
       const hpA = t.hp; G.heroUpdate(0.05);
       assert(t.hp < hpA && t2.hp < 1e7, 'Riko\'s ghost hops between enemies');
-      G.heroS('setsuna').ult = 60; G.heroUlt('setsuna');
+      G.heroS('setsuna').ult = 90; G.heroUlt('setsuna');
       assert(pl.setsunaT > 0 && G.heroGuard(100) === 70, 'Setsuna\'s ultimate cuts damage taken by 30%');
-      pl.setsunaT = 0; pl.minaShieldT = 0; G.heroS('nefi').ult = 60; G.heroUlt('nefi'); pl.hp = 50;
+      pl.setsunaT = 0; pl.minaShieldT = 0; G.heroS('nefi').ult = 90; G.heroUlt('nefi'); pl.hp = 50;
       assert(pl.nefiT > 0 && G.heroGuard(9999) === 49, 'Nefi\'s prayer leaves the hero with 1 HP');
-      pl.nefiT = 0; pl.hp = G.D.maxHp * 0.5; const hpR = pl.hp; G.heroS('riko').ult = 60; G.heroUlt('riko');
+      pl.nefiT = 0; pl.hp = G.D.maxHp * 0.5; const hpR = pl.hp; G.heroS('riko').ult = 90; G.heroUlt('riko');
       assert(pl.hp > hpR, 'Riko\'s ultimate heals the hero');
+      party(['mina', 'aria', 'shion']);
+      assert(G.heroGuard(100) === 90, 'Shion at your side cuts damage taken by 10%');
+      t.hp = 1e7; t.dead = false; t.x = pl.x + 1; t.y = pl.y; G.prog.potions = 0; G.heroS('yuzu').ult = 90; G.heroUlt('yuzu');
+      assert(G.prog.potions === 2 && t.weakT > 0, 'Yuzu\'s cure-all refills two potions and weakens enemies');
+      G.heroS('shion').ult = 90; G.heroUlt('shion');
+      assert(t.hp < 1e7 && t.stunT > 0, 'Shion\'s ultimate hits and stuns');
+      const hpS = t.hp; G.heroS('stella').ult = 90; G.heroUlt('stella');
+      assert(t.hp < hpS, 'Stella\'s meteor shower hits');
+      pl.hp = G.D.maxHp * 0.3; const hpL = pl.hp; G.heroS('luna').ult = 90; G.heroUlt('luna');
+      assert(pl.hp > hpL, 'Luna\'s feast drains life back to the hero');
       t.dead = true; t2.dead = true;
     }
+    party(['mina', 'aria', 'karen']);
     pl.hp = G.D.maxHp * 0.5; const hp0 = pl.hp; G.heroEnt('mina').atkT = 0; G.heroUpdate(0.05);
     assert(pl.hp > hp0, 'Mina heals the hero');
-    const e = G.makeTestElite(); e.maxHp = e.hp = 1e7; e.x = pl.x + 2; e.y = pl.y; G.heroS('aria').ult = 60;
+    const e = G.makeTestElite(); e.maxHp = e.hp = 1e7; e.x = pl.x + 2; e.y = pl.y; G.heroS('aria').ult = 90;
     G.heroUlt('aria');
     assert(e.hp < 1e7 && pl.ariaSongT > 0 && !$('cutin').hidden, 'Aria\'s ultimate hits, buffs and shows a cut-in');
     e.dead = true;
