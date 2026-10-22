@@ -133,11 +133,24 @@ High-quality anime game character illustration, cel shading, clean thin lineart,
 
 ---
 
-## 5. 今後の候補（地層ごとに1人）
+## 5. カレン（`karen`）✅
+
+**役どころ**：灼熱の坑道（B11〜B15）で踊る炎の踊り子。B13Fで出会い、B14Fで仲間になる。一座が坑道の奥で消えた理由を探している。
+**性格・口調**：勝ち気で姉御肌、照れ屋。「アタシ」「〜じゃない！」「相棒！」
+**戦い方**：前衛。敵の群れの中に飛び込み、まわりを炎で焼く。奥義「紅蓮の舞」でまわりに炎の大ダメージ、8秒間 攻撃の速さが倍。
+**見た目**：紅い髪の高いポニーテール（毛先が炎の色）、金の炎の髪飾り、琥珀色の瞳、八重歯、赤と金の踊り子衣装と透ける橙のショール。
+
+絵は `tools/art/gemini_gen.py`（Gemini API）で生成：1枚目の立ち絵を作り、残り3枚はそれを参照画像に渡して顔をそろえた。
+
+```
+[共通の画風（§0）]
+Bust portrait from chest up of a lively confident girl around 17, a fire dancer: long crimson-red hair in a high ponytail with flame-orange tips, a golden flame-shaped hair ornament, big bright amber-orange eyes, confident cheeky grin showing a small fang, red and gold dancer outfit with a flowing sheer orange shawl and gold bangles, a few small embers floating around her.
+```
+
+## 6. 今後の候補（地層ごとに1人）
 
 | 地層 | 名前（仮） | 役どころ | 元素 |
 |---|---|---|---|
-| 灼熱の坑道 | カレン | 炎の踊り子。勝ち気で姉御肌 | 炎 |
 | 氷晶の洞 | セツナ | 氷の国の姫。礼儀正しく寂しがり | 氷 |
 | 骸の納骨堂 | リコ | 気弱な死霊術師。骸骨の友だちがいる | 雷 |
 | 砂に沈んだ神殿 | ネフィ | 神殿の巫女。古代語で話すおっとり者 | 回復 |

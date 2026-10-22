@@ -659,7 +659,16 @@ const assert = (c, msg) => { if (!c) { errors.push('ASSERT FAIL: ' + msg); conso
     assert(G.heroJoined('mina') && !G.paused && $('talkDlg').hidden, 'Mina joins the party after the scene');
     for (const f of [11, 16, 21]) { G.enterDungeon(f); frames(3); G.paused = false; G.heroTick(1); skip(); }
     assert(G.heroJoined('aria') && ['aria_voice', 'aria_meet', 'aria_join'].every((k) => G.storySeen().includes(k)), 'Aria\'s arc plays out from B11 to B20 and she joins');
-    assert(G.heroOut().length === 2 && G.heroAtkMul() > 1, 'both heroines travel along; Aria\'s song raises attack');
+    assert(G.heroJoined('karen') && ['karen_meet', 'karen_join'].every((k) => G.storySeen().includes(k)), 'Karen is met and joins in the burning mine (B13-B14)');
+    assert(G.heroOut().length === 3 && G.heroAtkMul() > 1, 'all three heroines travel along; Aria\'s song raises attack');
+    {
+      const k = G.heroEnt('karen'), t = G.makeTestElite(); t.maxHp = t.hp = 1e7; t.x = pl.x + 3; t.y = pl.y; k.x = t.x - 1; k.y = t.y; k.atkT = 0; k.map = G.curMap;
+      G.heroUpdate(0.05);
+      assert(t.hp < 1e7, 'Karen dances into the pack and burns enemies next to her');
+      G.heroS('karen').ult = 60; const hp1 = t.hp; G.heroUlt('karen');
+      assert(t.hp < hp1 && pl.karenDanceT > 0, 'Karen\'s ultimate burns everything nearby and speeds up her dance');
+      t.dead = true;
+    }
     pl.hp = G.D.maxHp * 0.5; const hp0 = pl.hp; G.heroEnt('mina').atkT = 0; G.heroUpdate(0.05);
     assert(pl.hp > hp0, 'Mina heals the hero');
     const e = G.makeTestElite(); e.maxHp = e.hp = 1e7; e.x = pl.x + 2; e.y = pl.y; G.heroS('aria').ult = 60;

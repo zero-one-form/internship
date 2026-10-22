@@ -58,8 +58,9 @@ async function browserPath() {
     ['tip', (G) => { G.closeSheet(); document.getElementById('petOk').click(); G.paused = false; G.showTip(G.TIPS[3][2]); }],
     ['talk', (G) => { document.getElementById('tip').classList.remove('on'); G.enterMap(0, null); G.player.x = G.SPAWN.x; G.player.y = G.SPAWN.y; G.prog.story = []; G.heroS('mina').j = false; G.qState().main = G.MAINQ.length; G.paused = false; G.heroTick(1); G.talkAdvance(); }],
     ['talk_aria', (G) => { while (G.talkCur) G.talkAdvance(); G.playScene('aria_join'); G.talkAdvance(); G.talkAdvance(); }],
-    ['heroines_field', (G) => { while (G.talkCur) G.talkAdvance(); G.heroS('aria').j = true; G.heroS('mina').j = true; G.enterDungeon(21); G.prog.opt.auto = true; }],
-    ['cutin', (G) => { G.heroS('aria').ult = 60; G.heroUlt('aria'); }],
+    ['talk_karen', (G) => { while (G.talkCur) G.talkAdvance(); G.playScene('karen_join'); G.talkAdvance(); }],
+    ['heroines_field', (G) => { while (G.talkCur) G.talkAdvance(); G.heroS('aria').j = true; G.heroS('mina').j = true; G.heroS('karen').j = true; G.enterDungeon(21); G.prog.opt.auto = true; }],
+    ['cutin', (G) => { G.heroS('karen').ult = 60; G.heroUlt('karen'); }],
     ['hero_tab', (G) => { G.prog.opt.auto = false; G.heroS('mina').aff = 70; G.openSheet(); G.setTab('pet'); }],
   ];
   for (const [name, fn] of steps) {

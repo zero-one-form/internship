@@ -11,6 +11,11 @@
       name: 'アリア', title: '底に眠る歌', col: '#b9a6ff', hair: ['#f4f2ff', '#c6b4ff'], cloth: ['#fffaf0', '#e8c46a'], eye: '#f2c94c',
       ult: '汝の歌', ultD: 'まわりの敵すべてに雷の大ダメージ。8秒間 味方全員の攻撃 +30%',
       d: '歌で味方の攻撃を高め、音の波で敵をまとめて打つ（雷）。奥義「汝の歌」'
+    },
+    karen: {
+      name: 'カレン', title: '灼熱の踊り子', col: '#ff7a3c', hair: ['#e8443a', '#ff9a3c'], cloth: ['#d8342c', '#f2b84a'], eye: '#ffa040',
+      ult: '紅蓮の舞', ultD: 'まわりの敵すべてに炎の大ダメージ。8秒間 カレンの舞が倍の速さになる',
+      d: '前に出て敵の群れの中で舞い、炎でまとめて焼く。奥義「紅蓮の舞」'
     }
   };
   const HERO_IDS = Object.keys(HEROINES);
@@ -75,6 +80,34 @@
       ['mina', 'normal', 'あなたの名前、いつか思い出せたら、一番に教えて'],
       ['mina', 'smile', '約束よ。受付係は、名前を覚えるのが仕事なんだから']
     ],
+    karen_meet: [
+      ['', '', '熱気の向こうで、炎がくるりと回った。踊っている――燃える坑道の真ん中で、ひとりの少女が。'],
+      ['karen', 'normal', 'へえ、ここまで降りてくる物好きがいるなんてね。アタシはカレン。見てのとおり、踊り子よ'],
+      ['mina', 'sad', 'こんな場所で踊りを？ 危ないわ'],
+      ['karen', 'smile', '危ないから踊るの！ 炎ってのはね、怖がると噛みつくけど、一緒に踊れば味方になるんだから'],
+      ['karen', 'normal', '……アンタの剣、いい音してる。ちょっと先まで、見物させてもらうわ']
+    ],
+    karen_join: [
+      ['karen', 'smile', 'やるじゃない！ アンタと戦ってると、足が勝手にステップ踏んじゃう'],
+      ['karen', 'sad', '……実はね、アタシの一座、この坑道の奥で消えたの。火の神様に捧げる舞の途中で'],
+      ['karen', 'normal', 'アンタたち、もっと下まで行くんでしょ？ だったら、アタシも行く。みんなの行方、自分の目で確かめたい'],
+      ['mina', 'smile', '前に出てくれる仲間は大歓迎よ。……無茶はしないでね'],
+      ['karen', 'smile', '無茶は踊り子の特技よ！ よろしく、相棒！'],
+      ['', '', 'カレンが仲間になった。']
+    ],
+    karen_t1: [
+      ['karen', 'normal', 'ガルドのおっちゃん、アタシの腕輪を見て「いい細工だ」だって。……あの人に褒められると、なんか照れる'],
+      ['karen', 'smile', 'トマには踊りを教えてあげたの。三歩で転んだけど！']
+    ],
+    karen_t2: [
+      ['karen', 'sad', '一座のみんな、ほんとはもう……って、わかってる。わかってるけど'],
+      ['karen', 'normal', 'だから、アタシは踊り続ける。みんなの分まで、明るい舞を'],
+      ['karen', 'smile', '……アンタの前だと、湿っぽい顔しちゃうな。ナイショね']
+    ],
+    karen_t3: [
+      ['karen', 'normal', 'ねえ、全部終わったら、アタシの舞を一番前で見てよ'],
+      ['karen', 'smile', '観客はアンタひとりでいい。……なんてね！ 顔、赤いわよ？']
+    ],
     aria_t1: [
       ['aria', 'normal', 'ミーナのごはん、あたたかい。……あたたかい、すき'],
       ['aria', 'smile', 'あなたの剣のおと、たのしい。ちゃん、ちゃん、って']
@@ -88,7 +121,7 @@
       ['aria', 'normal', 'だから、あなたがわすれても、わたしが、うたってあげる']
     ]
   };
-  const TALKS = { mina: [['mina_t1', 2], ['mina_t2', 5], ['mina_t3', 8]], aria: [['aria_t1', 2], ['aria_t2', 5], ['aria_t3', 8]] };
+  const TALKS = { mina: [['mina_t1', 2], ['mina_t2', 5], ['mina_t3', 8]], aria: [['aria_t1', 2], ['aria_t2', 5], ['aria_t3', 8]], karen: [['karen_t1', 2], ['karen_t2', 5], ['karen_t3', 8]] };
   const HERO_E = {};
   let talkQ = [], talkCur = null, talkI = 0, talkAutoT = 0, heroAuraT = 0, heroKillN = 0;
 
@@ -163,7 +196,7 @@
     return E;
   }
   function heroUpdate(dt) {
-    for (const k of ['minaShieldT', 'ariaSongT']) if (player[k] > 0) player[k] = Math.max(0, player[k] - dt);
+    for (const k of ['minaShieldT', 'ariaSongT', 'karenDanceT']) if (player[k] > 0) player[k] = Math.max(0, player[k] - dt);
     const out = heroOut();
     out.forEach((id, i) => heroStep(id, heroEnt(id), i, dt));
     if (autoOn() && !paused && !player.dead) for (const id of out) if (heroS(id).ult >= ULT_NEED && nearest(player.x, player.y, 5, null)) { heroUlt(id); break; }
@@ -172,8 +205,11 @@
     E.anim += dt;
     if (E.map !== curMap || hyp(E.x - player.x, E.y - player.y) > 14) { E.map = curMap; E.x = player.x - 0.8 + idx * 1.6; E.y = player.y + 0.8; }
     const fight = !player.dead && !inCamp(player.x, player.y) ? nearest(player.x, player.y, 7, null) : null;
-    const back = idx === 0 ? [-1.3, 1.1] : [1.1, 1.3];
-    const tx = player.x + back[0] * (fight ? 1.6 : 1), ty = player.y + back[1] * (fight ? 1.6 : 1);
+    const back = [[-1.3, 1.1], [1.1, 1.3], [0.2, 1.9]][idx % 3];
+    // the dancer fights in front, inside the pack; the others stay behind the hero
+    const front = id === 'karen' && fight && hyp(fight.x - player.x, fight.y - player.y) < 5;
+    const tx = front ? fight.x + (player.x - fight.x) * 0.25 : player.x + back[0] * (fight ? 1.6 : 1);
+    const ty = front ? fight.y + (player.y - fight.y) * 0.25 : player.y + back[1] * (fight ? 1.6 : 1);
     const dx = tx - E.x, dy = ty - E.y, d = hyp(dx, dy), sp = Math.max(3.6, D.speed * 1.2);
     E.moving = d > 0.2;
     if (E.moving) { const st = Math.min(d, sp * dt); E.x += dx / d * st; E.y += dy / d * st; if (Math.abs(dx - dy) > 0.02) E.faceLeft = (dx - dy) < 0; }
@@ -186,6 +222,13 @@
       E.atkT = 1.6;
       if (player.hp < D.maxHp * 0.85) { const amt = Math.round(D.maxHp * 0.03 * heroPow(id)); player.hp = Math.min(D.maxHp, player.hp + amt); burst(player.x, player.y, 20, 'heal', 6, 'mint', 1.2); return; }
       if (fight) { faceE(E, fight); shots.push({ x: E.x, y: E.y, h: 36, tgt: fight, dmg: D.atk * 0.7 * pw, sp: 11, trail: [], col: 'mint' }); }
+    } else if (id === 'karen') {
+      if (E.atkT > 0 || !fight) return;
+      E.atkT = player.karenDanceT > 0 ? 0.9 : 1.8;
+      const hits = enemies.filter((e) => !e.dead && hyp(e.x - E.x, e.y - E.y) < 2.4);
+      if (!hits.length) { faceE(E, fight); shots.push({ x: E.x, y: E.y, h: 30, tgt: fight, dmg: D.atk * 0.7 * pw, sp: 12, trail: [], col: 'warm', ctx: { dmg: 1, crit: 0, leech: 0, el: 'fire' } }); return; }
+      withEl('fire', () => { for (const e of hits) hitEnemy(e, D.atk * 0.8 * pw); });
+      addVfx({ k: 'ring', x: E.x, y: E.y, R: 2.4, c: '255,140,60', w: 6, life: 0.4 });
     } else {
       if (E.atkT > 0 || !fight) return;
       E.atkT = 2.4;
@@ -206,7 +249,7 @@
       const hgt = 70 * zoom, wd = hgt * im.naturalWidth / im.naturalHeight;
       ctx.save(); ctx.translate(x0, y0 - fl); if (E.faceLeft) ctx.scale(-1, 1); ctx.drawImage(im, -wd / 2, -hgt, wd, hgt); ctx.restore();
     } else drawHeroinePH(ctx, E.hid, x0, y0 - fl, 1.25 * zoom, E.anim, E.faceLeft, 'normal');
-    emis.push([E.hid === 'aria' ? 'violet' : 'mint', x0, y0 - fl - 30 * zoom, 26 * zoom, 0.25]);
+    emis.push([{ aria: 'violet', karen: 'warm' }[E.hid] || 'mint', x0, y0 - fl - 30 * zoom, 26 * zoom, 0.25]);
   }
   function heroOnKill(e) {
     const out = heroOut();
@@ -226,6 +269,12 @@
     if (id === 'mina') {
       player.hp = Math.min(D.maxHp, player.hp + D.maxHp * 0.6); player.minaShieldT = 6;
       addVfx({ k: 'pillar', x: player.x, y: player.y, c: '140,230,160', life: 1 }); burst(player.x, player.y, 20, 'heal', 30, 'mint', 2);
+    } else if (id === 'karen') {
+      withEl('fire', () => { for (const e of enemies) if (!e.dead && hyp(e.x - player.x, e.y - player.y) < 6) hitEnemy(e, D.atk * 5.5 * heroPow(id)); });
+      player.karenDanceT = 8;
+      addVfx({ k: 'ring', x: player.x, y: player.y, R: 6, c: '255,130,50', w: 14, life: 0.8 }); addVfx({ k: 'sflash', c: '255,170,90', a: 0.3, life: 0.5 });
+      burst(player.x, player.y, 20, 'ember', 30, 'warm', 2);
+      addShake(10); zoomPunch(0.06);
     } else {
       withEl('volt', () => { for (const e of enemies) if (!e.dead && hyp(e.x - player.x, e.y - player.y) < 7) hitEnemy(e, D.atk * 6 * heroPow(id)); });
       player.ariaSongT = 8;
@@ -277,6 +326,7 @@
   function talkDone(key) {
     if (!storySeen().includes(key)) storySeen().push(key);
     if (key === 'mina_join') { const S = heroS('mina'); S.j = true; S.out = true; toast('ミーナが仲間になった！（「仲間」タブで会話できる）'); sfx('level'); }
+    if (key === 'karen_join') { const S = heroS('karen'); S.j = true; S.out = true; toast('カレンが仲間になった！'); sfx('level'); }
     if (key === 'aria_join') { const S = heroS('aria'); S.j = true; S.out = true; toast('アリアが仲間になった！'); sfx('level'); }
     for (const id of HERO_IDS) for (const [k] of TALKS[id]) if (k === key) { prog.gold += 500 * (1 + affLv(id)); heroS(id).seen.push(k); toast(HEROINES[id].name + 'との距離が縮まった（' + 500 * (1 + affLv(id)) + 'G）'); }
   }
@@ -292,6 +342,8 @@
     once('mina_join', q.main >= MAINQ.length && curMap === 0 && inCamp(player.x, player.y));
     if (curMap === 3 && !WB.on) {
       once('aria_voice', curFloor >= 11 && heroJoined('mina'));
+      once('karen_meet', curFloor >= 13 && heroJoined('mina'));
+      once('karen_join', curFloor >= 14 && seen.includes('karen_meet') && (curFloor > 14 || stairsOpen));
       once('aria_meet', curFloor >= 15 && seen.includes('aria_voice') && (curFloor > 15 || stairsOpen));
       once('aria_join', curFloor >= 20 && seen.includes('aria_meet') && (curFloor > 20 || stairsOpen));
       once('story_b30', curFloor >= 30 && heroJoined('aria') && (curFloor > 30 || stairsOpen));
